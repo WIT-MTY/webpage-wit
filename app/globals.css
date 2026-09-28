@@ -1,0 +1,165 @@
+@import 'tailwindcss';
+
+/*
+  WIT design tokens.
+  Everything visual on the site pulls from here, so a palette change is one edit.
+*/
+@theme {
+  --font-sans: 'Raleway Variable', 'Raleway', system-ui, sans-serif;
+  --font-display: 'Playfair Display Variable', 'Playfair Display', Georgia, serif;
+
+  --color-night: #080414;      /* page base, straight from the landing page */
+  --color-wit-deep: #47126b;   /* brand secondary, dark surfaces */
+  --color-wit-purple: #6411ad; /* brand primary */
+  --color-wit-glow: #7c22c7;   /* button gradient start */
+  --color-wit-violet: #9066d2; /* gradient light stop */
+  --color-peri: #c6c8ee;       /* periwinkle, logo + accent text */
+  --color-wit-pink: #ff5795;   /* accent only, never a large surface */
+}
+
+html {
+  background: var(--color-night);
+  color: #fff;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: rgba(198, 200, 238, 0.3);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-peri);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* ── Glass surfaces ──
+   The landing page used backdrop-filter everywhere. Over this site's smooth
+   gradient background the blur is nearly invisible but very expensive on phones,
+   so panels get the same highlight/shadow recipe without it. Only the nav keeps
+   a real backdrop blur, and only on large screens. */
+.glass {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 10px 36px rgba(0, 0, 0, 0.35);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 8px 30px rgba(0, 0, 0, 0.35);
+}
+
+.nav-glass {
+  background: rgba(14, 7, 32, 0.86);
+}
+
+/*
+  The nav used a live backdrop-filter blur. Measured on a hi-dpi screen it cost
+  ~3fps and produced visible stutter while scrolling, because the browser
+  re-blurs the strip on every frame as content moves under it. A solid
+  translucent fill looks near-identical over this background and is free.
+*/
+@media (min-width: 1024px) {
+  .nav-glass {
+    background: linear-gradient(to bottom, rgba(14, 7, 32, 0.92), rgba(14, 7, 32, 0.82));
+  }
+}
+
+/* ── Motion ── transform and opacity only, so it all stays on the compositor. */
+@keyframes float-slow {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -18px, 0) rotate(3deg); }
+}
+
+@keyframes float-medium {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -12px, 0) rotate(-2deg); }
+}
+
+@keyframes chevron-bounce {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50% { transform: translateY(6px); opacity: 0.9; }
+}
+
+@keyframes marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+.animate-rise {
+  animation: rise-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+/*
+  Ambient motion stops while scrolling or off-screen. See components/MotionGovernor.tsx.
+
+  This switches the animation OFF rather than pausing it. Measured: a paused
+  animation keeps the element on its own compositor layer, so the browser still
+  re-composites it on every scroll frame (~37fps on a hi-dpi 1920 screen).
+  Turning it off lets those layers merge back into the page and holds 60fps.
+  The cost is a sub-pixel snap when motion resumes, which is invisible next to
+  the scroll itself.
+*/
+.is-scrolling [data-ambient],
+[data-offscreen] [data-ambient] {
+  animation: none !important;
+  will-change: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Lumi's idle bob. Paused while scrolling / off-screen by MotionGovernor. */
+@keyframes lumi-bob {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -6px, 0); }
+}
+
+/* Lumi steps aside while the mobile register prompt is showing. */
+@media (max-width: 767px) {
+  html[data-register-prompt='1'] [data-lumi] {
+    display: none;
+  }
+}
