@@ -8,7 +8,7 @@ cards; the design replaces them with a countdown panel and flip cards.
 
 ## Tasks
 
-- [ ] **"Próximo evento" panel.** Blurred event photo behind, event name,
+- [x] **"Próximo evento" panel.** Blurred event photo behind, event name,
       where/when, the live registration count, and the big gradient
       "En N días". Two buttons: **Registrarme** (primary, opens
       `formUrl` in a new tab) and **Conoce más** (scrolls to that event's card).
