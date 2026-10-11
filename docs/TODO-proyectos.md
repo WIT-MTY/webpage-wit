@@ -13,7 +13,7 @@ cards; the design replaces them with a countdown panel and flip cards.
       "En N días". Two buttons: **Registrarme** (primary, opens
       `formUrl` in a new tab) and **Conoce más** (scrolls to that event's card).
       Data: `NEXT_EVENT` and `nextEvent()` in `lib/site.ts`.
-- [ ] **Three panel states** (see the states board in Figma):
+- [x] **Three panel states** (see the states board in Figma):
       1. registration open (default)
       2. `registrationOpen: false` → hide Registrarme, make Conoce más primary,
          grey dot, add a "Registro cerrado" tag

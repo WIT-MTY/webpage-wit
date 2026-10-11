@@ -99,7 +99,7 @@ export const EVENTS: WitEvent[] = [
     description:
       'Preparación y vinculación para conseguir tu primera práctica profesional: CV, entrevistas y contacto directo con empresas.',
     // TODO: paste the Journey to Internship Google Form URL here.
-    formUrl: null,
+    formUrl: null, 
     photos: [],
     metrics: [
       { value: '—', label: 'participantes' },

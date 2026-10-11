@@ -44,13 +44,51 @@ async function getRegistrationCount(url: string | null): Promise<number | null> 
   }
 }
 
+/**
+ * The three states of the "Próximo evento" panel:
+ * - open:   event announced, registration open (default)
+ * - closed: event announced, registrationOpen === false (or no form URL)
+ * - none:   NEXT_EVENT === null, or its date already passed
+ */
+type PanelState = 'open' | 'closed' | 'none'
+
+/** "Pronto" with no event or no date, "Hoy" on the day, otherwise "En N días". */
+function CountdownDisplay({ state, daysLeft }: { state: PanelState; daysLeft: number | null }) {
+  const big =
+    'm-0 bg-clip-text font-display text-[clamp(4rem,10vw,7rem)] font-extrabold leading-none text-transparent'
+
+  if (state === 'none' || daysLeft === null || daysLeft === 0) {
+    return (
+      <p className={big} style={{ backgroundImage: COUNTDOWN_GRADIENT }}>
+        {state !== 'none' && daysLeft === 0 ? 'Hoy' : 'Pronto'}
+      </p>
+    )
+  }
+
+  return (
+    <>
+      <p className="m-0 font-display text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-peri">En</p>
+      <p className={big} style={{ backgroundImage: COUNTDOWN_GRADIENT }}>
+        {daysLeft}
+      </p>
+      <p className="mt-2 mb-0 text-[15px] font-light uppercase tracking-[0.3em] text-peri/80">
+        {daysLeft === 1 ? 'día' : 'días'}
+      </p>
+    </>
+  )
+}
+
 export default async function ProyectosPage() {
   const event = nextEvent()
   const daysLeft = daysUntil(NEXT_EVENT?.date ?? null)
   // An event whose date already passed counts as "no event".
   const upcoming = event && NEXT_EVENT && (daysLeft === null || daysLeft >= 0) ? event : null
   const registrations = upcoming ? await getRegistrationCount(NEXT_EVENT?.countUrl ?? null) : null
-  const canRegister = Boolean(upcoming?.formUrl && NEXT_EVENT?.registrationOpen)
+  const state: PanelState = !upcoming
+    ? 'none'
+    : NEXT_EVENT?.registrationOpen && upcoming.formUrl
+      ? 'open'
+      : 'closed'
   const hasCard = upcoming
     ? upcoming.slug === 'hack4her' || ACTIVITIES.some((a) => a.slug === upcoming.slug)
     : false
@@ -104,8 +142,7 @@ export default async function ProyectosPage() {
           </div>
         </Container>
       </section>
-
-      {/* Próximo evento. Data: NEXT_EVENT and nextEvent() in lib/site.ts. */}
+      
       <section className="pt-10">
         <Container>
           <div className="relative isolate overflow-hidden rounded-[2rem] border border-wit-pink/25 p-8 sm:p-12 lg:p-16">
@@ -130,78 +167,83 @@ export default async function ProyectosPage() {
               ]}
             />
 
-            {upcoming ? (
-              <div className="relative grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-end">
-                <div>
-                  <MicroLabel className="mb-6 text-wit-pink/80">Próximo evento</MicroLabel>
-                  <Heading className="text-[clamp(2.6rem,6vw,4.75rem)]">{upcoming.title}</Heading>
-                  {/* Where / when */}
-                  <p className="mt-4 mb-0 text-[14px] font-light uppercase tracking-[0.2em] text-peri/85">
-                    {NEXT_EVENT?.whereWhen}
-                  </p>
-                  <p className="mt-6 mb-10 max-w-md text-[17px] font-light leading-[1.75] text-white/80">
-                    {upcoming.description}
-                  </p>
-                  <div className="flex flex-wrap gap-4">
-                    <Button href={canRegister ? upcoming.formUrl! : '#'} external={canRegister}>
-                      Registrarme ↗
-                    </Button>
-                    {hasCard && <Button href={`#${upcoming.slug}`}>Conoce más ↓</Button>}
-                  </div>
-                  {registrations !== null && (
-                    <p className="mt-6 mb-0 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[14px] font-light text-white/85 backdrop-blur-sm">
-                      <span className="relative flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-wit-pink opacity-75" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-wit-pink" />
-                      </span>
-                      <span>
-                        <strong className="font-semibold text-white">{registrations}</strong>{' '}
-                        {registrations === 1 ? 'persona registrada' : 'personas registradas'}
-                      </span>
-                    </p>
+            <div className="relative grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-end">
+              <div>
+                <div className="mb-6 flex flex-wrap items-center gap-3">
+                  <MicroLabel className="m-0 text-wit-pink/80">Próximo evento</MicroLabel>
+                  {state === 'closed' && (
+                    <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[12px] font-medium uppercase tracking-[0.2em] text-white/70">
+                      Registro cerrado
+                    </span>
                   )}
                 </div>
 
-                {/* Big gradient "En N días" */}
-                <div className="lg:text-right">
-                  {daysLeft === null || daysLeft === 0 ? (
-                    <p
-                      className="m-0 bg-clip-text font-display text-[clamp(4rem,10vw,7rem)] font-extrabold leading-none text-transparent"
-                      style={{ backgroundImage: COUNTDOWN_GRADIENT }}
-                    >
-                      {daysLeft === 0 ? 'Hoy' : 'En N días'}
+                {upcoming ? (
+                  <>
+                    <Heading className="text-[clamp(2.6rem,6vw,4.75rem)]">{upcoming.title}</Heading>
+                    {/* Where / when */}
+                    <p className="mt-4 mb-0 text-[14px] font-light uppercase tracking-[0.2em] text-peri/85">
+                      {NEXT_EVENT?.whereWhen}
                     </p>
-                  ) : (
-                    <>
-                      <p className="m-0 font-display text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-peri">En</p>
-                      <p
-                        className="m-0 bg-clip-text font-display text-[clamp(4rem,10vw,7rem)] font-extrabold leading-none text-transparent"
-                        style={{ backgroundImage: COUNTDOWN_GRADIENT }}
-                      >
-                        {daysLeft}
+                    <p className="mt-6 mb-10 max-w-md text-[17px] font-light leading-[1.75] text-white/80">
+                      {upcoming.description}
+                    </p>
+
+                    <div className="flex flex-wrap gap-4">
+                      {state === 'open' && (
+                        <Button href={upcoming.formUrl!} external>
+                          Registrarme ↗
+                        </Button>
+                      )}
+                      {hasCard && <Button href={`#${upcoming.slug}`}>Conoce más ↓</Button>}
+                      {/* Closed and no card to scroll to: don't leave the panel without an action. */}
+                      {state === 'closed' && !hasCard && instagram && (
+                        <Button href={instagram.href} external>
+                          {instagram.handle} ↗
+                        </Button>
+                      )}
+                    </div>
+
+                    {registrations !== null && (
+                      <p className="mt-6 mb-0 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[14px] font-light text-white/85 backdrop-blur-sm">
+                        <span className="relative flex h-2 w-2">
+                          {state === 'open' && (
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-wit-pink opacity-75" />
+                          )}
+                          <span
+                            className={`relative inline-flex h-2 w-2 rounded-full ${
+                              state === 'open' ? 'bg-wit-pink' : 'bg-white/40'
+                            }`}
+                          />
+                        </span>
+                        <span>
+                          <strong className="font-semibold text-white">{registrations}</strong>{' '}
+                          {registrations === 1 ? 'persona registrada' : 'personas registradas'}
+                        </span>
                       </p>
-                      <p className="mt-2 mb-0 text-[15px] font-light uppercase tracking-[0.3em] text-peri/80">
-                        {daysLeft === 1 ? 'día' : 'días'}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
-            ) : (
-              /* "No event" state, shown when NEXT_EVENT is null or its date already passed. */
-              <div className="relative">
-                <MicroLabel className="mb-6 text-wit-pink/80">Próximo evento</MicroLabel>
-                <Heading className="text-[clamp(2.2rem,5vw,3.75rem)]">Muy pronto anunciamos el siguiente</Heading>
-                <p className="mt-6 mb-10 max-w-md text-[17px] font-light leading-[1.75] text-white/80">
-                  Síguenos para enterarte primero de nuestros eventos.
-                </p>
-                {instagram && (
-                  <Button href={instagram.href} external>
-                    {instagram.handle} ↗
-                  </Button>
+                    )}
+                  </>
+                ) : (
+                  /* "No event" state: NEXT_EVENT is null or its date already passed. */
+                  <>
+                    <Heading className="text-[clamp(2.2rem,5vw,3.75rem)]">Estamos preparando lo que sigue</Heading>
+                    <p className="mt-6 mb-10 max-w-md text-[17px] font-light leading-[1.75] text-white/80">
+                      Síguenos para enterarte primero de nuestros eventos.
+                    </p>
+                    {instagram && (
+                      <Button href={instagram.href} external>
+                        {instagram.handle} ↗
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
-            )}
+
+              {/* Big gradient countdown: "En N días" / "Hoy" / "Pronto" */}
+              <div className="lg:text-right">
+                <CountdownDisplay state={state} daysLeft={daysLeft} />
+              </div>
+            </div>
           </div>
         </Container>
       </section>

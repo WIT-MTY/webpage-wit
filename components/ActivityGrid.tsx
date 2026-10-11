@@ -21,7 +21,7 @@ export default function ActivityGrid({ detailed = false }: { detailed?: boolean 
           </>
         )
         return (
-          <li key={a.title}>
+          <li key={a.title} id={detailed ? a.slug : undefined} className="scroll-mt-28">
             {detailed ? (
               <div className="glass h-full rounded-3xl p-8">{inner}</div>
             ) : (
