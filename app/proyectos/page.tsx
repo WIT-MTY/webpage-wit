@@ -31,7 +31,7 @@ function daysUntil(iso: string | null): number | null {
   return Math.round((Date.parse(targetKey) - Date.parse(dayKey(new Date()))) / 86_400_000)
 }
 
-/** Live count from the event's Apps Script, which returns { count }. Null hides the pill. */
+/** Live count from the event's Apps Script, which returns { count }. Null shows "—" in the pill. */
 async function getRegistrationCount(url: string | null): Promise<number | null> {
   if (!url) return null
   try {
@@ -89,6 +89,8 @@ export default async function ProyectosPage() {
     : NEXT_EVENT?.registrationOpen && upcoming.formUrl
       ? 'open'
       : 'closed'
+  // Green dot only when registration is open and the count actually loaded.
+  const live = state === 'open' && registrations !== null
   const hasCard = upcoming
     ? upcoming.slug === 'hack4her' || ACTIVITIES.some((a) => a.slug === upcoming.slug)
     : false
@@ -142,7 +144,8 @@ export default async function ProyectosPage() {
           </div>
         </Container>
       </section>
-      
+
+      {/* Próximo evento. Data: NEXT_EVENT and nextEvent() in lib/site.ts. States: see PanelState. */}
       <section className="pt-10">
         <Container>
           <div className="relative isolate overflow-hidden rounded-[2rem] border border-wit-pink/25 p-8 sm:p-12 lg:p-16">
@@ -204,24 +207,21 @@ export default async function ProyectosPage() {
                       )}
                     </div>
 
-                    {registrations !== null && (
-                      <p className="mt-6 mb-0 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[14px] font-light text-white/85 backdrop-blur-sm">
-                        <span className="relative flex h-2 w-2">
-                          {state === 'open' && (
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-wit-pink opacity-75" />
-                          )}
-                          <span
-                            className={`relative inline-flex h-2 w-2 rounded-full ${
-                              state === 'open' ? 'bg-wit-pink' : 'bg-white/40'
-                            }`}
-                          />
-                        </span>
-                        <span>
-                          <strong className="font-semibold text-white">{registrations}</strong>{' '}
-                          {registrations === 1 ? 'persona registrada' : 'personas registradas'}
-                        </span>
-                      </p>
-                    )}
+                    {/* Live count: "—" when there's no countUrl or the script fails. Green dot = live. */}
+                    <p className="mt-6 mb-0 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-[14px] font-light text-white/85 backdrop-blur-sm">
+                      <span className="relative flex h-2 w-2">
+                        {live && (
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                        )}
+                        <span
+                          className={`relative inline-flex h-2 w-2 rounded-full ${live ? 'bg-green-400' : 'bg-white/40'}`}
+                        />
+                      </span>
+                      <span>
+                        <strong className="font-semibold text-white">{registrations ?? '—'}</strong>{' '}
+                        {registrations === 1 ? 'persona registrada' : 'personas registradas'}
+                      </span>
+                    </p>
                   </>
                 ) : (
                   /* "No event" state: NEXT_EVENT is null or its date already passed. */

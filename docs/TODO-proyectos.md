@@ -19,7 +19,7 @@ cards; the design replaces them with a countdown panel and flip cards.
          grey dot, add a "Registro cerrado" tag
       3. `NEXT_EVENT === null` → "Estamos preparando lo que sigue", single
          Instagram button, countdown shows "Pronto"
-- [ ] **Live count.** Use `useRegistrationCount(NEXT_EVENT.countUrl)`. Shows
+- [x] **Live count.** Use `useRegistrationCount(NEXT_EVENT.countUrl)`. Shows
       "—" while loading or if it fails. Green dot = live.
 - [ ] **Event flip cards.** One card per entry in `EVENTS`. Front: category,
       title, description, photo carousel, sign-up button (only when `formUrl`
