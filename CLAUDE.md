@@ -21,6 +21,9 @@ Never hardcode content in a component if it belongs in these files.
 ## Never invent content
 No fake names, numbers, dates, sponsors or metrics, not even as filler. Leave
 placeholders or `TODO`. Only Hack4Her's "482 participantes" is a real number.
+Only these numbers are real: Hack4Her's 482 participantes, and WitCode's annual
+metrics (34 estudiantes universitarios haciendo servicio social, 92% de
+permanencia en los talleres, 5 años). Every other metric stays "—".
 
 ## Shared files: ask before editing
 `app/globals.css`, `components/ui.tsx`, `components/Nav.tsx`,
