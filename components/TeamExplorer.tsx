@@ -1,79 +1,8 @@
 'use client'
 
-import Image from 'next/image'
 import { useMemo, useState } from 'react'
-import Celestial, { celestialFor } from './Celestial'
-import { AREAS, GENERATIONS, MEMBERS, areaLabel, roleLabel, type AreaId, type Member } from '@/data/members'
-
-type Size = 'lg' | 'md' | 'sm'
-
-function Avatar({ m, size, seed }: { m: Member; size: Size; seed: string }) {
-  const px = size === 'lg' ? 104 : size === 'md' ? 84 : 68
-  return (
-    <span
-      className="relative flex shrink-0 items-center justify-center overflow-hidden rounded-full text-peri"
-      style={{
-        width: px,
-        height: px,
-        background: 'radial-gradient(circle at 32% 28%, rgba(124,34,199,0.55), rgba(45,8,90,0.9) 70%)',
-        boxShadow: '0 0 0 1px rgba(198,200,238,0.18), 0 0 30px rgba(124,34,199,0.35)',
-      }}
-    >
-      {m.photo ? (
-        <Image src={m.photo} alt="" fill sizes={`${px}px`} className="object-cover" />
-      ) : (
-        <Celestial kind={celestialFor(seed)} size={Math.round(px * 0.36)} />
-      )}
-    </span>
-  )
-}
-
-function MemberCard({
-  m,
-  seed,
-  size = 'sm',
-  onSelect,
-  highlight,
-  delay = 0,
-}: {
-  m: Member
-  seed: string
-  size?: Size
-  onSelect?: () => void
-  highlight?: boolean
-  delay?: number
-}) {
-  const body = (
-    <>
-      <Avatar m={m} size={size} seed={seed} />
-      <span className="mt-5 block font-display text-[19px] font-bold leading-tight text-white">{m.name}</span>
-      <span className="mt-1.5 block text-[14px] font-light text-white/65">{roleLabel(m)}</span>
-    </>
-  )
-
-  const cls = `glass animate-rise flex h-full w-full flex-col items-center rounded-3xl px-5 py-7 text-center ${
-    highlight ? 'border-peri/45 shadow-[0_0_40px_rgba(124,34,199,0.35)]' : ''
-  }`
-
-  if (onSelect) {
-    return (
-      <button
-        type="button"
-        onClick={onSelect}
-        className={`${cls} cursor-pointer transition-colors duration-200 hover:border-peri/40 hover:bg-white/[0.09]`}
-        style={{ animationDelay: `${delay}ms` }}
-        aria-label={`${m.name}, ${roleLabel(m)}. Ver equipo de ${areaLabel(m.area)}`}
-      >
-        {body}
-      </button>
-    )
-  }
-  return (
-    <div className={cls} style={{ animationDelay: `${delay}ms` }}>
-      {body}
-    </div>
-  )
-}
+import MemberCard from './MemberCard'
+import { AREAS, GENERATIONS, MEMBERS, areaLabel, type AreaId, type Member } from '@/data/members'
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -134,7 +63,7 @@ export default function TeamExplorer() {
         Generación {generation}, {area ? areaLabel(area) : 'todas las áreas'}: {visibleCount} integrantes
       </p>
 
-      {/* Presidency, always visible for the selected generation */}
+      {/* Presidency */}
       <div key={`lead-${generation}`} className="mx-auto mt-12 grid max-w-2xl gap-5 sm:grid-cols-2">
         {leadership.map((m, i) => (
           <MemberCard key={seed(m)} m={m} seed={seed(m)} size="lg" delay={i * 60} />
@@ -180,7 +109,10 @@ export default function TeamExplorer() {
 
             {coordinators.length > 0 ? (
               <>
-                <div className="my-8 h-10 w-px" style={{ background: 'linear-gradient(to bottom, rgba(198,200,238,0.5), transparent)' }} />
+                <div
+                  className="my-8 h-10 w-px"
+                  style={{ background: 'linear-gradient(to bottom, rgba(198,200,238,0.5), transparent)' }}
+                />
                 <ul className="m-0 flex w-full max-w-4xl list-none flex-wrap justify-center gap-4 p-0">
                   {coordinators.map((m, i) => (
                     <li key={seed(m)} className="w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)]">
