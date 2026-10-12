@@ -21,7 +21,7 @@ cards; the design replaces them with a countdown panel and flip cards.
          Instagram button, countdown shows "Pronto"
 - [x] **Live count.** Use `useRegistrationCount(NEXT_EVENT.countUrl)`. Shows
       "—" while loading or if it fails. Green dot = live.
-- [ ] **Event flip cards.** One card per entry in `EVENTS`. Front: category,
+- [x] **Event flip cards.** One card per entry in `EVENTS`. Front: category,
       title, description, photo carousel, sign-up button (only when `formUrl`
       exists), and the Impacto / Patrocinadores buttons. Backs: three metrics
       using `CountUp`, and a sponsor logo grid. Build it with

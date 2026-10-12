@@ -1,24 +1,194 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 import PageHero from '@/components/PageHero'
-import ActivityGrid from '@/components/ActivityGrid'
 import CollabCTA from '@/components/CollabCTA'
+import CountUp from '@/components/CountUp'
+import FlipCard from '@/components/FlipCard'
 import FloatingShapes from '@/components/FloatingShapes'
+import PhotoFrame from '@/components/PhotoFrame'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
-import { ACTIVITIES, HACK4HER_URL, NEXT_EVENT, SOCIALS, nextEvent } from '@/lib/site'
+import { EVENTS, HACK4HER_URL, NEXT_EVENT, SOCIALS, nextEvent, type WitEvent } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Proyectos',
-  description: 'Conferencias, Journey to Internship, talleres, Día de la Mujer y Hack4Her.',
+  description: 'Conferencias, Journey to Internship, talleres, Día de la Mujer, Hack4Her y Run4WIT.',
 }
 
-/** Re-render every minute so the countdown and the registration count stay current. */
-export const revalidate = 60
+/*
+  Rendering note: this page reads `searchParams` (the flip state below), so it
+  renders on every request. That keeps the countdown exact; the registration
+  count is still cached for 60s by its own fetch.
+*/
 
 /** Used until the event has its own photo in EVENTS[].photos. */
 const FALLBACK_PHOTO = 'https://imagenes.excelsior.com.mx/files/og_thumbnail/uploads/2026/06/10/6a29c7cf67f0c.jpeg'
 
 const COUNTDOWN_GRADIENT = 'linear-gradient(135deg, #ffffff 0%, #c4b5fd 50%, #ff5795 100%)'
+
+// ── Flip state ───────────────────────────────────────────────
+/*
+  FlipCard is controlled (it needs a `side` prop), and this is a server
+  component, so there's no useState here. The flip lives in the URL instead:
+  /proyectos?card=talleres&side=impact. Links use scroll={false} + replace, so
+  the page doesn't jump and Back doesn't replay every flip. Next keeps the DOM
+  between these navigations, so FlipCard's CSS rotation still animates.
+  One card is flipped at a time; flipping another one turns the first back.
+*/
+type Side = 'front' | 'impact' | 'sponsors'
+type Flip = { slug: string; side: Exclude<Side, 'front'> }
+type SearchParams = Record<string, string | string[] | undefined>
+
+function readFlip(sp: SearchParams): Flip | null {
+  const card = typeof sp.card === 'string' ? sp.card : null
+  const side = sp.side
+  if (!card || (side !== 'impact' && side !== 'sponsors')) return null
+  if (!EVENTS.some((e) => e.slug === card)) return null
+  return { slug: card, side }
+}
+
+function FlipLink({ slug, side, children }: { slug: string; side: Side; children: React.ReactNode }) {
+  const href = side === 'front' ? '/proyectos' : `/proyectos?card=${encodeURIComponent(slug)}&side=${side}`
+  return (
+    <Link
+      href={href}
+      scroll={false}
+      replace
+      prefetch={false}
+      className="glass-strong inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.2em] text-white/90 no-underline transition-colors duration-200 hover:bg-white/16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-peri"
+    >
+      {children}
+    </Link>
+  )
+}
+
+// ── Event card faces ─────────────────────────────────────────
+
+function CardFace({ children }: { children: React.ReactNode }) {
+  return <div className="glass flex h-full flex-col rounded-3xl p-6 sm:p-7">{children}</div>
+}
+
+/** Swipeable strip (CSS scroll-snap, no JS). With no photos it shows one PhotoFrame placeholder. */
+function PhotoStrip({ event }: { event: WitEvent }) {
+  const photos: (string | null)[] = event.photos.length ? event.photos : [null]
+  const many = photos.length > 1
+  return (
+    <div className="relative">
+      <div
+        className="flex snap-x snap-mandatory gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        {...(many ? { tabIndex: 0, role: 'region', 'aria-label': `Fotos de ${event.title}` } : {})}
+      >
+        {photos.map((src, i) => (
+          <PhotoFrame
+            key={src ?? `empty-${i}`}
+            src={src}
+            alt={`${event.title}, foto ${i + 1}`}
+            sizes="(min-width: 1024px) 340px, (min-width: 768px) 45vw, 90vw"
+            className="aspect-[4/3] w-full shrink-0 snap-center"
+          />
+        ))}
+      </div>
+      {many && (
+        <span className="pointer-events-none absolute right-3 bottom-3 rounded-full bg-black/45 px-3 py-1 text-[10px] font-light uppercase tracking-[0.2em] text-white/85 backdrop-blur-sm">
+          Desliza para ver {photos.length} fotos
+        </span>
+      )}
+    </div>
+  )
+}
+
+function EventFront({ event }: { event: WitEvent }) {
+  return (
+    <CardFace>
+      <PhotoStrip event={event} />
+      <p className="mt-6 mb-0 text-[11px] font-medium uppercase tracking-[0.3em] text-wit-pink/80">{event.category}</p>
+      <h3 className="mt-2 mb-0 font-display text-2xl font-bold text-white">{event.title}</h3>
+      <p className="mt-3 mb-0 text-[15px] font-light leading-relaxed text-white/70">{event.description}</p>
+      <div className="mt-auto flex flex-wrap gap-3 pt-7">
+        {event.formUrl && (
+          <Button href={event.formUrl} external className="w-full">
+            Registrarme ↗
+          </Button>
+        )}
+        <FlipLink slug={event.slug} side="impact">
+          Impacto
+        </FlipLink>
+        <FlipLink slug={event.slug} side="sponsors">
+          Patrocinadores
+        </FlipLink>
+      </div>
+    </CardFace>
+  )
+}
+
+function BackHeader({ event, label }: { event: WitEvent; label: string }) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <div>
+        <p className="m-0 text-[11px] font-medium uppercase tracking-[0.3em] text-wit-pink/80">{label}</p>
+        <h3 className="mt-2 mb-0 font-display text-xl font-bold text-white">{event.title}</h3>
+      </div>
+      <FlipLink slug={event.slug} side="front">
+        ← Volver
+      </FlipLink>
+    </div>
+  )
+}
+
+/** `active` remounts CountUp each time this face is shown, so the numbers count up on every flip. */
+function EventImpact({ event, active }: { event: WitEvent; active: boolean }) {
+  return (
+    <CardFace>
+      <BackHeader event={event} label="Impacto" />
+      <dl className="m-0 my-auto grid gap-5 py-8">
+        {event.metrics.map((m) => (
+          <div key={m.label} className="flex flex-col-reverse border-b border-white/10 pb-5 last:border-0 last:pb-0">
+            <dt className="mt-1 text-[13px] font-light uppercase tracking-[0.25em] text-peri/80">{m.label}</dt>
+            <dd className="m-0">
+              <CountUp
+                key={active ? 'shown' : 'hidden'}
+                value={m.value}
+                className="bg-[linear-gradient(135deg,#ffffff_0%,#c4b5fd_50%,#ff5795_100%)] bg-clip-text font-display text-[clamp(2.5rem,5vw,3.25rem)] font-extrabold leading-none text-transparent"
+              />
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </CardFace>
+  )
+}
+
+function EventSponsors({ event }: { event: WitEvent }) {
+  return (
+    <CardFace>
+      <BackHeader event={event} label="Patrocinadores" />
+      {event.sponsors.length ? (
+        <ul className="m-0 my-auto grid list-none grid-cols-2 gap-3 p-0 py-8 sm:grid-cols-3">
+          {event.sponsors.map((logo, i) => (
+            <li
+              key={`${logo ?? 'empty'}-${i}`}
+              className={`relative flex aspect-[3/2] items-center justify-center rounded-2xl ${
+                logo ? 'bg-white/[0.92]' : 'border border-dashed border-peri/35 bg-[rgba(71,18,107,0.28)]'
+              }`}
+            >
+              {logo ? (
+                <Image src={logo} alt={`Patrocinador de ${event.title}`} fill sizes="140px" className="object-contain p-4" />
+              ) : (
+                <span className="text-[10px] font-light uppercase tracking-[0.18em] text-peri/60">Logo pendiente</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="my-auto py-8 text-[15px] font-light leading-relaxed text-white/70">
+          Pronto anunciaremos a quienes hacen posible este evento.
+        </p>
+      )}
+    </CardFace>
+  )
+}
+
+// ── Próximo evento ───────────────────────
 
 /** Calendar days from today until `iso`, in Mexico City time. Null if there's no valid date. */
 function daysUntil(iso: string | null): number | null {
@@ -78,7 +248,11 @@ function CountdownDisplay({ state, daysLeft }: { state: PanelState; daysLeft: nu
   )
 }
 
-export default async function ProyectosPage() {
+// ── Page ─────────────────────────────────────────────────────
+
+export default async function ProyectosPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const flip = readFlip(await searchParams)
+
   const event = nextEvent()
   const daysLeft = daysUntil(NEXT_EVENT?.date ?? null)
   // An event whose date already passed counts as "no event".
@@ -91,10 +265,11 @@ export default async function ProyectosPage() {
       : 'closed'
   // Green dot only when registration is open and the count actually loaded.
   const live = state === 'open' && registrations !== null
-  const hasCard = upcoming
-    ? upcoming.slug === 'hack4her' || ACTIVITIES.some((a) => a.slug === upcoming.slug)
-    : false
+  // Every event in EVENTS has a flip card with id={slug}, so "Conoce más" always has a target.
+  const hasCard = upcoming ? EVENTS.some((e) => e.slug === upcoming.slug) : false
   const instagram = SOCIALS.find((s) => s.label === 'Instagram')
+  const hack4her = EVENTS.find((e) => e.slug === 'hack4her')
+  const hackHeadline = hack4her?.metrics[0]
 
   return (
     <>
@@ -109,12 +284,31 @@ export default async function ProyectosPage() {
         ]}
       />
 
+      {/* Event flip cards. One per EVENTS entry; each <li> owns the #slug anchor. */}
       <Container>
-        <ActivityGrid detailed />
+        <ul className="m-0 grid list-none gap-6 p-0 md:grid-cols-2 lg:grid-cols-3">
+          {EVENTS.map((e) => {
+            const side: Side = flip?.slug === e.slug ? flip.side : 'front'
+            return (
+              <li key={e.slug} id={e.slug} className="scroll-mt-28">
+                {/* The arbitrary variants stretch FlipCard's inner layers so cards in a row share a height. */}
+                <FlipCard
+                  side={side}
+                  className="h-full [&>div]:h-full [&>div>div:first-child]:h-full"
+                  faces={{
+                    front: <EventFront event={e} />,
+                    impact: <EventImpact event={e} active={side === 'impact'} />,
+                    sponsors: <EventSponsors event={e} />,
+                  }}
+                />
+              </li>
+            )
+          })}
+        </ul>
       </Container>
 
-      {/* Hack4Her feature. The event has its own site, so this links out. */}
-      <section id="hack4her" className="scroll-mt-28 pt-28">
+      {/* Hack4Her feature. The event has its own site, so this links out. The anchor lives on its card above. */}
+      <section className="pt-28">
         <Container>
           <div className="relative overflow-hidden rounded-[2rem] border border-wit-pink/25 p-8 sm:p-12 lg:p-16"
             style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.45) 0%, rgba(71,18,107,0.35) 45%, rgba(255,87,149,0.22) 100%)' }}
@@ -126,20 +320,25 @@ export default async function ProyectosPage() {
             />
             <div className="relative grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-end">
               <div>
-                <MicroLabel className="mb-6 text-wit-pink/80">Hackathon</MicroLabel>
-                <Heading className="text-[clamp(2.6rem,6vw,4.75rem)]">Hack4Her</Heading>
+                <MicroLabel className="mb-6 text-wit-pink/80">{hack4her?.category ?? 'Hackathon'}</MicroLabel>
+                <Heading className="text-[clamp(2.6rem,6vw,4.75rem)]">{hack4her?.title ?? 'Hack4Her'}</Heading>
                 <p className="mt-6 mb-10 max-w-md text-[17px] font-light leading-[1.75] text-white/80">
-                  Nuestro hackathon para impulsar a más mujeres en tecnología: equipos, mentoras y retos reales de la
-                  industria.
+                  {hack4her?.description}
                 </p>
-                <Button href={HACK4HER_URL ?? '#'} external={Boolean(HACK4HER_URL)}>
+                <Button href={HACK4HER_URL ?? '#hack4her'} external={Boolean(HACK4HER_URL)}>
                   Ir a Hack4Her ↗
                 </Button>
               </div>
-              <div className="lg:text-right">
-                <p className="m-0 font-display text-[clamp(4rem,10vw,7rem)] font-extrabold leading-none text-white">482</p>
-                <p className="mt-2 mb-0 text-[15px] font-light uppercase tracking-[0.3em] text-peri/80">participantes</p>
-              </div>
+              {hackHeadline && (
+                <div className="lg:text-right">
+                  <p className="m-0 font-display text-[clamp(4rem,10vw,7rem)] font-extrabold leading-none text-white">
+                    <CountUp value={hackHeadline.value} />
+                  </p>
+                  <p className="mt-2 mb-0 text-[15px] font-light uppercase tracking-[0.3em] text-peri/80">
+                    {hackHeadline.label}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </Container>
@@ -162,7 +361,7 @@ export default async function ProyectosPage() {
             )}
             <div
               className="absolute inset-0 -z-10"
-              style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.45) 0%, rgba(71,18,107,0.35) 45%, rgba(255,87,149,0.22) 100%)'  }}
+              style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.45) 0%, rgba(71,18,107,0.35) 45%, rgba(255,87,149,0.22) 100%)' }}
             />
             <FloatingShapes
               items={[
