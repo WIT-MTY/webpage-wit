@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import MemberCard from './MemberCard'
-import { AREAS, GENERATIONS, MEMBERS, areaLabel, type AreaId, type Member } from '@/data/members'
+import { AREAS, GENERATIONS, MEMBERS, areaLabel, isShown, type AreaId, type Member } from '@/data/members'
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -25,16 +25,23 @@ export default function TeamExplorer() {
   const [generation, setGeneration] = useState(GENERATIONS[0])
   const [area, setArea] = useState<AreaId | null>(null)
 
-  const gen = useMemo(() => MEMBERS.filter((m) => m.generation === generation), [generation])
+  const gen = useMemo(() => MEMBERS.filter((m) => isShown(m) && m.generation === generation), [generation])
   const leadership = gen.filter((m) => m.role === 'presidencia' || m.role === 'vicepresidencia')
   const directors = AREAS.map((a) => gen.find((m) => m.role === 'director' && m.area === a.id)).filter(Boolean) as Member[]
   const director = area ? gen.find((m) => m.role === 'director' && m.area === area) : undefined
   const coordinators = area ? gen.filter((m) => m.role === 'coordinador' && m.area === area) : []
+  // Only areas with someone to show get a chip.
+  const areas = AREAS.filter((a) => gen.some((m) => m.area === a.id))
+  const isNewest = generation === GENERATIONS[0]
 
   // Stable seed per person so their icon never changes between renders.
   const seed = (m: Member) => `${m.name}|${m.generation}|${m.role}|${m.area ?? ''}|${gen.indexOf(m)}`
 
   const visibleCount = leadership.length + (area ? (director ? 1 : 0) + coordinators.length : directors.length)
+
+  if (GENERATIONS.length === 0) {
+    return <p className="m-0 text-center text-[15px] font-light text-white/60">Pronto conocerás a nuestro equipo.</p>
+  }
 
   return (
     <div>
@@ -71,6 +78,7 @@ export default function TeamExplorer() {
       </div>
 
       {/* Area filter */}
+      {areas.length > 0 && (
       <div className="mt-16 flex flex-col items-center gap-4">
         <span className="text-[11px] uppercase tracking-[0.3em] text-peri/60" id="area-label">
           Áreas
@@ -79,13 +87,14 @@ export default function TeamExplorer() {
           <Chip active={area === null} onClick={() => setArea(null)}>
             Todas
           </Chip>
-          {AREAS.map((a) => (
+          {areas.map((a) => (
             <Chip key={a.id} active={area === a.id} onClick={() => setArea(a.id)}>
               {a.label}
             </Chip>
           ))}
         </div>
       </div>
+      )}
 
       {/* Directors grid, or one area's director + coordinators */}
       <div key={`${generation}-${area ?? 'all'}`} className="mt-12">
@@ -121,11 +130,11 @@ export default function TeamExplorer() {
                   ))}
                 </ul>
               </>
-            ) : (
+            ) : isNewest ? (
               <p className="mt-8 mb-0 text-center text-[15px] font-light text-white/55">
                 Pronto conocerás al equipo de coordinación de esta área.
               </p>
-            )}
+            ) : null}
           </div>
         )}
       </div>
