@@ -13,9 +13,10 @@ import styles from './HeroTypewriter.module.css'
   - Plays once per session. Afterwards, and under prefers-reduced-motion,
     "Tech needs you!" is written immediately, with no caret.
   - Stops while the tab is hidden and resumes where it left off.
-  - Layout: an invisible copy of the longest line ("Tech needs fewer bugs")
-    sizes the box, and on mobile the box always holds two lines, so nothing
-    around it moves.
+  - Layout: full width, centered, so the text grows from the center while
+    typing and "Tech needs you!" ends exactly centered. A fixed min-height
+    (one line on desktop, two on mobile, where it may wrap) keeps anything
+    below from moving.
 */
 
 /** Every timing in the animation, in ms. Tune here. */
@@ -53,7 +54,8 @@ const TIMING = {
 }
 
 const FINAL_TEXT = 'Tech needs you!'
-const LONGEST = 'Tech needs fewer bugs'
+/** Must match the tracking-[…] class on the line; cancels the last character's trailing spacing. */
+const TRACKING = '0.35em'
 const ONCE_KEY = 'wit-hero-typed'
 
 type Els = { prefix: HTMLSpanElement; sel: HTMLSpanElement; word: HTMLSpanElement; bang: HTMLSpanElement; caret: HTMLSpanElement }
@@ -232,20 +234,20 @@ export default function HeroTypewriter() {
     <p
       ref={rootRef}
       lang="en"
-      className="relative m-0 mb-10 min-h-[3.2em] font-light italic uppercase leading-[1.6] tracking-[0.35em] text-white/88 sm:min-h-0 sm:whitespace-nowrap"
+      className="m-0 mb-10 min-h-[3.2em] w-full text-center font-light italic uppercase leading-[1.6] tracking-[0.35em] text-white/88 sm:min-h-[1.6em] sm:whitespace-nowrap"
       style={{ fontSize: 'clamp(11px, 1.2vw, 15px)' }}
     >
       <span className="sr-only">{FINAL_TEXT}</span>
-      {/* Sizes the box: the longest line the animation ever shows. */}
-      <span className="invisible" aria-hidden="true">
-        {LONGEST}
-      </span>
-      <span className="absolute inset-0 text-left" aria-hidden="true">
-        <span ref={prefixRef} />
-        <span ref={selRef}>
-          <span ref={wordRef} />
+      <span aria-hidden="true">
+        {/* The last character's tracking sits on its right; the negative margin cancels it so the glyphs center. */}
+        <span style={{ marginRight: `-${TRACKING}` }}>
+          <span ref={prefixRef} />
+          <span ref={selRef}>
+            <span ref={wordRef} />
+          </span>
+          <span ref={bangRef} className={`${styles.bang} ${styles.accent}`} />
         </span>
-        <span ref={bangRef} className={`${styles.bang} ${styles.accent}`} />
+        {/* Zero-width box (bar drawn by a pseudo-element), so it never moves the text. */}
         <span ref={caretRef} className={`${styles.caret} ${styles.idle}`} />
       </span>
     </p>
