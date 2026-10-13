@@ -48,6 +48,9 @@ export const APPLICATIONS_OPEN: string | null = null
  */
 export const WITCODE_APPLY_URL: string | null = null
 
+/** WitCode's own Instagram (@witcode.mty), shown on /witcode. Not part of SOCIALS. */
+export const WITCODE_INSTAGRAM_URL: string | null = 'https://www.instagram.com/witcode.mty/'
+
 // ── Events ───────────────────────────────────────────────────
 
 export type EventMetric = { value: string; label: string }

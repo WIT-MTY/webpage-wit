@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import PageHero from '@/components/PageHero'
 import PhotoFrame from '@/components/PhotoFrame'
 import CollabCTA from '@/components/CollabCTA'
+import { SocialIcon } from '@/components/SocialIcon'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
-import { WITCODE_APPLY_URL, WITCODE_DESCRIPTION, WITCODE_STATS } from '@/lib/site'
+import { WITCODE_APPLY_URL, WITCODE_DESCRIPTION, WITCODE_INSTAGRAM_URL, WITCODE_STATS } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'WitCode',
@@ -59,6 +60,20 @@ export default function WitCodePage() {
               >
                 Convocatoria no abierta por ahora
               </button>
+            )}
+            {WITCODE_INSTAGRAM_URL && (
+              <Button
+                href={WITCODE_INSTAGRAM_URL}
+                external
+                variant="glass"
+                ariaLabel="Síguenos en Instagram @witcode.mty (se abre en una pestaña nueva)"
+              >
+                <SocialIcon name="Instagram" size={16} />
+                {/* One text run, so it wraps as a sentence on narrow screens. */}
+                <span>
+                  Síguenos en Instagram <span className="normal-case tracking-normal">@witcode.mty</span>
+                </span>
+              </Button>
             )}
           </div>
         </div>
