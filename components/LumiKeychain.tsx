@@ -20,9 +20,11 @@ const ENTER_DEG = 12
 const KICK_DEG = 16
 const GLINT_DELAY_MS = 600
 const GLINT_MS = 700
-const FIREFLY_MS = 900 // her belly glow pulse
-const WAVE_SPEED = 0.9 // px per ms: how fast the ring of light spreads from her
-const WAVE_MIN_MS = 900
+const FIREFLY_MS = 550 // her belly glow pulse
+const FIREFLY_PEAK = 0.6
+const WAVE_SPEED = 2.6 // px per ms: how fast the ring of light spreads from her
+const WAVE_MIN_MS = 450
+const WAVE_PEAK = 0.65 // light, not a strobe
 const WAVE_RING = 128 * 0.88 // radius of the ring's bright band in flash-ring.svg at scale 1
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -143,7 +145,7 @@ export default function LumiKeychain() {
     const pulse = firefly.animate(
       [
         { opacity: 0, transform: 'scale(0.6)' },
-        { opacity: 0.9, transform: 'scale(1)', offset: 0.25 },
+        { opacity: FIREFLY_PEAK, transform: 'scale(1)', offset: 0.25 },
         { opacity: 0, transform: 'scale(1.3)' },
       ],
       { duration: FIREFLY_MS, easing: 'ease-out' },
@@ -155,9 +157,14 @@ export default function LumiKeychain() {
     const oy = g.top + g.height / 2
     const blocks = Array.from(document.querySelectorAll<HTMLElement>('[data-lumi-flash]'))
     const rects = blocks.map((b) => b.getBoundingClientRect())
-    // The ring has to reach the farthest corner of the farthest block.
+    // Page-wide: the ring sweeps the whole viewport (and any block beyond it).
+    const vw = window.innerWidth
+    const vh = window.innerHeight
     const reach = Math.max(
-      0,
+      Math.hypot(ox, oy),
+      Math.hypot(vw - ox, oy),
+      Math.hypot(ox, vh - oy),
+      Math.hypot(vw - ox, vh - oy),
       ...rects.flatMap((r) => [
         Math.hypot(r.left - ox, r.top - oy),
         Math.hypot(r.right - ox, r.top - oy),
@@ -177,11 +184,11 @@ export default function LumiKeychain() {
       wave.getAnimations().forEach((a) => a.cancel())
       const anim = wave.animate(
         [
-          { transform: 'scale(0)', opacity: 1 },
-          { opacity: 1, offset: 0.65 },
+          { transform: 'scale(0)', opacity: WAVE_PEAK },
+          { opacity: WAVE_PEAK, offset: 0.6 },
           { transform: `scale(${endScale})`, opacity: 0 },
         ],
-        { duration, easing: 'cubic-bezier(0.3, 0.5, 0.5, 1)' },
+        { duration, easing: 'cubic-bezier(0.2, 0.6, 0.4, 1)' },
       )
       anim.onfinish = () => anim.cancel()
     })
