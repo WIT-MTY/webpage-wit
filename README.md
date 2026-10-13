@@ -48,9 +48,9 @@ All in `lib/site.ts`. Each renders a graceful fallback while empty.
 
 - `HACK4HER_URL`: the Hack4Her site. The nav button and Proyectos page link here.
 - `CONTACT_EMAIL`: shows "Por confirmar" while `null`.
-- `APPLICATIONS_OPEN`: ISO date like `'2027-01-15T09:00:00-06:00'`. Shows "Próximamente" while `null`.
+- `RECRUITMENT_OPENS_AT`: ISO date for the Únete countdown on Integrantes. Currently an estimate; update `RECRUITMENT_NOTE` with it.
 - `COLLAGE_PHOTOS` and `MARQUEE_PHOTOS`: put images in `public/photos/` and set paths like `'/photos/wit25.jpg'`.
-- WitCode group photo: `WITCODE_PHOTO` at the top of `app/witcode/page.tsx`.
+- WitCode photos: `WITCODE_PHOTOS` in `lib/site.ts`; put images in `public/witcode/`.
 - Ally logos: `ALLIES` at the top of `app/aliados/page.tsx`.
 
 The old site's repo has real photos worth reusing (for example `images/wit25.JPG` and `images/proyectos/JTI24_3.JPG`).

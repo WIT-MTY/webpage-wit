@@ -4,7 +4,7 @@ import PhotoFrame from '@/components/PhotoFrame'
 import CollabCTA from '@/components/CollabCTA'
 import { SocialIcon } from '@/components/SocialIcon'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
-import { WITCODE_APPLY_URL, WITCODE_DESCRIPTION, WITCODE_INSTAGRAM_URL, WITCODE_STATS } from '@/lib/site'
+import { WITCODE_APPLY_URL, WITCODE_DESCRIPTION, WITCODE_INSTAGRAM_URL, WITCODE_PHOTOS, WITCODE_STATS } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'WitCode',
@@ -12,16 +12,26 @@ export const metadata: Metadata = {
     'WitCode: talleres de tecnología para alumnas de 1° a 3° de secundaria de la escuela Ciudad de los Niños.',
 }
 
-/** TODO: drop the group photo in /public/photos and set the path here. */
-const WITCODE_PHOTO: string | null = null
-
 const PROGRAMA = [
   'Clases semanales sobre diferentes temas tecnológicos.',
   'Grupos de principiantes (para alumnas nuevas al programa) y avanzadas.',
   'Modalidad en línea, con sesiones presenciales de inicio y clausura.',
 ]
 
+/** Caption laid over a photo block. */
+function PhotoCaption({ className, children }: { className: string; children: React.ReactNode }) {
+  return (
+    <p
+      className={`absolute m-0 font-display font-extrabold leading-none text-white ${className}`}
+      style={{ textShadow: '0 2px 20px rgba(0,0,0,0.6)' }}
+    >
+      {children}
+    </p>
+  )
+}
+
 export default function WitCodePage() {
+  const [big, small] = WITCODE_PHOTOS
   return (
     <>
       <PageHero
@@ -35,7 +45,7 @@ export default function WitCodePage() {
         ]}
       />
 
-      <Container className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+      <Container className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start">
         <div className="glass rounded-[2rem] p-8 sm:p-10">
           <MicroLabel className="mb-5">Propósito</MicroLabel>
           <p className="m-0 font-display text-[clamp(1.35rem,2.4vw,1.75rem)] font-semibold leading-snug text-white">
@@ -78,16 +88,31 @@ export default function WitCodePage() {
           </div>
         </div>
 
-        <div className="relative">
-          <PhotoFrame src={WITCODE_PHOTO} alt="Generación de WitCode" className="aspect-[4/3] w-full" sizes="(min-width: 1024px) 560px, 92vw" />
-          <p
-            className="absolute bottom-6 left-7 m-0 font-display text-[clamp(1.6rem,3vw,2.25rem)] font-extrabold leading-none text-white"
-            style={{ textShadow: '0 2px 20px rgba(0,0,0,0.6)' }}
-          >
-            Bienvenida
-            <br />
-            WitCode
-          </p>
+        {/*
+          Two photo blocks: a large one and a smaller one that overlaps its
+          lower-right corner (md+). Stacked on mobile. Sticky beside the long
+          text on desktop. Static: the rotation is not animated.
+        */}
+        <div className="flex flex-col gap-5 md:relative md:block md:pb-48 lg:sticky lg:top-28">
+          <div className="relative md:w-[86%]">
+            <PhotoFrame
+              src={big.src}
+              alt={big.alt}
+              className="aspect-[4/3] w-full"
+              sizes="(min-width: 1024px) 480px, (min-width: 768px) 86vw, 92vw"
+            />
+            <PhotoCaption className="bottom-6 left-7 max-w-[10ch] text-[clamp(1.6rem,3vw,2.25rem)]">{big.caption}</PhotoCaption>
+          </div>
+          {/* Solid backing so the translucent placeholder doesn't show the big block through it. */}
+          <div className="relative rounded-3xl bg-night md:absolute md:right-0 md:bottom-0 md:w-[50%] md:rotate-3">
+            <PhotoFrame
+              src={small.src}
+              alt={small.alt}
+              className="aspect-[4/3] w-full md:aspect-[4/5]"
+              sizes="(min-width: 1024px) 280px, (min-width: 768px) 50vw, 92vw"
+            />
+            <PhotoCaption className="bottom-5 left-6 max-w-[14ch] text-[clamp(1.1rem,1.8vw,1.35rem)]">{small.caption}</PhotoCaption>
+          </div>
         </div>
       </Container>
 

@@ -25,7 +25,8 @@ The filters already work (`components/TeamExplorer.tsx`). The design adds the
 - [ ] **Mobile:** two cards per row, area chips scroll horizontally with
       scroll-snap and an edge fade.
 - [ ] **Únete section:** already built. Check it against Figma and wire
-      `APPLICATIONS_OPEN` when Kat has the date.
+      the official date into `RECRUITMENT_OPENS_AT` (and `RECRUITMENT_NOTE`)
+      when Kat has it. The current date is an estimate.
 
 ## Watch out
 
