@@ -1,0 +1,35 @@
+/*
+  Gradient ring around a pill button. The ring is a pre-rendered image
+  (/fx/ig-ring.svg) on a pseudo-element; only its opacity and scale move.
+
+  Default: a faint steady ring (also the no-JS and reduced-motion state).
+  .play: three pulses, then it settles back on the faint ring. One-shot.
+*/
+.ring {
+  position: relative;
+  display: inline-block;
+}
+
+.ring::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: url('/fx/ig-ring.svg') center / 100% 100% no-repeat;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.play::before {
+  animation: ring-pulse 900ms ease-in-out 3;
+}
+
+@keyframes ring-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play::before {
+    animation: none;
+  }
+}

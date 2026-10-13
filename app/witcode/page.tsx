@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import PageHero from '@/components/PageHero'
-import PhotoFrame from '@/components/PhotoFrame'
+import PhotoFade from '@/components/PhotoFade'
+import CountUp from '@/components/CountUp'
+import Reveal from '@/components/Reveal'
 import CollabCTA from '@/components/CollabCTA'
 import { SocialIcon } from '@/components/SocialIcon'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
@@ -51,10 +53,10 @@ export default function WitCodePage() {
           <p className="m-0 font-display text-[clamp(1.35rem,2.4vw,1.75rem)] font-semibold leading-snug text-white">
             {WITCODE_DESCRIPTION[0]}
           </p>
-          {WITCODE_DESCRIPTION.slice(1).map((p) => (
-            <p key={p} className="mt-6 mb-0 text-[16px] font-light leading-[1.75] text-white/75">
-              {p}
-            </p>
+          {WITCODE_DESCRIPTION.slice(1).map((p, i) => (
+            <Reveal key={p} delay={i * 120}>
+              <p className="mt-6 mb-0 text-[16px] font-light leading-[1.75] text-white/75">{p}</p>
+            </Reveal>
           ))}
           <div className="mt-10 flex flex-wrap gap-3">
             {WITCODE_APPLY_URL ? (
@@ -95,8 +97,8 @@ export default function WitCodePage() {
         */}
         <div className="flex flex-col gap-5 md:relative md:block md:pb-48 lg:sticky lg:top-28">
           <div className="relative md:w-[86%]">
-            <PhotoFrame
-              src={big.src}
+            <PhotoFade
+              photos={big.photos}
               alt={big.alt}
               className="aspect-[4/3] w-full"
               sizes="(min-width: 1024px) 480px, (min-width: 768px) 86vw, 92vw"
@@ -105,9 +107,11 @@ export default function WitCodePage() {
           </div>
           {/* Solid backing so the translucent placeholder doesn't show the big block through it. */}
           <div className="relative rounded-3xl bg-night md:absolute md:right-0 md:bottom-0 md:w-[50%] md:rotate-3">
-            <PhotoFrame
-              src={small.src}
+            {/* Offset so the two blocks never change at the same moment. */}
+            <PhotoFade
+              photos={small.photos}
               alt={small.alt}
+              staggerOffset={2750}
               className="aspect-[4/3] w-full md:aspect-[4/5]"
               sizes="(min-width: 1024px) 280px, (min-width: 768px) 50vw, 92vw"
             />
@@ -118,38 +122,45 @@ export default function WitCodePage() {
 
       <section className="pt-24">
         <Container className="grid gap-6 md:grid-cols-2">
-          <div className="glass rounded-[2rem] p-8 sm:p-10">
-            <Heading as="h2" className="text-4xl">
-              Programa
-            </Heading>
-            <ul className="mt-8 mb-0 flex list-none flex-col gap-5 p-0">
-              {PROGRAMA.map((item) => (
-                <li key={item} className="flex gap-4 text-[16px] font-light leading-relaxed text-white/80">
-                  <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-peri shadow-[0_0_10px_rgba(198,200,238,0.8)]" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <Reveal>
+            <div className="glass h-full rounded-[2rem] p-8 sm:p-10">
+              <Heading as="h2" className="text-4xl">
+                Programa
+              </Heading>
+              <ul className="mt-8 mb-0 flex list-none flex-col gap-5 p-0">
+                {PROGRAMA.map((item) => (
+                  <li key={item} className="flex gap-4 text-[16px] font-light leading-relaxed text-white/80">
+                    <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-peri shadow-[0_0_10px_rgba(198,200,238,0.8)]" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Reveal>
 
-          <div
-            className="rounded-[2rem] border border-white/10 p-8 sm:p-10"
-            style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.55) 0%, rgba(71,18,107,0.4) 60%, rgba(144,102,210,0.3) 100%)' }}
-          >
-            <Heading as="h2" className="text-4xl">
-              Impacto
-            </Heading>
-            <MicroLabel className="mt-6">Métricas anuales</MicroLabel>
-            <dl className="mt-6 mb-0 flex flex-col gap-5">
-              {WITCODE_STATS.map((s) => (
-                <div key={s.label} className="flex items-baseline gap-5">
-                  <dt className="sr-only">{s.label}</dt>
-                  <dd className="m-0 min-w-24 shrink-0 whitespace-nowrap font-display text-4xl font-extrabold text-peri">{s.value}</dd>
-                  <dd className="m-0 text-[15px] font-light leading-snug text-white/80">{s.label}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+          <Reveal delay={120}>
+            <div
+              className="h-full rounded-[2rem] border border-white/10 p-8 sm:p-10"
+              style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.55) 0%, rgba(71,18,107,0.4) 60%, rgba(144,102,210,0.3) 100%)' }}
+            >
+              <Heading as="h2" className="text-4xl">
+                Impacto
+              </Heading>
+              <MicroLabel className="mt-6">Métricas anuales</MicroLabel>
+              <dl className="mt-6 mb-0 flex flex-col gap-5">
+                {WITCODE_STATS.map((s, i) => (
+                  <Reveal key={s.label} delay={240 + i * 120} className="flex items-baseline gap-5">
+                    <dt className="sr-only">{s.label}</dt>
+                    {/* Server HTML holds the final value; it counts up from 0 once on screen. */}
+                    <dd className="m-0 min-w-24 shrink-0 whitespace-nowrap font-display text-4xl font-extrabold tabular-nums text-peri">
+                      <CountUp value={s.value} duration={1200} />
+                    </dd>
+                    <dd className="m-0 text-[15px] font-light leading-snug text-white/80">{s.label}</dd>
+                  </Reveal>
+                ))}
+              </dl>
+            </div>
+          </Reveal>
         </Container>
       </section>
 

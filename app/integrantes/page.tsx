@@ -4,6 +4,7 @@ import TeamExplorer from '@/components/TeamExplorer'
 import Countdown from '@/components/Countdown'
 import StarField from '@/components/StarField'
 import FloatingShapes from '@/components/FloatingShapes'
+import RingPulse from '@/components/RingPulse'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
 import { RECRUITMENT_NOTE, RECRUITMENT_OPENS_AT, SOCIALS } from '@/lib/site'
 
@@ -66,9 +67,11 @@ export default function IntegrantesPage() {
           </p>
           <Countdown target={RECRUITMENT_OPENS_AT} note={RECRUITMENT_NOTE} />
           <div className="mt-12">
-            <Button href={SOCIALS[0].href} external variant="glass">
-              Entérate en Instagram →
-            </Button>
+            <RingPulse>
+              <Button href={SOCIALS[0].href} external variant="glass">
+                Entérate en Instagram →
+              </Button>
+            </RingPulse>
           </div>
         </Container>
       </section>
