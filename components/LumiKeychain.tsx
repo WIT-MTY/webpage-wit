@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { LUMI_LINES } from '@/lib/site'
 import geometry from './lumi-keychain.json'
 import styles from './LumiKeychain.module.css'
+import shine from './Shine.module.css'
 
 // There is no /contacto line in LUMI_LINES yet. The Aliados line ("¡Escríbenos!")
 // fits this page, so it is reused rather than writing new copy.
@@ -20,6 +21,8 @@ const ENTER_DEG = 12
 const KICK_DEG = 16
 const GLINT_DELAY_MS = 600
 const GLINT_MS = 700
+const FLASH_SPEED = 1.6 // px per ms: how fast the flash travels out from Lumi
+const FLASH_MS = 800
 
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -37,6 +40,19 @@ function swingKeyframes(from: number, peak: number): Keyframe[] {
   return angles.map((a) => ({ transform: `rotate(${a}deg)`, easing: 'ease-in-out' }))
 }
 
+/**
+  The light sweep a block shows when Lumi's flash reaches it. Put it inside an
+  element with `data-lumi-flash` and `position: relative` (rounded corners carry over).
+*/
+export function FlashTrack() {
+  return (
+    <span className={shine.track} aria-hidden="true">
+      {/* The brighter glint streak, so the flash reads on the cards too. */}
+      <span className={shine.strip} style={{ backgroundImage: "url('/fx/glint.svg')" }} data-lumi-flash-strip="" />
+    </span>
+  )
+}
+
 /*
   Lumi as an acrylic keychain charm hanging from the nav on Contáctanos. The
   global Lumi hides on this route (components/Lumi.tsx).
@@ -49,6 +65,10 @@ function swingKeyframes(from: number, peak: number): Keyframe[] {
     - Click: a 16° kick with the same decay. Rapid clicks restart from the
       current angle, so nothing jumps.
     - Glint: one light sweep across the charm 600ms after load and on every click.
+      The same flash then travels out across the page: every [data-lumi-flash]
+      block gets its own sweep, later the farther it is from Lumi and moving
+      away from her, so it reads as one wave. Small clipped strips only; no
+      page-wide moving layer.
     - prefers-reduced-motion: none of the above; a still charm.
   The swing-in and kick use the Web Animations API on top of the CSS idle
   sway; when one finishes, the idle restarts from the center to match.
@@ -109,6 +129,38 @@ export default function LumiKeychain() {
     )
     glintAnim.current = anim
     anim.onfinish = () => anim.cancel() // no lingering animation
+    flashPage()
+  }
+
+  // Send the flash out across the page's blocks.
+  const flashPage = () => {
+    const charm = charmRef.current
+    if (!charm) return
+    const c = charm.getBoundingClientRect()
+    const ox = c.left + c.width / 2
+    const oy = c.top + c.height / 2
+    document.querySelectorAll<HTMLElement>('[data-lumi-flash]').forEach((block) => {
+      const strip = block.querySelector<HTMLElement>(':scope > * > [data-lumi-flash-strip]')
+      if (!strip) return
+      const r = block.getBoundingClientRect()
+      // Distance from Lumi to the nearest point of the block.
+      const dx = Math.max(r.left - ox, 0, ox - r.right)
+      const dy = Math.max(r.top - oy, 0, oy - r.bottom)
+      // Sweep away from Lumi: right to left when she is on the block's right.
+      const fromRight = ox > r.left + r.width / 2
+      const [from, to] = fromRight ? ['300%', '-120%'] : ['-120%', '300%']
+      strip.getAnimations().forEach((a) => a.cancel())
+      const anim = strip.animate(
+        [
+          { transform: `translate3d(${from}, 0, 0) skewX(-18deg)`, opacity: 0 },
+          { opacity: 1, offset: 0.2 },
+          { opacity: 1, offset: 0.75 },
+          { transform: `translate3d(${to}, 0, 0) skewX(-18deg)`, opacity: 0 },
+        ],
+        { duration: FLASH_MS, delay: Math.hypot(dx, dy) / FLASH_SPEED, easing: 'ease-out' },
+      )
+      anim.onfinish = () => anim.cancel()
+    })
   }
 
   // On page enter: swing in, then the glint as she starts to settle.
