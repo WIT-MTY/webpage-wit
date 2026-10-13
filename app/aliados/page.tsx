@@ -2,8 +2,11 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { Metadata } from 'next'
 import PageHero from '@/components/PageHero'
-import CollabCTA from '@/components/CollabCTA'
+import AllyCTA from '@/components/AllyCTA'
+import AllyTile from '@/components/AllyTile'
 import Celestial from '@/components/Celestial'
+import LogoConveyor from '@/components/LogoConveyor'
+import Typewriter from '@/components/Typewriter'
 import { Container, Heading, MicroLabel } from '@/components/ui'
 import { ALLIES } from '@/lib/site'
 
@@ -28,6 +31,7 @@ const WAYS = [
 ]
 
 export default function AliadosPage() {
+  const allies = ALLIES.map((ally) => ({ ally, logo: resolveLogo(ally.logo) }))
   return (
     <>
       <PageHero
@@ -40,8 +44,14 @@ export default function AliadosPage() {
           { shape: 'burst', depth: 'near', size: 76, rotate: 8, opacity: 1, pos: { bottom: '12%', right: '16%' }, motion: 'medium', duration: 7, hideBelow: 'sm' },
         ]}
       >
-        <p className="mt-10 mb-0 font-mono text-[13px] tracking-[0.12em] text-wit-pink/85">
-          &gt; juntas construimos un futuro más inclusivo();
+        <p className="mt-10 mb-0 font-mono text-[13px] tracking-[0.12em] text-peri/85">
+          <span className="text-wit-pink/85" aria-hidden="true">
+            &gt;{' '}
+          </span>
+          <Typewriter
+            text={[{ text: 'juntas construimos un futuro más inclusivo' }, { text: '();', tone: 'accent' }]}
+            tones={{ accent: 'text-wit-pink' }}
+          />
         </p>
       </PageHero>
 
@@ -50,34 +60,16 @@ export default function AliadosPage() {
           <MicroLabel className="mb-5">Diferentes talentos, mismo propósito</MicroLabel>
           <Heading className="text-[clamp(2.2rem,5vw,3.75rem)]">Aliados estratégicos</Heading>
         </div>
-        <ul className="m-0 flex list-none flex-wrap justify-center gap-5 p-0">
-          {ALLIES.map((a) => {
-            const logo = resolveLogo(a.logo)
-            return (
-              <li key={a.name} className="flex w-[calc(50%-10px)] flex-col items-center text-center sm:w-[200px]">
-                {logo ? (
-                  <div
-                    className={`flex aspect-[3/2] w-full items-center justify-center rounded-2xl ${
-                      a.tileBg === 'black' ? 'bg-black' : 'bg-white'
-                    } ${a.wideLogo ? 'px-3 py-4' : 'p-5'}`}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element -- ally logos, mixed formats */}
-                    <img src={logo} alt={`Logotipo de ${a.name}`} className="h-full w-full object-contain" />
-                  </div>
-                ) : (
-                  <div className="glass-strong flex aspect-[3/2] w-full items-center justify-center rounded-2xl p-5">
-                    <span className="font-display text-[15px] font-semibold leading-tight text-white">{a.name}</span>
-                  </div>
-                )}
-                {logo && !a.nameInLogo && (
-                  <span className="mt-4 text-[11px] uppercase tracking-[0.25em] text-peri/65">{a.name}</span>
-                )}
-                {a.years && <span className="mt-1 text-[11px] tracking-[0.15em] text-white/50">{a.years}</span>}
-              </li>
-            )
-          })}
+        {/* Reduced motion: the static grid. Otherwise: the conveyor. CSS picks, so the server HTML already matches. */}
+        <ul className="m-0 hidden list-none flex-wrap justify-center gap-5 p-0 motion-reduce:flex">
+          {allies.map(({ ally, logo }) => (
+            <li key={ally.name} className="flex w-[calc(50%-10px)] flex-col items-center text-center sm:w-[200px]">
+              <AllyTile ally={ally} logo={logo} />
+            </li>
+          ))}
         </ul>
       </Container>
+      <LogoConveyor items={allies} className="mx-auto max-w-[1440px] motion-reduce:hidden" />
 
       <section className="pt-28">
         <Container>
@@ -96,7 +88,7 @@ export default function AliadosPage() {
         </Container>
       </section>
 
-      <CollabCTA />
+      <AllyCTA />
     </>
   )
 }

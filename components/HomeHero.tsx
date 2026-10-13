@@ -9,6 +9,7 @@
 */
 
 import FloatingShapes, { type FloatingShape } from './FloatingShapes'
+import HeroTypewriter from './HeroTypewriter'
 import { Button } from './ui'
 import { MARQUEE_MOTION, MARQUEE_PHOTOS } from '@/lib/site'
 
@@ -134,12 +135,7 @@ export default function HomeHero() {
           style={{ background: 'linear-gradient(to right, transparent, rgba(198,200,238,0.35), transparent)' }}
         />
 
-        <p
-          className="m-0 mb-10 font-light italic uppercase tracking-[0.35em] text-white/88"
-          style={{ fontSize: 'clamp(11px, 1.2vw, 15px)' }}
-        >
-          Tech needs <span style={{ color: PERIWINKLE, textShadow: '0 0 20px rgba(198,200,238,0.6)' }}>WIT</span>
-        </p>
+        <HeroTypewriter />
 
         <div className="flex flex-col items-center gap-4 sm:flex-row">
           <Button href="/integrantes#unete">Únete</Button>
