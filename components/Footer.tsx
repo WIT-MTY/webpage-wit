@@ -74,6 +74,7 @@ export default function Footer() {
       <div className="relative border-t border-white/8 bg-wit-deep/60">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-6 py-5 text-center text-xs font-light text-white/55 sm:flex-row sm:text-left lg:px-10">
           <span>Grupo estudiantil del Tecnológico de Monterrey, Campus Monterrey</span>
+          <span>{new Date().getFullYear()} Women in Technology</span>
         </div>
       </div>
     </footer>
