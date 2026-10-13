@@ -5,7 +5,7 @@ import Countdown from '@/components/Countdown'
 import StarField from '@/components/StarField'
 import FloatingShapes from '@/components/FloatingShapes'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
-import { APPLICATIONS_OPEN, SOCIALS } from '@/lib/site'
+import { RECRUITMENT_NOTE, RECRUITMENT_OPENS_AT, SOCIALS } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Integrantes',
@@ -64,7 +64,7 @@ export default function IntegrantesPage() {
           <p className="mt-8 mb-12 max-w-md text-[17px] font-light leading-relaxed text-white/70">
             Sé parte de algo estelar. Las aplicaciones abren cada semestre.
           </p>
-          <Countdown target={APPLICATIONS_OPEN} />
+          <Countdown target={RECRUITMENT_OPENS_AT} note={RECRUITMENT_NOTE} />
           <div className="mt-12">
             <Button href={SOCIALS[0].href} external variant="glass">
               Entérate en Instagram →

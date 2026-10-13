@@ -37,10 +37,15 @@ export const ADDRESS = [
 export const ADDRESS_MAP_URL: string | null = 'https://maps.app.goo.gl/hNCyZcVZoSddFUPw6'
 
 /**
- * Recruitment countdown on /integrantes.
- * ISO date string, e.g. '2027-01-15T09:00:00-06:00'. While null: "Próximamente".
+ * Recruitment countdown on /integrantes ("Únete"), as ISO with the Monterrey
+ * offset. Once it passes, the countdown is replaced by "Las aplicaciones ya
+ * abrieron". Null hides the countdown.
  */
-export const APPLICATIONS_OPEN: string | null = null
+// ESTIMATE, replace with the official date.
+export const RECRUITMENT_OPENS_AT: string | null = '2027-02-05T00:00:00-06:00'
+
+/** Line shown with the recruitment countdown. Update it together with the date. */
+export const RECRUITMENT_NOTE = 'Las aplicaciones abren aproximadamente el 5 de febrero'
 
 /**
  * Form for applying to WitCode. While null, /witcode shows a disabled
@@ -71,11 +76,6 @@ export type WitEvent = {
   date: string | null
   /** Google Form for this event. Null hides the sign-up button. */
   formUrl: string | null
-  /**
-   * Shown instead of a sign-up button when there is no form:
-   * 'soon' = "Próximamente", 'ended' = "Evento finalizado".
-   */
-  status?: 'soon' | 'ended'
   /** Photos for the card carousel: put files in /public/photos. */
   photos: string[]
   metrics: EventMetric[]
@@ -128,7 +128,12 @@ const EVENT_LIST: WitEvent[] = [
     description:
       'Un hackathon dirigido a chicas de secundaria con el propósito de fomentar la participación de mujeres en la tecnología desde una temprana edad.',
   },
-  pendingEvent('reunion-nacional', 'Reunión Nacional'),
+  {
+    ...pendingEvent('reunion-nacional', 'Reunión Nacional'),
+    // TODO confirm with Dana
+    description:
+      'Una reunión que invita a mujeres de todo el país: investigadoras, docentes, profesionistas, estudiantes y mujeres de todas las áreas STEM. Entre paneles y coffee breaks, conversamos sobre las adversidades y los retos que enfrentan las mujeres.',
+  },
   {
     slug: 'hack4her',
     title: 'Hack4Her',
@@ -156,7 +161,6 @@ const EVENT_LIST: WitEvent[] = [
     date: null,
     // TODO: paste the Journey to Internship Google Form URL here.
     formUrl: null,
-    status: 'soon',
     photos: [],
     metrics: [
       { value: '—', label: 'participantes' },
@@ -187,11 +191,10 @@ const EVENT_LIST: WitEvent[] = [
     title: 'Run4WIT',
     category: 'Carrera',
     tagline: 'Corremos por más mujeres en tecnología.',
-    // TODO: fill in from the Instagram post (date, distance, cause).
-    description: '',
+    description:
+      'Una carrera con causa en colaboración con RUNIIS, donde cada paso impulsa oportunidades en STEM. Categorías de 3K y 5K en el Ágora de las Artes.',
     date: null,
     formUrl: null,
-    status: 'ended', // Run4WIT already took place
     photos: [],
     metrics: [
       { value: '—', label: 'corredoras' },
@@ -260,7 +263,6 @@ export const ACTIVITIES = EVENTS.map((e) => ({
   tagline: e.tagline,
   body: e.description,
   slug: e.slug,
-  status: e.status,
   icon: ACTIVITY_ICONS[e.slug as keyof typeof ACTIVITY_ICONS] ?? 'star',
 }))
 
@@ -331,6 +333,17 @@ export const LUMI_LINES: Record<string, string> = {
 }
 
 // ── Photos ───────────────────────────────────────────────────
+
+/**
+ * The two photo blocks beside the description on /witcode: the first is the
+ * large one, the second the smaller overlapping one. Drop the files in
+ * /public/witcode and set `src` to e.g. '/witcode/bienvenida.jpg'. While
+ * `src` is null the dashed placeholder shows.
+ */
+export const WITCODE_PHOTOS: { src: string | null; alt: string; caption: string }[] = [
+  { src: null, alt: 'Generación de WitCode', caption: 'Bienvenida WitCode' },
+  { src: null, alt: 'Taller de WitCode en Ciudad de los Niños', caption: 'Talleres en Ciudad de los Niños' },
+]
 
 /** Home collage. Drop files in /public/photos and fill `src`. */
 export const COLLAGE_PHOTOS: { src: string | null; alt: string }[] = [

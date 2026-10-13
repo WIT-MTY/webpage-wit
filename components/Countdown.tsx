@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type RefObject } from 'react'
+import { useEffect, useRef, useState, type RefObject } from 'react'
 
 export type Parts = { d: number; h: number; m: number; s: number }
 
@@ -102,15 +102,25 @@ export function CountdownCells({ state, label }: { state: Parts | 'pending'; lab
   )
 }
 
-/** Countdown to applications opening (Integrantes). */
-export default function Countdown({ target }: { target: string | null }) {
-  const state = useCountdown(target)
+/**
+ * Countdown to applications opening (Integrantes). Pauses while off-screen.
+ * Renders nothing without a target; once the target passes, the cells give
+ * way to "Las aplicaciones ya abrieron".
+ */
+export default function Countdown({ target, note }: { target: string | null; note: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const state = useCountdown(target, ref)
 
-  if (state === 'none') {
-    return <p className="m-0 font-display text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-peri">Próximamente</p>
-  }
-  if (state === 'done') {
-    return <p className="m-0 font-display text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-peri">¡Aplicaciones abiertas!</p>
-  }
-  return <CountdownCells state={state} label="Tiempo para que abran las aplicaciones" />
+  return (
+    <div ref={ref} className="flex flex-col items-center">
+      {state === 'done' ? (
+        <p className="m-0 font-display text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-peri">Las aplicaciones ya abrieron</p>
+      ) : state !== 'none' ? (
+        <>
+          <CountdownCells state={state} label="Tiempo para que abran las aplicaciones" />
+          <p className="mt-8 mb-0 text-[13px] font-light tracking-[0.04em] text-white/60">{note}</p>
+        </>
+      ) : null}
+    </div>
+  )
 }
