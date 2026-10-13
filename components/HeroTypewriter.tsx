@@ -13,7 +13,7 @@ import styles from './HeroTypewriter.module.css'
   - Plays once per session. Afterwards, and under prefers-reduced-motion,
     "Tech needs you!" is written immediately, with no caret.
   - Stops while the tab is hidden and resumes where it left off.
-  - Layout: an invisible copy of the longest line ("Tech needs a rubber duck")
+  - Layout: an invisible copy of the longest line ("Tech needs fewer bugs")
     sizes the box, and on mobile the box always holds two lines, so nothing
     around it moves.
 */
@@ -37,11 +37,11 @@ const TIMING = {
   TYPE_COFFEE_MS: 70,
   HOLD_COFFEE_MS: 700,
   SELECT_COFFEE_MS: 250,
-  /** Step 6: pause before "a rubber duck". */
-  DELETE_PAUSE_DUCK_MS: 200,
-  TYPE_DUCK_MS: 60,
-  HOLD_DUCK_MS: 800,
-  SELECT_DUCK_MS: 250,
+  /** Step 6: pause before "fewer bugs". */
+  DELETE_PAUSE_BUGS_MS: 200,
+  TYPE_BUGS_MS: 60,
+  HOLD_BUGS_MS: 800,
+  SELECT_BUGS_MS: 250,
   /** Step 7: suspense beat, caret blinking alone. */
   SUSPENSE_MS: 900,
   /** Step 8: "you", per character. */
@@ -53,7 +53,7 @@ const TIMING = {
 }
 
 const FINAL_TEXT = 'Tech needs you!'
-const LONGEST = 'Tech needs a rubber duck'
+const LONGEST = 'Tech needs fewer bugs'
 const ONCE_KEY = 'wit-hero-typed'
 
 type Els = { prefix: HTMLSpanElement; sel: HTMLSpanElement; word: HTMLSpanElement; bang: HTMLSpanElement; caret: HTMLSpanElement }
@@ -104,10 +104,10 @@ const TIMELINE: Op[] = [
   ...type('word', 'coffee', T.TYPE_COFFEE_MS),
   ...pause(T.HOLD_COFFEE_MS),
   ...selectAndDelete(T.SELECT_COFFEE_MS),
-  ...pause(T.DELETE_PAUSE_DUCK_MS),
-  ...type('word', 'a rubber duck', T.TYPE_DUCK_MS),
-  ...pause(T.HOLD_DUCK_MS),
-  ...selectAndDelete(T.SELECT_DUCK_MS),
+  ...pause(T.DELETE_PAUSE_BUGS_MS),
+  ...type('word', 'fewer bugs', T.TYPE_BUGS_MS),
+  ...pause(T.HOLD_BUGS_MS),
+  ...selectAndDelete(T.SELECT_BUGS_MS),
   ...pause(T.SUSPENSE_MS),
   tone('accent'),
   ...type('word', 'you', T.TYPE_YOU_MS),
