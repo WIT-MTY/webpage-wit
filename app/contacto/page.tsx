@@ -3,6 +3,7 @@ import PageHero from '@/components/PageHero'
 import LumiKeychain, { FlashOutline } from '@/components/LumiKeychain'
 import { SocialIcon } from '@/components/SocialIcon'
 import CopyEmail from '@/components/CopyEmail'
+import InstagramHero from '@/components/InstagramHero'
 import MagneticLink from '@/components/MagneticLink'
 import Reveal from '@/components/Reveal'
 import Spotlight from '@/components/Spotlight'
@@ -20,6 +21,9 @@ export default function ContactoPage() {
       {line}
     </span>
   ))
+
+  const instagram = SOCIALS.find((s) => s.label === 'Instagram')
+  const otherSocials = SOCIALS.filter((s) => s !== instagram)
 
   return (
     <>
@@ -81,8 +85,10 @@ export default function ContactoPage() {
             <Spotlight />
             <div className="relative">
               <MicroLabel className="mb-6">Redes</MicroLabel>
-              <ul className="m-0 flex list-none flex-col items-start gap-3 p-0">
-                {SOCIALS.map((s) => (
+              {/* Instagram is the hero action; the other networks follow as pills. */}
+              {instagram && <InstagramHero href={instagram.href} handle={instagram.handle} />}
+              <ul className={`m-0 flex list-none flex-col items-start gap-3 p-0 ${instagram ? 'mt-8' : ''}`}>
+                {otherSocials.map((s) => (
                   <li key={s.label}>
                     <MagneticLink
                       href={s.href}
