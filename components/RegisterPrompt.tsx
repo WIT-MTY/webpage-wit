@@ -23,7 +23,7 @@ import { useRegistrationCount } from '@/lib/useRegistrationCount'
     - Non-blocking: no dark overlay, the page keeps scrolling, no focus trap.
     - "Registrarme" opens the event's form in a new tab. Once the event
       starts it becomes a disabled "Registro cerrado".
-    - "Ver evento" goes to /proyectos, where the Próximo evento panel is.
+    - "Ver evento" goes to the Próximo evento panel (/proyectos#proximo-evento).
 */
 
 /** "32d 04h 10m" */
@@ -189,7 +189,7 @@ export default function RegisterPrompt() {
               </button>
             )}
             <Link
-              href="/proyectos"
+              href="/proyectos#proximo-evento"
               className="mt-3 block rounded-full border border-peri/30 py-3 text-center text-[12px] font-medium uppercase tracking-[0.2em] text-white/85"
             >
               Ver evento

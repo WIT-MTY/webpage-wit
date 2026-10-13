@@ -15,13 +15,17 @@ function ArrowUpRight() {
 }
 
 function Hack4HerLink({ className }: { className: string }) {
+  // No URL yet: a non-clickable "Próximamente" version, never a dead link.
+  if (!HACK4HER_URL) {
+    return (
+      <span aria-disabled="true" className={`${className} pointer-events-none opacity-60`}>
+        Hack4Her
+        <span className="text-[0.8em] font-normal normal-case tracking-normal text-peri">Próximamente</span>
+      </span>
+    )
+  }
   return (
-    <a
-      href={HACK4HER_URL ?? '#'}
-      target={HACK4HER_URL ? '_blank' : undefined}
-      rel={HACK4HER_URL ? 'noopener noreferrer' : undefined}
-      className={className}
-    >
+    <a href={HACK4HER_URL} target="_blank" rel="noopener noreferrer" className={className}>
       Hack4Her
       <span className="text-peri">
         <ArrowUpRight />

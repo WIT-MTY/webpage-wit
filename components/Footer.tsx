@@ -30,14 +30,21 @@ export default function Footer() {
               </li>
             ))}
             <li>
-              <a
-                href={HACK4HER_URL ?? '#'}
-                target={HACK4HER_URL ? '_blank' : undefined}
-                rel={HACK4HER_URL ? 'noopener noreferrer' : undefined}
-                className="text-sm font-light text-white/75 transition-colors hover:text-peri"
-              >
-                Hack4Her ↗
-              </a>
+              {HACK4HER_URL ? (
+                <a
+                  href={HACK4HER_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-light text-white/75 transition-colors hover:text-peri"
+                >
+                  Hack4Her ↗<span className="sr-only"> (abre en otra pestaña)</span>
+                </a>
+              ) : (
+                // No URL yet: plain text, never a dead link.
+                <span aria-disabled="true" className="text-sm font-light text-white/45">
+                  Hack4Her · Próximamente
+                </span>
+              )}
             </li>
           </ul>
         </nav>
@@ -54,6 +61,8 @@ export default function Footer() {
                   className="inline-flex items-center gap-3 text-sm font-light text-white/75 transition-colors hover:text-peri"
                 >
                   <SocialIcon name={s.label} />
+                  {/* The icon is hidden from screen readers; say which network it is. */}
+                  <span className="sr-only">{s.label}: </span>
                   {s.handle}
                 </a>
               </li>
