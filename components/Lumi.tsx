@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { LUMI_LINES } from '@/lib/site'
+import { LUMI_COMPANION } from '@/lib/motion-flags'
+import LumiCompanion from './LumiCompanion'
 
 /*
   Lumi, the WIT firefly. Floats in the corner on every page except
@@ -17,6 +19,10 @@ import { LUMI_LINES } from '@/lib/site'
     - "Ocultar a Lumi" hides her for the rest of the visit (sessionStorage).
     - Hidden while the mobile register prompt is open (see RegisterPrompt).
     - prefers-reduced-motion: no bobbing.
+
+  With LUMI_COMPANION (lib/motion-flags.ts) she becomes a companion that
+  glides between section anchors: see LumiCompanion.tsx. The bubble and
+  "Ocultar a Lumi" work the same way in both versions.
 
   Assets: /public/lumi.webp. The single existing pose is used at every size;
   a flying/sitting pose would need new renders from the illustrator.
@@ -54,6 +60,29 @@ export default function Lumi() {
   const hide = () => {
     sessionStorage.setItem('lumi-hidden', '1')
     setHidden(true)
+  }
+
+  if (LUMI_COMPANION) {
+    return (
+      <LumiCompanion
+        talking={talking}
+        onToggle={() => setTalking((t) => !t)}
+        bubble={
+          talking && (
+            <div role="status" aria-live="polite" className="glass animate-rise rounded-2xl px-4 py-3">
+              <p className="m-0 text-[13px] font-medium leading-relaxed text-white/92">{line}</p>
+              <button
+                type="button"
+                onClick={hide}
+                className="mt-2 cursor-pointer border-none bg-transparent p-0 text-[11px] text-peri/60 underline"
+              >
+                Ocultar a Lumi
+              </button>
+            </div>
+          )
+        }
+      />
+    )
   }
 
   return (

@@ -55,23 +55,26 @@ export default function AliadosPage() {
         </p>
       </PageHero>
 
-      <Container>
-        <div className="mb-10 text-center">
-          <MicroLabel className="mb-5">Diferentes talentos, mismo propósito</MicroLabel>
-          <Heading className="text-[clamp(2.2rem,5vw,3.75rem)]">Aliados estratégicos</Heading>
-        </div>
-        {/* Reduced motion: the static grid. Otherwise: the conveyor. CSS picks, so the server HTML already matches. */}
-        <ul className="m-0 hidden list-none flex-wrap justify-center gap-5 p-0 motion-reduce:flex">
-          {allies.map(({ ally, logo }) => (
-            <li key={ally.name} className="flex w-[calc(50%-10px)] flex-col items-center text-center sm:w-[200px]">
-              <AllyTile ally={ally} logo={logo} />
-            </li>
-          ))}
-        </ul>
-      </Container>
-      <LogoConveyor items={allies} className="mx-auto max-w-[1440px] motion-reduce:hidden" />
+      {/* data-lumi-anchor: where Lumi sits while this part is mid-screen (LumiCompanion). */}
+      <div data-lumi-anchor="center">
+        <Container>
+          <div className="mb-10 text-center">
+            <MicroLabel className="mb-5">Diferentes talentos, mismo propósito</MicroLabel>
+            <Heading className="text-[clamp(2.2rem,5vw,3.75rem)]">Aliados estratégicos</Heading>
+          </div>
+          {/* Reduced motion: the static grid. Otherwise: the conveyor. CSS picks, so the server HTML already matches. */}
+          <ul className="m-0 hidden list-none flex-wrap justify-center gap-5 p-0 motion-reduce:flex">
+            {allies.map(({ ally, logo }) => (
+              <li key={ally.name} className="flex w-[calc(50%-10px)] flex-col items-center text-center sm:w-[200px]">
+                <AllyTile ally={ally} logo={logo} />
+              </li>
+            ))}
+          </ul>
+        </Container>
+        <LogoConveyor items={allies} className="mx-auto max-w-[1440px] motion-reduce:hidden" />
+      </div>
 
-      <section className="pt-28">
+      <section data-lumi-anchor="left" className="pt-28">
         <Container>
           <Heading className="mb-10 text-center text-[clamp(2rem,4.5vw,3.25rem)]">Formas de colaborar</Heading>
           <ul className="m-0 grid list-none gap-5 p-0 md:grid-cols-3">

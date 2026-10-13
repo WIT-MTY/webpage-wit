@@ -16,7 +16,8 @@ export const metadata: Metadata = {
 export default function IntegrantesPage() {
   return (
     <>
-      <div className="relative">
+      {/* data-lumi-anchor: where Lumi sits while that part is mid-screen (LumiCompanion). */}
+      <div data-lumi-anchor="right" className="relative">
         <StarField />
         <PageHero
           label="Integrantes"
@@ -33,7 +34,7 @@ export default function IntegrantesPage() {
       </div>
 
       {/* Recruitment */}
-      <section id="unete" className="relative mt-32 scroll-mt-24 overflow-hidden py-28">
+      <section id="unete" data-lumi-anchor="center" className="relative mt-32 scroll-mt-24 overflow-hidden py-28">
         <div
           className="pointer-events-none absolute inset-0"
           style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 55%, rgba(71,18,107,0.55) 0%, rgba(8,4,20,0) 70%)' }}

@@ -12,7 +12,7 @@ export default function Home() {
       <HomeHero />
 
       {/* Sobre nosotras */}
-      <section id="sobre-nosotras" className="scroll-mt-24 pt-24">
+      <section id="sobre-nosotras" data-lumi-anchor="right" className="scroll-mt-24 pt-24">
         <Container className="grid items-center gap-16 lg:grid-cols-[1fr_1.05fr]">
           <div>
             <MicroLabel className="mb-6">Sobre nosotras</MicroLabel>
@@ -59,7 +59,7 @@ export default function Home() {
       </section>
 
       {/* Proyectos */}
-      <section className="pt-32">
+      <section data-lumi-anchor="left" className="pt-32">
         <Container>
           <div className="mb-12 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <div>
@@ -80,7 +80,7 @@ export default function Home() {
       </section>
 
       {/* WitCode */}
-      <section className="pt-32">
+      <section data-lumi-anchor="right" className="pt-32">
         <Container>
           <div className="glass relative overflow-hidden rounded-[2rem] p-8 sm:p-12 lg:p-16">
             <div

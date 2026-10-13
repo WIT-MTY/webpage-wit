@@ -47,80 +47,83 @@ export default function WitCodePage() {
         ]}
       />
 
-      <Container className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start">
-        <div className="glass rounded-[2rem] p-8 sm:p-10">
-          <MicroLabel className="mb-5">Propósito</MicroLabel>
-          <p className="m-0 font-display text-[clamp(1.35rem,2.4vw,1.75rem)] font-semibold leading-snug text-white">
-            {WITCODE_DESCRIPTION[0]}
-          </p>
-          {WITCODE_DESCRIPTION.slice(1).map((p, i) => (
-            <Reveal key={p} delay={i * 120}>
-              <p className="mt-6 mb-0 text-[16px] font-light leading-[1.75] text-white/75">{p}</p>
-            </Reveal>
-          ))}
-          <div className="mt-10 flex flex-wrap gap-3">
-            {WITCODE_APPLY_URL ? (
-              // TODO(kat): confirm the button label once applications open.
-              <Button href={WITCODE_APPLY_URL} external>
-                Aplicar
-              </Button>
-            ) : (
-              <button
-                type="button"
-                disabled
-                className="cursor-not-allowed rounded-full border border-white/15 bg-white/[0.06] px-7 py-3.5 text-[12px] font-medium uppercase tracking-[0.2em] text-white/55"
-              >
-                Convocatoria no abierta por ahora
-              </button>
-            )}
-            {WITCODE_INSTAGRAM_URL && (
-              <Button
-                href={WITCODE_INSTAGRAM_URL}
-                external
-                variant="glass"
-                ariaLabel="Síguenos en Instagram @witcode.mty (se abre en una pestaña nueva)"
-              >
-                <SocialIcon name="Instagram" size={16} />
-                {/* One text run, so it wraps as a sentence on narrow screens. */}
-                <span>
-                  Síguenos en Instagram <span className="normal-case tracking-normal">@witcode.mty</span>
-                </span>
-              </Button>
-            )}
+      {/* data-lumi-anchor: where Lumi sits while this part is mid-screen (LumiCompanion). */}
+      <div data-lumi-anchor="left">
+        <Container className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start">
+          <div className="glass rounded-[2rem] p-8 sm:p-10">
+            <MicroLabel className="mb-5">Propósito</MicroLabel>
+            <p className="m-0 font-display text-[clamp(1.35rem,2.4vw,1.75rem)] font-semibold leading-snug text-white">
+              {WITCODE_DESCRIPTION[0]}
+            </p>
+            {WITCODE_DESCRIPTION.slice(1).map((p, i) => (
+              <Reveal key={p} delay={i * 120}>
+                <p className="mt-6 mb-0 text-[16px] font-light leading-[1.75] text-white/75">{p}</p>
+              </Reveal>
+            ))}
+            <div className="mt-10 flex flex-wrap gap-3">
+              {WITCODE_APPLY_URL ? (
+                // TODO(kat): confirm the button label once applications open.
+                <Button href={WITCODE_APPLY_URL} external>
+                  Aplicar
+                </Button>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  className="cursor-not-allowed rounded-full border border-white/15 bg-white/[0.06] px-7 py-3.5 text-[12px] font-medium uppercase tracking-[0.2em] text-white/55"
+                >
+                  Convocatoria no abierta por ahora
+                </button>
+              )}
+              {WITCODE_INSTAGRAM_URL && (
+                <Button
+                  href={WITCODE_INSTAGRAM_URL}
+                  external
+                  variant="glass"
+                  ariaLabel="Síguenos en Instagram @witcode.mty (se abre en una pestaña nueva)"
+                >
+                  <SocialIcon name="Instagram" size={16} />
+                  {/* One text run, so it wraps as a sentence on narrow screens. */}
+                  <span>
+                    Síguenos en Instagram <span className="normal-case tracking-normal">@witcode.mty</span>
+                  </span>
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/*
-          Two photo blocks: a large one and a smaller one that overlaps its
-          lower-right corner (md+). Stacked on mobile. Sticky beside the long
-          text on desktop. Static: the rotation is not animated.
-        */}
-        <div className="flex flex-col gap-5 md:relative md:block md:pb-48 lg:sticky lg:top-28">
-          <div className="relative md:w-[86%]">
-            <PhotoFade
-              photos={big.photos}
-              alt={big.alt}
-              className="aspect-[4/3] w-full"
-              sizes="(min-width: 1024px) 480px, (min-width: 768px) 86vw, 92vw"
-            />
-            <PhotoCaption className="bottom-6 left-7 max-w-[10ch] text-[clamp(1.6rem,3vw,2.25rem)]">{big.caption}</PhotoCaption>
+          {/*
+            Two photo blocks: a large one and a smaller one that overlaps its
+            lower-right corner (md+). Stacked on mobile. Sticky beside the long
+            text on desktop. Static: the rotation is not animated.
+          */}
+          <div className="flex flex-col gap-5 md:relative md:block md:pb-48 lg:sticky lg:top-28">
+            <div className="relative md:w-[86%]">
+              <PhotoFade
+                photos={big.photos}
+                alt={big.alt}
+                className="aspect-[4/3] w-full"
+                sizes="(min-width: 1024px) 480px, (min-width: 768px) 86vw, 92vw"
+              />
+              <PhotoCaption className="bottom-6 left-7 max-w-[10ch] text-[clamp(1.6rem,3vw,2.25rem)]">{big.caption}</PhotoCaption>
+            </div>
+            {/* Solid backing so the translucent placeholder doesn't show the big block through it. */}
+            <div className="relative rounded-3xl bg-night md:absolute md:right-0 md:bottom-0 md:w-[50%] md:rotate-3">
+              {/* Offset so the two blocks never change at the same moment. */}
+              <PhotoFade
+                photos={small.photos}
+                alt={small.alt}
+                staggerOffset={2750}
+                className="aspect-[4/3] w-full md:aspect-[4/5]"
+                sizes="(min-width: 1024px) 280px, (min-width: 768px) 50vw, 92vw"
+              />
+              <PhotoCaption className="bottom-5 left-6 max-w-[14ch] text-[clamp(1.1rem,1.8vw,1.35rem)]">{small.caption}</PhotoCaption>
+            </div>
           </div>
-          {/* Solid backing so the translucent placeholder doesn't show the big block through it. */}
-          <div className="relative rounded-3xl bg-night md:absolute md:right-0 md:bottom-0 md:w-[50%] md:rotate-3">
-            {/* Offset so the two blocks never change at the same moment. */}
-            <PhotoFade
-              photos={small.photos}
-              alt={small.alt}
-              staggerOffset={2750}
-              className="aspect-[4/3] w-full md:aspect-[4/5]"
-              sizes="(min-width: 1024px) 280px, (min-width: 768px) 50vw, 92vw"
-            />
-            <PhotoCaption className="bottom-5 left-6 max-w-[14ch] text-[clamp(1.1rem,1.8vw,1.35rem)]">{small.caption}</PhotoCaption>
-          </div>
-        </div>
-      </Container>
+        </Container>
+      </div>
 
-      <section className="pt-24">
+      <section data-lumi-anchor="right" className="pt-24">
         <Container className="grid gap-6 md:grid-cols-2">
           <Reveal>
             <div className="glass h-full rounded-[2rem] p-8 sm:p-10">
