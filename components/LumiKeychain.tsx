@@ -1,8 +1,9 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { LUMI_LINES } from '@/lib/site'
+import geometry from './lumi-keychain.json'
 import styles from './LumiKeychain.module.css'
 
 // There is no /contacto line in LUMI_LINES yet. The Aliados line ("¡Escríbenos!")
@@ -10,26 +11,116 @@ import styles from './LumiKeychain.module.css'
 // TODO(kat): add a '/contacto' line to LUMI_LINES if you want one of its own.
 const LINE = LUMI_LINES['/contacto'] ?? LUMI_LINES['/aliados']
 
-/*
-  Lumi as a keychain hanging from the nav on Contáctanos. The global Lumi
-  hides on this route (components/Lumi.tsx), so the two never show together.
+// Damped swing: each value is a fraction of the first (peak) angle.
+const DECAY = [1, -0.66, 0.42, -0.25, 0.12, 0]
+const SWING_MS = 2600
+const CHARM_FOLLOW = 0.4 // the charm swings at 40% of the chain's angle…
+const CHARM_LAG_MS = 200 // …and this much later
+const ENTER_DEG = 12
+const KICK_DEG = 16
+const GLINT_DELAY_MS = 600
+const GLINT_MS = 700
 
-  Motion (see LumiKeychain.module.css):
-    - Intro once per session: drop, light wave, dangle. Server HTML includes
-      it, so there is no flash of the resting keychain before it drops.
-    - Rest: slow ±1.5° sway, data-ambient (stops while scrolling/off-screen).
-    - prefers-reduced-motion: resting keychain, no motion.
-  Click shows Lumi's line, same pattern as the global Lumi: second click,
-  Escape or 6s closes it.
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/** Current rotation in degrees, wherever the element is mid-animation. */
+function currentAngle(el: HTMLElement) {
+  const t = getComputedStyle(el).transform
+  if (!t || t === 'none') return 0
+  const m = new DOMMatrixReadOnly(t)
+  return (Math.atan2(m.b, m.a) * 180) / Math.PI
+}
+
+/** A decaying swing from `from` through peak × DECAY, eased between every keyframe. */
+function swingKeyframes(from: number, peak: number): Keyframe[] {
+  const angles = [from, ...DECAY.map((f) => f * peak)]
+  return angles.map((a) => ({ transform: `rotate(${a}deg)`, easing: 'ease-in-out' }))
+}
+
+/*
+  Lumi as an acrylic keychain charm hanging from the nav on Contáctanos. The
+  global Lumi hides on this route (components/Lumi.tsx).
+
+  Motion:
+    - Enter: swings out to 12° and settles over ~2.6s (decaying overshoot).
+      It starts from her resting angle, so hydration never makes her jump.
+    - Idle: soft CSS pendulum (±3°, 5.2s), data-ambient so MotionGovernor
+      stops it while scrolling and off-screen.
+    - Click: a 16° kick with the same decay. Rapid clicks restart from the
+      current angle, so nothing jumps.
+    - Glint: one light sweep across the charm 600ms after load and on every click.
+    - prefers-reduced-motion: none of the above; a still charm.
+  The swing-in and kick use the Web Animations API on top of the CSS idle
+  sway; when one finishes, the idle restarts from the center to match.
 */
 export default function LumiKeychain() {
-  const [intro, setIntro] = useState(true)
+  const chainRef = useRef<HTMLDivElement>(null)
+  const charmRef = useRef<HTMLDivElement>(null)
+  const streakRef = useRef<HTMLSpanElement>(null)
+  const swings = useRef<Animation[]>([])
+  const glintAnim = useRef<Animation | null>(null)
   const [talking, setTalking] = useState(false)
 
-  // Intro plays once per visit.
+  const restartIdle = () => {
+    for (const el of [chainRef.current, charmRef.current]) {
+      el?.getAnimations().forEach((a) => {
+        if (a instanceof CSSAnimation) a.currentTime = 0
+      })
+    }
+  }
+
+  // Swing out to `peak` from wherever she is now, then decay back to 0°.
+  const swing = (peak: number) => {
+    const chain = chainRef.current
+    const charm = charmRef.current
+    if (!chain || !charm || reducedMotion()) return
+    const chainFrom = currentAngle(chain)
+    const charmFrom = currentAngle(charm)
+    swings.current.forEach((a) => a.cancel())
+
+    // Both hold their end (0°) until the charm, which lags, is done too.
+    const chainAnim = chain.animate(swingKeyframes(chainFrom, peak), { duration: SWING_MS, fill: 'forwards' })
+    const charmAnim = charm.animate(swingKeyframes(charmFrom, peak * CHARM_FOLLOW), {
+      duration: SWING_MS,
+      delay: CHARM_LAG_MS,
+      fill: 'both',
+    })
+    swings.current = [chainAnim, charmAnim]
+    charmAnim.onfinish = () => {
+      if (swings.current[1] !== charmAnim) return // a newer kick took over
+      swings.current.forEach((a) => a.cancel())
+      swings.current = []
+      restartIdle()
+    }
+  }
+
+  const glint = () => {
+    const streak = streakRef.current
+    if (!streak || reducedMotion()) return
+    glintAnim.current?.cancel()
+    const anim = streak.animate(
+      [
+        { transform: 'translate3d(-130%, 0, 0) rotate(18deg)', opacity: 0 },
+        { opacity: 1, offset: 0.2 },
+        { opacity: 1, offset: 0.75 },
+        { transform: 'translate3d(200%, 0, 0) rotate(18deg)', opacity: 0 },
+      ],
+      { duration: GLINT_MS, easing: 'ease-out' },
+    )
+    glintAnim.current = anim
+    anim.onfinish = () => anim.cancel() // no lingering animation
+  }
+
+  // On page enter: swing in, then the glint as she starts to settle.
   useEffect(() => {
-    if (sessionStorage.getItem('lumi-keychain-intro') === '1') setIntro(false)
-    else sessionStorage.setItem('lumi-keychain-intro', '1')
+    swing(ENTER_DEG)
+    const id = window.setTimeout(glint, GLINT_DELAY_MS)
+    return () => {
+      window.clearTimeout(id)
+      swings.current.forEach((a) => a.cancel())
+      glintAnim.current?.cancel()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, on mount
   }, [])
 
   useEffect(() => {
@@ -44,41 +135,55 @@ export default function LumiKeychain() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  return (
-    <div className={`${styles.keychain} ${intro ? styles.intro : ''}`} data-ambient-group="">
-      {/* eslint-disable-next-line @next/next/no-img-element -- decorative pre-rendered glow */}
-      <img src="/keychain/wave.svg" alt="" aria-hidden="true" className={styles.wave} />
+  const onClick = () => {
+    swing(KICK_DEG)
+    glint()
+    setTalking((t) => !t)
+  }
 
-      <div className={styles.drop}>
-        <div className={styles.dangle}>
-          <div className={styles.sway} data-ambient="">
-            <button
-              type="button"
-              onClick={() => setTalking((t) => !t)}
-              aria-label={talking ? 'Ocultar el mensaje de Lumi' : 'Mostrar el mensaje de Lumi'}
-              aria-expanded={talking}
-              className={styles.button}
-            >
-              <span className={styles.nudge}>
-                <span className={styles.rig}>
-                  <span className={styles.clasp} />
-                  {/* eslint-disable-next-line @next/next/no-img-element -- vector part, native size */}
-                  <img src="/keychain/chain.svg" alt="" width={25} height={184} className={styles.chain} />
-                  <Image
-                    src="/lumi.webp"
-                    alt="Lumi, la mascota de WIT, colgando como llavero"
-                    width={180}
-                    height={355}
-                    sizes="180px"
-                    className={styles.lumi}
-                  />
-                  {/* eslint-disable-next-line @next/next/no-img-element -- vector part, native size */}
-                  <img src="/keychain/split-ring.svg" alt="" width={46} height={46} className={styles.ring} />
-                </span>
-              </span>
-            </button>
-          </div>
+  const vars = {
+    '--img-w': geometry.width,
+    '--img-h': geometry.height,
+    '--hx': geometry.holeX,
+    '--hy': geometry.holeY,
+  } as CSSProperties
+
+  return (
+    <div className={styles.keychain} style={vars} data-ambient-group="">
+      <div ref={chainRef} className={styles.chain} data-idle="" data-ambient="">
+        <span className={styles.rig}>
+          <span className={styles.clasp} />
+          {/* eslint-disable-next-line @next/next/no-img-element -- vector part, native size */}
+          <img src="/keychain/chain.svg" alt="" width={25} height={184} className={styles.chainImg} />
+        </span>
+
+        <div ref={charmRef} className={styles.charm} data-idle="" data-ambient="">
+          <button
+            type="button"
+            onClick={onClick}
+            aria-label={talking ? 'Ocultar el mensaje de Lumi' : 'Mostrar el mensaje de Lumi'}
+            aria-expanded={talking}
+            className={styles.button}
+          >
+            <Image
+              src="/lumi-keychain.webp"
+              alt="Lumi, la mascota de WIT, como llavero de acrílico"
+              width={geometry.width}
+              height={geometry.height}
+              sizes="96px"
+              className={styles.image}
+            />
+            <span className={styles.glint} aria-hidden="true">
+              <span ref={streakRef} className={styles.streak} />
+            </span>
+          </button>
         </div>
+
+        {/* The ring goes over the charm, through its hole. */}
+        <span className={styles.rig}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- vector part, native size */}
+          <img src="/keychain/split-ring.svg" alt="" width={46} height={46} className={styles.ring} />
+        </span>
       </div>
 
       {talking && LINE && (
