@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import PageHero from '@/components/PageHero'
 import ActivityGrid from '@/components/ActivityGrid'
+import NextEventPanel from '@/components/NextEventPanel'
 import CollabCTA from '@/components/CollabCTA'
 import FloatingShapes from '@/components/FloatingShapes'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
@@ -25,6 +26,7 @@ export default function ProyectosPage() {
         ]}
       />
 
+      <NextEventPanel />
       <Container>
         <ActivityGrid detailed />
       </Container>

@@ -1,5 +1,5 @@
 import HomeHero from '@/components/HomeHero'
-import ActivityGrid from '@/components/ActivityGrid'
+import EventCarousel from '@/components/EventCarousel'
 import CollabCTA from '@/components/CollabCTA'
 import PhotoFrame from '@/components/PhotoFrame'
 import FloatingShapes from '@/components/FloatingShapes'
@@ -70,7 +70,12 @@ export default function Home() {
               Durante el semestre organizamos actividades para aprender, conectar y crear juntas.
             </p>
           </div>
-          <ActivityGrid />
+          <EventCarousel />
+          <div className="mt-10 flex justify-center">
+            <Button href="/proyectos" variant="glass">
+              Ver todos los proyectos
+            </Button>
+          </div>
         </Container>
       </section>
 

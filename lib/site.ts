@@ -46,11 +46,15 @@ export type EventMetric = { value: string; label: string }
 export type WitEvent = {
   slug: string
   title: string
+  /** Other name the event is known by. Reference only, never displayed. */
+  aka?: string
   category: string
   /** Empty string = not written yet; the line is hidden on public cards. */
   tagline: string
   /** Empty string = not written yet; the line is hidden on public cards. */
   description: string
+  /** Short highlights shown as chips in the Próximo evento panel. */
+  chips?: string[]
   /** ISO date of the event. Null until it is confirmed. */
   date: string | null
   /** Google Form for this event. Null hides the sign-up button. */
@@ -64,7 +68,6 @@ export type WitEvent = {
 
 /** The order events are listed in, everywhere. */
 export const EVENT_ORDER = [
-  'journey-to-internship-warmup',
   'hackwitu',
   'journey-to-internship',
   'dia-de-la-mujer',
@@ -90,8 +93,19 @@ const pendingEvent = (slug: string, title: string): WitEvent => ({
 })
 
 const EVENT_LIST: WitEvent[] = [
-  pendingEvent('journey-to-internship-warmup', 'Journey to Internship: Warm-up'),
-  pendingEvent('hackwitu', 'HackWITU'),
+  {
+    ...pendingEvent('hackwitu', 'HackWITu'),
+    aka: 'Hack4Prepa',
+    category: 'Hackathon',
+    tagline: 'No necesitas ser experta en STEM, ¡solo tener curiosidad, creatividad y ganas de intentarlo!',
+    // TODO(kat): confirm wording
+    description:
+      'HackWITu es un hackathon dirigido a estudiantes de preparatoria con el propósito de fomentar la participación de mujeres en la tecnología.',
+    chips: ['Equipos de cuatro integrantes', 'Merch oficial', 'Networking', 'Comida'],
+    date: '2026-11-14T08:00:00-06:00',
+    formUrl:
+      'https://docs.google.com/forms/d/e/1FAIpQLSfEkFMz5DSeC2yTq1MsO7lmwlY9WV48x-Hdld0OBFYmQjy07Q/viewform',
+  },
   {
     ...pendingEvent('empowerhack', 'EmpowerHack'),
     description:
@@ -175,22 +189,29 @@ const orderOf = (slug: string) => (EVENT_ORDER as readonly string[]).indexOf(slu
 export const EVENTS: WitEvent[] = [...EVENT_LIST].sort((a, b) => orderOf(a.slug) - orderOf(b.slug))
 
 /**
- * The upcoming event, shown in the "Próximo evento" panel and the mobile
- * register prompt. Set to null when there is nothing coming up: both switch
- * to their "no event" state on their own.
+ * The upcoming event, shown in the "Próximo evento" panel (Proyectos) and the
+ * mobile register prompt (Inicio). Set to null when there is nothing coming
+ * up: the panel disappears and the prompt never shows.
+ * The registration link is the event's own `formUrl`.
  */
 export const NEXT_EVENT: {
   slug: string
-  /** ISO date of the event itself, drives the "En N días" countdown. */
+  /**
+   * Start, as ISO with an explicit Monterrey offset. Drives the countdown,
+   * which is then the same for every visitor whatever their time zone.
+   */
   date: string | null
-  whereWhen: string
+  /** End time, same day, "HH:MM" Monterrey time. */
+  endTime: string | null
+  venue: string | null
   registrationOpen: boolean
-  /** Google Apps Script URL that returns { count } for this event's form. */
+  /** Google Apps Script URL that returns { count } for this event's form. Null hides the counter. */
   countUrl: string | null
 } | null = {
-  slug: 'journey-to-internship-warmup',
-  date: null,
-  whereWhen: 'Fecha y lugar por confirmar',
+  slug: 'hackwitu',
+  date: '2026-11-14T08:00:00-06:00',
+  endTime: '18:00',
+  venue: 'Innovation Gym, Tec de Monterrey',
   registrationOpen: true,
   countUrl: null,
 }
@@ -198,14 +219,13 @@ export const NEXT_EVENT: {
 /** The full event record for NEXT_EVENT, or null. */
 export const nextEvent = () => (NEXT_EVENT ? EVENTS.find((e) => e.slug === NEXT_EVENT.slug) ?? null : null)
 
-// ── Activities (Inicio teaser + Proyectos) ───────────────────
+// ── Activities (Inicio carousel + Proyectos) ─────────────────
 
 /**
  * Celestial icon per event, see components/Celestial.tsx for the options.
- * There are 6 icons for 8 events: the two repeats sit far apart in the grid.
+ * There are 6 icons for 7 events: the one repeat sits far apart in the grid.
  */
 const ACTIVITY_ICONS: Record<(typeof EVENT_ORDER)[number], string> = {
-  'journey-to-internship-warmup': 'moon',
   hackwitu: 'burst',
   'journey-to-internship': 'constellation',
   'dia-de-la-mujer': 'star',
@@ -223,6 +243,9 @@ export const ACTIVITIES = EVENTS.map((e) => ({
   slug: e.slug,
   icon: ACTIVITY_ICONS[e.slug as keyof typeof ACTIVITY_ICONS] ?? 'star',
 }))
+
+/** The events featured in the Inicio carousel, in this order. */
+export const INICIO_FEATURED = ['hack4her', 'journey-to-internship', 'empowerhack', 'dia-de-la-mujer'] as const
 
 // ── WitCode ──────────────────────────────────────────────────
 
