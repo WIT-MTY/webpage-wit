@@ -9,16 +9,20 @@ import styles from './Reveal.module.css'
  *
  * Only elements that start below the fold animate: anything already on
  * screen when the page loads stays put, so nothing visible blinks out on
- * hydration. Classes are toggled on the DOM directly; no re-renders.
- * prefers-reduced-motion: does nothing.
+ * hydration. With `onLoad`, on-screen elements get a CSS entrance from the
+ * first paint instead. Classes are toggled on the DOM directly; no re-renders.
+ * prefers-reduced-motion: no scroll reveal, and the entrance is cut to its end.
  */
 export default function Reveal({
   children,
   delay = 0,
+  onLoad = false,
   className = '',
 }: {
   children: React.ReactNode
   delay?: number
+  /** Also animate when already on screen at load (a CSS entrance from first paint). */
+  onLoad?: boolean
   className?: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -28,6 +32,7 @@ export default function Reveal({
     if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     if (el.getBoundingClientRect().top < window.innerHeight) return
 
+    el.classList.remove(styles.enter)
     el.classList.add(styles.hidden)
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -44,7 +49,11 @@ export default function Reveal({
   }, [delay])
 
   return (
-    <div ref={ref} className={className}>
+    <div
+      ref={ref}
+      className={`${onLoad ? styles.enter : ''} ${className}`}
+      style={onLoad ? ({ '--reveal-delay': `${delay}ms` } as React.CSSProperties) : undefined}
+    >
       {children}
     </div>
   )

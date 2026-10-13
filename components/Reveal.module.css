@@ -3,6 +3,11 @@
   Nothing is hidden in the server HTML: Reveal only hides elements that are
   still below the fold once JS runs, so no-JS and above-the-fold content are
   never blank.
+
+  .enter (Reveal `onLoad`): a CSS fade-up that plays from the first paint, so
+  content already on screen also gets an entrance without blinking out on
+  hydration. It runs without JS too. Elements that turn out to be below the
+  fold swap it for the scroll reveal.
 */
 .hidden {
   opacity: 0;
@@ -14,4 +19,26 @@
     opacity 600ms cubic-bezier(0.2, 0.7, 0.2, 1),
     transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
   transition-delay: var(--reveal-delay, 0ms);
+}
+
+.enter {
+  animation: reveal-up 600ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter {
+    animation: none;
+  }
 }

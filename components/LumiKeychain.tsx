@@ -27,6 +27,14 @@ const WAVE_MIN_MS = 450
 const WAVE_PEAK = 0.65 // light, not a strobe
 const WAVE_RING = 128 * 0.88 // radius of the ring's bright band in flash-ring.svg at scale 1
 
+/** Window event that gives Lumi her click kick from elsewhere on the page (see kickLumi). */
+const KICK_EVENT = 'lumi:kick'
+
+/** Kick the keychain as if it were clicked (swing + flash), without toggling her bubble. */
+export function kickLumi() {
+  window.dispatchEvent(new Event(KICK_EVENT))
+}
+
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /** Current rotation in degrees, wherever the element is mid-animation. */
@@ -66,7 +74,8 @@ export function FlashOutline() {
     - Idle: soft CSS pendulum (±3°, 5.2s), data-ambient so MotionGovernor
       stops it while scrolling and off-screen.
     - Click: a 16° kick with the same decay. Rapid clicks restart from the
-      current angle, so nothing jumps.
+      current angle, so nothing jumps. kickLumi() triggers the same kick and
+      flash from other components (e.g. copying the email).
     - Flash, 600ms after load and on every click: her belly glows like a
       firefly, a glint crosses the charm, and a ring of light spreads out from
       her. The ring only shows on the outlines of [data-lumi-flash] blocks
@@ -211,6 +220,16 @@ export default function LumiKeychain() {
     const id = window.setTimeout(() => setTalking(false), 6000)
     return () => window.clearTimeout(id)
   }, [talking])
+
+  useEffect(() => {
+    const onKick = () => {
+      swing(KICK_DEG)
+      glint()
+    }
+    window.addEventListener(KICK_EVENT, onKick)
+    return () => window.removeEventListener(KICK_EVENT, onKick)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- swing/glint only read refs
+  }, [])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setTalking(false)
