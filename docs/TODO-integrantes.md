@@ -1,5 +1,9 @@
 # Integrantes — `app/integrantes/page.tsx`
 
+> **On hold until after launch.** Please don't continue the tasks below or
+> open new branches for this page until launch is done. Kat will say when
+> to pick them up again.
+
 Figma: 🖥 Desktop → "Integrantes — Desktop", "Integrantes — Area Selected
 (Software)" · 📱 Mobile → "Integrantes — Mobile"
 

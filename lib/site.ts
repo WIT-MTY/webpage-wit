@@ -11,7 +11,7 @@ export const NAV_LINKS = [
   { label: 'Inicio', href: '/' },
   { label: 'Proyectos', href: '/proyectos' },
   { label: 'WitCode', href: '/witcode' },
-  { label: 'Aliados', href: '/aliados' },
+  { label: 'Aliados estratégicos', href: '/aliados' },
   { label: 'Integrantes', href: '/integrantes' },
   { label: 'Contáctanos', href: '/contacto' },
 ] as const
@@ -46,9 +46,17 @@ export type EventMetric = { value: string; label: string }
 export type WitEvent = {
   slug: string
   title: string
+  /** Other name the event is known by. Reference only, never displayed. */
+  aka?: string
   category: string
+  /** Empty string = not written yet; the line is hidden on public cards. */
   tagline: string
+  /** Empty string = not written yet; the line is hidden on public cards. */
   description: string
+  /** Short highlights shown as chips in the Próximo evento panel. */
+  chips?: string[]
+  /** ISO date of the event. Null until it is confirmed. */
+  date: string | null
   /** Google Form for this event. Null hides the sign-up button. */
   formUrl: string | null
   /** Photos for the card carousel: put files in /public/photos. */
@@ -58,14 +66,60 @@ export type WitEvent = {
   sponsors: (string | null)[]
 }
 
-export const EVENTS: WitEvent[] = [
+/** The order events are listed in, everywhere. */
+export const EVENT_ORDER = [
+  'hackwitu',
+  'journey-to-internship',
+  'dia-de-la-mujer',
+  'empowerhack',
+  'reunion-nacional',
+  'hack4her',
+  'run4wit',
+] as const
+
+/** Placeholder for an event we only know the name of. */
+const pendingEvent = (slug: string, title: string): WitEvent => ({
+  slug,
+  title,
+  // TODO: category, tagline, description and date.
+  category: '',
+  tagline: '',
+  description: '',
+  date: null,
+  formUrl: null,
+  photos: [],
+  metrics: [],
+  sponsors: [],
+})
+
+const EVENT_LIST: WitEvent[] = [
+  {
+    ...pendingEvent('hackwitu', 'HackWITu'),
+    aka: 'Hack4Prepa',
+    category: 'Hackathon',
+    tagline: 'No necesitas ser experta en STEM, ¡solo tener curiosidad, creatividad y ganas de intentarlo!',
+    // TODO(kat): confirm wording
+    description:
+      'HackWITu es un hackathon dirigido a estudiantes de preparatoria con el propósito de fomentar la participación de mujeres en la tecnología.',
+    chips: ['Equipos de cuatro integrantes', 'Merch oficial', 'Networking', 'Comida'],
+    date: '2026-11-14T08:00:00-06:00',
+    formUrl:
+      'https://docs.google.com/forms/d/e/1FAIpQLSfEkFMz5DSeC2yTq1MsO7lmwlY9WV48x-Hdld0OBFYmQjy07Q/viewform',
+  },
+  {
+    ...pendingEvent('empowerhack', 'EmpowerHack'),
+    description:
+      'Un hackathon dirigido a chicas de secundaria con el propósito de fomentar la participación de mujeres en la tecnología desde una temprana edad.',
+  },
+  pendingEvent('reunion-nacional', 'Reunión Nacional'),
   {
     slug: 'hack4her',
     title: 'Hack4Her',
     category: 'Hackathon',
     tagline: 'Un fin de semana para construir con causa.',
     description:
-      'Nuestro hackathon para impulsar a más mujeres en tecnología: equipos, mentoras y retos reales de la industria.',
+      'Hack4Her es un hackathon organizado por mujeres y dirigido a mujeres. El objetivo es fomentar la participación de mujeres en hackathons y en el área de la tecnología.',
+    date: null,
     formUrl: null,
     photos: [],
     metrics: [
@@ -76,28 +130,13 @@ export const EVENTS: WitEvent[] = [
     sponsors: [null, null, null, null, null, null],
   },
   {
-    slug: 'conferencias',
-    title: 'Conferencias',
-    category: 'Evento',
-    tagline: 'Voces que inspiran nuevos caminos.',
-    description:
-      'Mujeres de la industria y la academia comparten su trayectoria, sus aprendizajes y el camino que las llevó a donde están.',
-    formUrl: null,
-    photos: [],
-    metrics: [
-      { value: '—', label: 'asistentes' },
-      { value: '—', label: 'ponentes' },
-      { value: '—', label: 'ediciones' },
-    ],
-    sponsors: [null, null, null],
-  },
-  {
     slug: 'journey-to-internship',
     title: 'Journey to Internship',
     category: 'Programa',
     tagline: 'Puentes hacia grandes oportunidades.',
     description:
-      'Preparación y vinculación para conseguir tu primera práctica profesional: CV, entrevistas y contacto directo con empresas.',
+      'Las y los estudiantes del Tecnológico de Monterrey son invitados a una serie de conferencias y talleres impartidos por empresas con reconocimiento nacional y/o internacional con el objetivo de prepararse para internships.',
+    date: null,
     // TODO: paste the Journey to Internship Google Form URL here.
     formUrl: null,
     photos: [],
@@ -109,28 +148,13 @@ export const EVENTS: WitEvent[] = [
     sponsors: [null, null, null],
   },
   {
-    slug: 'talleres',
-    title: 'Talleres',
-    category: 'Evento',
-    tagline: 'Herramientas para crear sin límites.',
-    description:
-      'Sesiones prácticas para aprender haciendo, desde tus primeras líneas de código hasta proyectos completos.',
-    formUrl: null,
-    photos: [],
-    metrics: [
-      { value: '—', label: 'talleres' },
-      { value: '—', label: 'asistentes' },
-      { value: '—', label: 'horas' },
-    ],
-    sponsors: [null, null, null],
-  },
-  {
     slug: 'dia-de-la-mujer',
     title: 'Día de la Mujer',
     category: 'Evento',
     tagline: 'Celebramos hoy para un mañana más justo.',
     description:
-      'Una jornada para reconocer a las mujeres en tecnología y abrir la conversación sobre la brecha de género.',
+      'Desayuno conmemorativo donde alumnas, docentes y profesionales dialogan sobre experiencias y liderazgo femenino. Un espacio para inspirar y visibilizar su impacto.',
+    date: null,
     formUrl: null,
     photos: [],
     metrics: [
@@ -146,7 +170,8 @@ export const EVENTS: WitEvent[] = [
     category: 'Carrera',
     tagline: 'Corremos por más mujeres en tecnología.',
     // TODO: fill in from the Instagram post (date, distance, cause).
-    description: 'Descripción pendiente.',
+    description: '',
+    date: null,
     formUrl: null,
     photos: [],
     metrics: [
@@ -158,23 +183,35 @@ export const EVENTS: WitEvent[] = [
   },
 ]
 
+const orderOf = (slug: string) => (EVENT_ORDER as readonly string[]).indexOf(slug)
+
+/** All events, sorted by EVENT_ORDER. */
+export const EVENTS: WitEvent[] = [...EVENT_LIST].sort((a, b) => orderOf(a.slug) - orderOf(b.slug))
+
 /**
- * The upcoming event, shown in the "Próximo evento" panel and the mobile
- * register prompt. Set to null when there is nothing coming up: both switch
- * to their "no event" state on their own.
+ * The upcoming event, shown in the "Próximo evento" panel (Proyectos) and the
+ * mobile register prompt (Inicio). Set to null when there is nothing coming
+ * up: the panel disappears and the prompt never shows.
+ * The registration link is the event's own `formUrl`.
  */
 export const NEXT_EVENT: {
   slug: string
-  /** ISO date of the event itself, drives the "En N días" countdown. */
+  /**
+   * Start, as ISO with an explicit Monterrey offset. Drives the countdown,
+   * which is then the same for every visitor whatever their time zone.
+   */
   date: string | null
-  whereWhen: string
+  /** End time, same day, "HH:MM" Monterrey time. */
+  endTime: string | null
+  venue: string | null
   registrationOpen: boolean
-  /** Google Apps Script URL that returns { count } for this event's form. */
+  /** Google Apps Script URL that returns { count } for this event's form. Null hides the counter. */
   countUrl: string | null
 } | null = {
-  slug: 'journey-to-internship',
-  date: null,
-  whereWhen: 'Fecha y lugar por confirmar',
+  slug: 'hackwitu',
+  date: '2026-11-14T08:00:00-06:00',
+  endTime: '18:00',
+  venue: 'Innovation Gym, Tec de Monterrey',
   registrationOpen: true,
   countUrl: null,
 }
@@ -182,37 +219,84 @@ export const NEXT_EVENT: {
 /** The full event record for NEXT_EVENT, or null. */
 export const nextEvent = () => (NEXT_EVENT ? EVENTS.find((e) => e.slug === NEXT_EVENT.slug) ?? null : null)
 
-// ── Activities (Inicio teaser + Proyectos) ───────────────────
+// ── Activities (Inicio carousel + Proyectos) ─────────────────
 
-/** Celestial icon per activity, see components/Celestial.tsx for the options. */
-const ACTIVITY_ICONS: Record<string, string> = {
-  conferencias: 'burst',
+/**
+ * Celestial icon per event, see components/Celestial.tsx for the options.
+ * There are 6 icons for 7 events: the one repeat sits far apart in the grid.
+ */
+const ACTIVITY_ICONS: Record<(typeof EVENT_ORDER)[number], string> = {
+  hackwitu: 'burst',
   'journey-to-internship': 'constellation',
-  talleres: 'diamond',
   'dia-de-la-mujer': 'star',
+  empowerhack: 'diamond',
+  'reunion-nacional': 'planet',
+  hack4her: 'burst',
+  run4wit: 'moon',
 }
 
-export const ACTIVITIES = EVENTS.filter((e) => e.slug in ACTIVITY_ICONS).map((e) => ({
+/** One card per event, in EVENT_ORDER. */
+export const ACTIVITIES = EVENTS.map((e) => ({
   title: e.title,
   tagline: e.tagline,
   body: e.description,
   slug: e.slug,
-  icon: ACTIVITY_ICONS[e.slug],
+  icon: ACTIVITY_ICONS[e.slug as keyof typeof ACTIVITY_ICONS] ?? 'star',
 }))
+
+/** The events featured in the Inicio carousel, in this order. */
+export const INICIO_FEATURED = ['hack4her', 'journey-to-internship', 'empowerhack', 'dia-de-la-mujer'] as const
+
+// ── WitCode ──────────────────────────────────────────────────
+
+/** Annual metrics, shown on /witcode and the Inicio band. */
+export const WITCODE_STATS = [
+  { value: '34', label: 'estudiantes universitarios haciendo su servicio social' },
+  { value: '92%', label: 'de permanencia en los talleres' },
+  { value: '5', label: 'años cambiando vidas' },
+]
+
+/** Program description, one string per paragraph. Verbatim, do not edit. */
+export const WITCODE_DESCRIPTION = [
+  'WitCode no es solo un programa de servicio social; es el lugar donde la tecnología abre la puerta a un mundo de posibilidades para quienes más lo necesitan.',
+  'Nacido del grupo estudiantil WIT (Women in Technology) en el Tecnológico de Monterrey, WitCode toma inspiración de iniciativas globales como Hour of Code y la transforma en una herramienta de aprendizaje y visión.',
+  'Aquí, estudiantes universitarios se convierten en mentores para niñas de la escuela “Ciudad de los Niños”. Más allá de enseñar a programar con plataformas interactivas como Scratch, WitCode tiene la misión de decirle a cada niña y joven que pertenecen aquí, que su voz cuenta, que sus ideas tienen el poder de cambiar el futuro y que la brecha de género y la brecha digital se cierran comenzando por su propia convicción.',
+]
 
 // ── Allies ───────────────────────────────────────────────────
 
 export type Ally = {
   name: string
-  /** Logo in /public/aliados. Without one, the name shows as text. */
+  /** Logo file name in /public/aliados, without extension (.png, .jpg and
+   *  .webp are detected). Null or a missing file shows the name as text. */
   logo: string | null
   note?: string
   /** true = "Aliados actuales", false = the past-allies wall. */
   current: boolean
+  /** Years of the alliance. Shown under the name when present. */
+  years?: string
+  /** true = the logo already spells the name, so no caption is shown. */
+  nameInLogo?: boolean
+  /** Tile background behind the logo. Default white. */
+  tileBg?: 'black'
+  /** Wide horizontal lockup: less padding so it fills the tile width. */
+  wideLogo?: boolean
 }
 
 export const ALLIES: Ally[] = [
-  { name: 'Tecnológico de Monterrey', logo: null, note: 'Aliado académico', current: true },
+  { name: 'Arca Continental', logo: 'arca-continental', current: true },
+  { name: 'Peckers', logo: 'peckers', current: true, tileBg: 'black' },
+  { name: 'Heineken', logo: 'heineken', current: true },
+  { name: 'Apex Systems', logo: 'apex-systems', current: true },
+  {
+    name: 'Escuela de Ingeniería y Ciencias',
+    logo: 'escuela-ingenieria-ciencias',
+    current: true,
+    nameInLogo: true,
+    wideLogo: true,
+  },
+  { name: 'Ingenia', logo: 'ingenia', current: true },
+  { name: 'Carrier', logo: 'carrier', current: true },
 ]
 
 // ── Lumi ─────────────────────────────────────────────────────

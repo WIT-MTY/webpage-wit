@@ -1,5 +1,9 @@
 # Page assignments
 
+> **On hold until after launch.** Please don't continue the tasks in your
+> brief or open new branches until launch is done. Kat will say when to pick
+> them up again.
+
 One file per page. Read yours before you start, and read
 `../README.md` for how to run the project.
 

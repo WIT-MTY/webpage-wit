@@ -3,6 +3,7 @@ import PageHero from '@/components/PageHero'
 import PhotoFrame from '@/components/PhotoFrame'
 import CollabCTA from '@/components/CollabCTA'
 import { Container, Heading, MicroLabel } from '@/components/ui'
+import { WITCODE_DESCRIPTION, WITCODE_STATS } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'WitCode',
@@ -17,12 +18,6 @@ const PROGRAMA = [
   'Clases semanales sobre diferentes temas tecnológicos.',
   'Grupos de principiantes (para alumnas nuevas al programa) y avanzadas.',
   'Modalidad en línea, con sesiones presenciales de inicio y clausura.',
-]
-
-const IMPACTO = [
-  { value: '94', label: 'participantes' },
-  { value: '76', label: 'estudiantes universitarias realizando su servicio social' },
-  { value: '90%', label: 'de permanencia en los talleres' },
 ]
 
 export default function WitCodePage() {
@@ -43,12 +38,13 @@ export default function WitCodePage() {
         <div className="glass rounded-[2rem] p-8 sm:p-10">
           <MicroLabel className="mb-5">Propósito</MicroLabel>
           <p className="m-0 font-display text-[clamp(1.35rem,2.4vw,1.75rem)] font-semibold leading-snug text-white">
-            WitCode tiene como objetivo atender la brecha de género en la tecnología por medio de una educación que
-            brinde herramientas para nivelar las oportunidades de manera igualitaria en este ámbito.
+            {WITCODE_DESCRIPTION[0]}
           </p>
-          <p className="mt-6 mb-0 text-[16px] font-light leading-[1.75] text-white/75">
-            Lo anterior, mediante talleres a alumnas de 1° a 3° de secundaria de la escuela Ciudad de los Niños.
-          </p>
+          {WITCODE_DESCRIPTION.slice(1).map((p) => (
+            <p key={p} className="mt-6 mb-0 text-[16px] font-light leading-[1.75] text-white/75">
+              {p}
+            </p>
+          ))}
         </div>
 
         <div className="relative">
@@ -87,8 +83,9 @@ export default function WitCodePage() {
             <Heading as="h2" className="text-4xl">
               Impacto
             </Heading>
-            <dl className="mt-8 mb-0 flex flex-col gap-5">
-              {IMPACTO.map((s) => (
+            <MicroLabel className="mt-6">Métricas anuales</MicroLabel>
+            <dl className="mt-6 mb-0 flex flex-col gap-5">
+              {WITCODE_STATS.map((s) => (
                 <div key={s.label} className="flex items-baseline gap-5">
                   <dt className="sr-only">{s.label}</dt>
                   <dd className="m-0 min-w-24 shrink-0 whitespace-nowrap font-display text-4xl font-extrabold text-peri">{s.value}</dd>
@@ -96,7 +93,6 @@ export default function WitCodePage() {
                 </div>
               ))}
             </dl>
-            <p className="mt-8 mb-0 text-xs font-light text-white/50">En cifras totales del 2024.</p>
           </div>
         </Container>
       </section>
