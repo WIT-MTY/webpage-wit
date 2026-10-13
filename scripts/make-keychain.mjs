@@ -30,9 +30,14 @@ const TAB_CLEAR = 10 // minimum air between the tab and an antenna's border
 const HOLE_R = 14
 const HOLE_FROM_TOP = TAB_R // hole centered in the tab's round top
 
-const ACRYLIC = 0.55 // translucent white fill
+const ACRYLIC = 0.72 // translucent tinted fill
 const EDGE = 0.95 // 1px bright edge line
 const HIGHLIGHT = 0.25 // inner highlight along the top-left edge
+// Tinted acrylic: lilac (a brighter take on --color-peri) at the top-left, fading to a
+// soft pink (wit-pink lightened) at the bottom-right. Edge and highlight lean white.
+const TINT_FROM = [196, 178, 255]
+const TINT_TO = [255, 158, 204]
+const mix = (from, to, t) => from.map((c, k) => c + (to[k] - c) * t)
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v))
 
@@ -191,8 +196,11 @@ for (let y = 0; y < H; y++) {
     const shape = clamp01(e + 0.5) // anti-aliased edge
     if (shape === 0) continue
 
-    // Acrylic: translucent fill, brighter 1px edge line.
-    let a = ACRYLIC + (EDGE - ACRYLIC) * clamp01(1.6 - e)
+    // Acrylic: translucent tinted fill, brighter near-white 1px edge line.
+    const edge = clamp01(1.6 - e)
+    let a = ACRYLIC + (EDGE - ACRYLIC) * edge
+    let tint = mix(TINT_FROM, TINT_TO, clamp01((x / W + y / H) / 2 * 1.4 - 0.2))
+    tint = mix(tint, [255, 255, 255], edge * 0.7)
 
     // Inner highlight on edges facing the top-left light.
     if (e > 1.5 && e < 7) {
@@ -201,14 +209,14 @@ for (let y = 0; y < H; y++) {
       const len = Math.hypot(gx, gy) || 1
       // The gradient points inward; a top-left edge has it pointing down-right.
       const facing = clamp01(((gx + gy) / len / Math.SQRT2 - 0.3) / 0.7)
-      a = Math.min(EDGE, a + HIGHLIGHT * facing * (1 - (e - 1.5) / 5.5))
+      const glow = HIGHLIGHT * facing * (1 - (e - 1.5) / 5.5)
+      a = Math.min(EDGE, a + glow)
+      tint = mix(tint, [255, 255, 255], glow * 2)
     }
     a *= shape
 
     // Lumi on top of the acrylic, clipped to the die-cut.
-    let r = 255
-    let g = 255
-    let b = 255
+    let [r, g, b] = tint
     const lx = x - offX
     const ly = y - offY
     if (lx >= 0 && ly >= 0 && lx < w0 && ly < h0) {
@@ -216,9 +224,9 @@ for (let y = 0; y < H; y++) {
       const la = (lumi[j + 3] / 255) * shape
       const outA = la + a * (1 - la)
       if (outA > 0) {
-        r = (lumi[j] * la + 255 * a * (1 - la)) / outA
-        g = (lumi[j + 1] * la + 255 * a * (1 - la)) / outA
-        b = (lumi[j + 2] * la + 255 * a * (1 - la)) / outA
+        r = (lumi[j] * la + tint[0] * a * (1 - la)) / outA
+        g = (lumi[j + 1] * la + tint[1] * a * (1 - la)) / outA
+        b = (lumi[j + 2] * la + tint[2] * a * (1 - la)) / outA
       }
       a = outA
     }
