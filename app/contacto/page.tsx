@@ -3,7 +3,7 @@ import PageHero from '@/components/PageHero'
 import LumiKeychain, { FlashOutline } from '@/components/LumiKeychain'
 import { SocialIcon } from '@/components/SocialIcon'
 import { Container, MicroLabel } from '@/components/ui'
-import { ADDRESS, CONTACT_EMAIL, SOCIALS } from '@/lib/site'
+import { ADDRESS, ADDRESS_MAP_URL, CONTACT_EMAIL, SOCIALS } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Contáctanos',
@@ -11,6 +11,12 @@ export const metadata: Metadata = {
 }
 
 export default function ContactoPage() {
+  const addressLines = ADDRESS.map((line, i) => (
+    <span key={line} className={`block leading-relaxed ${i === 0 ? 'font-display text-xl font-bold text-white' : 'mt-2 text-[15px] font-light text-white/75'}`}>
+      {line}
+    </span>
+  ))
+
   return (
     <>
       {/* Under 640px the keychain hangs above the heading, so the hero starts lower. */}
@@ -73,11 +79,21 @@ export default function ContactoPage() {
           <FlashOutline />
           <MicroLabel className="mb-5">Dirección</MicroLabel>
           <address className="not-italic">
-            {ADDRESS.map((line, i) => (
-              <p key={line} className={`m-0 leading-relaxed ${i === 0 ? 'font-display text-xl font-bold text-white' : 'mt-2 text-[15px] font-light text-white/75'}`}>
-                {line}
-              </p>
-            ))}
+            {/* The address opens Google Maps when there is a link; otherwise it is plain text. */}
+            {ADDRESS_MAP_URL ? (
+              <a
+                href={ADDRESS_MAP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${ADDRESS.join(', ')}. Ver en Google Maps (se abre en una pestaña nueva)`}
+                className="group block decoration-peri/50 underline-offset-4 hover:underline"
+              >
+                {addressLines}
+                <span className="mt-4 block text-[13px] font-medium text-peri group-hover:text-white">Ver en Google Maps ↗</span>
+              </a>
+            ) : (
+              addressLines
+            )}
           </address>
         </div>
       </Container>

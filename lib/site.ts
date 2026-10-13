@@ -16,15 +16,15 @@ export const NAV_LINKS = [
   { label: 'Contáctanos', href: '/contacto' },
 ] as const
 
-/** Hack4Her lives on its own site. TODO: paste the real URL. */
-export const HACK4HER_URL: string | null = null
+/** Hack4Her lives on its own site. */
+export const HACK4HER_URL: string | null = 'https://www.hack4her.com/'
 
 export const CONTACT_EMAIL: string | null = 'wit.mty@gmail.com'
 
+/** Only networks with a confirmed URL. Anything not listed here is not shown. */
 export const SOCIALS = [
-  { label: 'Instagram', handle: '@wit.mty', href: 'https://instagram.com/wit.mty' },
-  { label: 'TikTok', handle: '@wit.mty', href: 'https://www.tiktok.com/@wit.mty' },
-  { label: 'LinkedIn', handle: 'Women in Technology', href: 'https://www.linkedin.com/company/82364150/' },
+  { label: 'Instagram', handle: '@wit.mty', href: 'https://www.instagram.com/wit.mty/?hl=es' },
+  { label: 'LinkedIn', handle: 'Women in Technology', href: 'https://mx.linkedin.com/company/wit-mty' },
 ] as const
 
 export const ADDRESS = [
@@ -33,11 +33,20 @@ export const ADDRESS = [
   '64849 Monterrey, N.L.',
 ]
 
+/** Google Maps link for ADDRESS. The address text links here wherever it is shown. */
+export const ADDRESS_MAP_URL: string | null = 'https://maps.app.goo.gl/hNCyZcVZoSddFUPw6'
+
 /**
  * Recruitment countdown on /integrantes.
  * ISO date string, e.g. '2027-01-15T09:00:00-06:00'. While null: "Próximamente".
  */
 export const APPLICATIONS_OPEN: string | null = null
+
+/**
+ * Form for applying to WitCode. While null, /witcode shows a disabled
+ * "Convocatoria no abierta por ahora" button instead of a link.
+ */
+export const WITCODE_APPLY_URL: string | null = null
 
 // ── Events ───────────────────────────────────────────────────
 
@@ -59,6 +68,11 @@ export type WitEvent = {
   date: string | null
   /** Google Form for this event. Null hides the sign-up button. */
   formUrl: string | null
+  /**
+   * Shown instead of a sign-up button when there is no form:
+   * 'soon' = "Próximamente", 'ended' = "Evento finalizado".
+   */
+  status?: 'soon' | 'ended'
   /** Photos for the card carousel: put files in /public/photos. */
   photos: string[]
   metrics: EventMetric[]
@@ -139,6 +153,7 @@ const EVENT_LIST: WitEvent[] = [
     date: null,
     // TODO: paste the Journey to Internship Google Form URL here.
     formUrl: null,
+    status: 'soon',
     photos: [],
     metrics: [
       { value: '—', label: 'participantes' },
@@ -173,6 +188,7 @@ const EVENT_LIST: WitEvent[] = [
     description: '',
     date: null,
     formUrl: null,
+    status: 'ended', // Run4WIT already took place
     photos: [],
     metrics: [
       { value: '—', label: 'corredoras' },
@@ -241,6 +257,7 @@ export const ACTIVITIES = EVENTS.map((e) => ({
   tagline: e.tagline,
   body: e.description,
   slug: e.slug,
+  status: e.status,
   icon: ACTIVITY_ICONS[e.slug as keyof typeof ACTIVITY_ICONS] ?? 'star',
 }))
 
