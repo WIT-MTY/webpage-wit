@@ -342,7 +342,7 @@ export const LUMI_LINES: Record<string, string> = {
  */
 export const WITCODE_PHOTOS: { src: string | null; alt: string; caption: string }[] = [
   { src: null, alt: 'Generación de WitCode', caption: 'Bienvenida WitCode' },
-  { src: null, alt: 'Taller de WitCode en Ciudad de los Niños', caption: 'Talleres en Ciudad de los Niños' },
+  { src: null, alt: 'Taller de WitCode con alumnas de Ciudad de los Niños', caption: 'Talleres con Ciudad de los Niños' },
 ]
 
 /** Home collage. Drop files in /public/photos and fill `src`. */
