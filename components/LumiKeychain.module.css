@@ -1,0 +1,201 @@
+/*
+  Lumi keychain on Contáctanos. Figma: Lumi/Keychain (42:285), storyboard 43:791.
+  Built at the component's native 200×505 and scaled with --s, so every part
+  keeps the Figma proportions. Transform and opacity only.
+
+  Pivot = top center of the clasp: every rotation uses transform-origin 50% 0.
+*/
+.keychain {
+  --s: 0.44;
+  position: absolute;
+  top: 56px; /* clasp tucks 4px under the 60px nav */
+  left: calc(50% - 100px * var(--s));
+  z-index: 20;
+  width: calc(200px * var(--s));
+  height: calc(505px * var(--s));
+}
+
+/* Beside the heading from 640px. Below that it hangs above the heading. */
+@media (min-width: 640px) {
+  .keychain {
+    --s: 0.6;
+    /* Right of "Hablemos": half its width is ~2.5× the PageHero title size. */
+    left: calc(50% + 2.5 * clamp(2.75rem, 8vw, 6rem) + 8px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .keychain {
+    --s: 0.72;
+  }
+}
+
+.drop,
+.dangle,
+.sway,
+.nudge {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 0;
+}
+
+.rig {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 505px;
+  transform: scale(var(--s));
+  transform-origin: 0 0;
+}
+
+.button {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.part {
+  position: absolute;
+  display: block;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+}
+
+.clasp {
+  composes: part;
+  left: 93px;
+  top: 0;
+  width: 14px;
+  height: 26px;
+  border-radius: 7px;
+  box-shadow: 0 0 6px rgba(198, 200, 238, 0.45);
+  background-image: linear-gradient(
+    118.3deg,
+    rgb(244, 241, 250) 0%,
+    rgb(184, 176, 208) 28.285%,
+    rgb(125, 117, 153) 49.498%,
+    rgb(229, 224, 242) 70.711%
+  );
+}
+
+/* The chain and ring SVGs carry 6px of shadow margin around the Figma box. */
+.chain {
+  composes: part;
+  left: 87.5px;
+  top: 14px;
+}
+
+.lumi {
+  composes: part;
+  left: 10px;
+  top: 150px;
+  width: 180px;
+  height: 355px;
+  object-fit: cover;
+}
+
+.ring {
+  composes: part;
+  left: 77px;
+  top: 180px;
+}
+
+/* Light wave from Lumi's belly. Pre-rendered image, peaks at 16% opacity. */
+.wave {
+  position: absolute;
+  left: calc(50% - 100px * var(--s));
+  top: calc(316px * var(--s));
+  width: calc(200px * var(--s));
+  height: calc(200px * var(--s));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bubble {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  width: max-content;
+  max-width: min(228px, calc(100vw - 32px));
+  transform: translateX(-50%);
+}
+
+/* ── Intro, once per session (.intro is removed after the first play) ── */
+.intro .drop {
+  animation: keychain-drop 450ms ease-in 400ms both;
+}
+.intro .dangle {
+  animation: keychain-dangle 2200ms ease-in-out 850ms both;
+}
+.intro .wave {
+  animation: keychain-wave 1100ms ease-out 850ms both;
+}
+
+/* ── Rest: idle sway. data-ambient, so MotionGovernor stops it while
+   scrolling and off-screen. ── */
+.sway {
+  animation: keychain-sway 6s ease-in-out 3.2s infinite;
+  will-change: transform;
+}
+
+.nudge {
+  transition: transform 300ms ease-out;
+}
+@media (hover: hover) {
+  .button:hover .nudge {
+    transform: rotate(-4deg);
+  }
+}
+.button:focus-visible {
+  outline: none;
+}
+.button:focus-visible .lumi {
+  outline: 2px solid rgba(198, 200, 238, 0.8);
+  outline-offset: 4px;
+  border-radius: 40px;
+}
+
+@keyframes keychain-drop {
+  0% { transform: translate3d(0, -110%, 0); }
+  80% { transform: translate3d(0, 12px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes keychain-dangle {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(9deg); }
+  45% { transform: rotate(-6deg); }
+  65% { transform: rotate(3.5deg); }
+  82% { transform: rotate(-1.5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes keychain-wave {
+  0% { transform: scale(0.3); opacity: 0; }
+  35% { opacity: 0.16; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+@keyframes keychain-sway {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(1.5deg); }
+  75% { transform: rotate(-1.5deg); }
+}
+
+/* Reduced motion: no drop, wave, dangle or sway. The resting keychain only. */
+@media (prefers-reduced-motion: reduce) {
+  .intro .drop,
+  .intro .dangle,
+  .intro .wave,
+  .sway {
+    animation: none;
+  }
+  .nudge {
+    transition: none;
+  }
+}

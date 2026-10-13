@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import PageHero from '@/components/PageHero'
+import LumiKeychain from '@/components/LumiKeychain'
 import { SocialIcon } from '@/components/SocialIcon'
 import { Container, MicroLabel } from '@/components/ui'
 import { ADDRESS, CONTACT_EMAIL, SOCIALS } from '@/lib/site'
@@ -12,15 +13,19 @@ export const metadata: Metadata = {
 export default function ContactoPage() {
   return (
     <>
-      <PageHero
-        label="Contáctanos"
-        title="Hablemos"
-        intro="¿Quieres colaborar, patrocinar un evento o unirte a la comunidad? Escríbenos."
-        shapes={[
-          { shape: 'slab', depth: 'far', size: 280, rotate: -16, opacity: 0.4, pos: { top: '14%', right: '-1%' }, motion: 'slow', duration: 13, hideBelow: 'lg' },
-          { shape: 'loop', depth: 'mid', size: 140, rotate: 18, opacity: 0.85, pos: { top: '22%', left: '8%' }, motion: 'medium', duration: 10, hideBelow: 'md' },
-        ]}
-      />
+      {/* Under 640px the keychain hangs above the heading, so the hero starts lower. */}
+      <div className="relative max-sm:pt-40">
+        <LumiKeychain />
+        <PageHero
+          label="Contáctanos"
+          title="Hablemos"
+          intro="¿Quieres colaborar, patrocinar un evento o unirte a la comunidad? Escríbenos."
+          shapes={[
+            { shape: 'slab', depth: 'far', size: 280, rotate: -16, opacity: 0.4, pos: { top: '14%', right: '-1%' }, motion: 'slow', duration: 13, hideBelow: 'lg' },
+            { shape: 'loop', depth: 'mid', size: 140, rotate: 18, opacity: 0.85, pos: { top: '22%', left: '8%' }, motion: 'medium', duration: 10, hideBelow: 'md' },
+          ]}
+        />
+      </div>
 
       <Container className="grid gap-5 md:grid-cols-3">
         <div className="glass rounded-3xl p-8 md:col-span-2">
