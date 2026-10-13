@@ -2,10 +2,10 @@ import Link from 'next/link'
 import Celestial, { type CelestialKind } from './Celestial'
 import { ACTIVITIES } from '@/lib/site'
 
-/** The four signature activities. `detailed` shows the long description (Proyectos page). */
+/** One card per event, in EVENT_ORDER. `detailed` renders plain cards instead of links (Proyectos page). */
 export default function ActivityGrid({ detailed = false }: { detailed?: boolean }) {
   return (
-    <ul className={`m-0 grid list-none gap-5 p-0 ${detailed ? 'md:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-4'}`}>
+    <ul className="m-0 grid list-none gap-5 p-0 md:grid-cols-2">
       {ACTIVITIES.map((a) => {
         const inner = (
           <>
@@ -16,17 +16,17 @@ export default function ActivityGrid({ detailed = false }: { detailed?: boolean 
               <Celestial kind={a.icon as CelestialKind} size={20} />
             </span>
             <h3 className="m-0 font-display text-2xl font-bold text-white">{a.title}</h3>
-            <p className="mt-2 mb-0 text-[15px] font-light leading-relaxed text-peri/85">{a.tagline}</p>
-            {detailed && <p className="mt-4 mb-0 text-[15px] font-light leading-relaxed text-white/70">{a.body}</p>}
+            {a.tagline && <p className="mt-2 mb-0 text-[15px] font-light leading-relaxed text-peri/85">{a.tagline}</p>}
+            {a.body && <p className="mt-4 mb-0 text-[15px] font-light leading-relaxed text-white/70">{a.body}</p>}
           </>
         )
         return (
-          <li key={a.title}>
+          <li key={a.slug}>
             {detailed ? (
               <div className="glass h-full rounded-3xl p-8">{inner}</div>
             ) : (
               <Link
-                href="/proyectos"
+                href={`/proyectos#${a.slug}`}
                 className="glass group flex h-full flex-col rounded-3xl p-7 transition-colors duration-200 hover:border-peri/35 hover:bg-white/[0.09]"
               >
                 {inner}

@@ -47,7 +47,9 @@ export type WitEvent = {
   slug: string
   title: string
   category: string
+  /** Empty string = not written yet; the line is hidden on public cards. */
   tagline: string
+  /** Empty string = not written yet; the line is hidden on public cards. */
   description: string
   /** ISO date of the event. Null until it is confirmed. */
   date: string | null
@@ -78,8 +80,8 @@ const pendingEvent = (slug: string, title: string): WitEvent => ({
   title,
   // TODO: category, tagline, description and date.
   category: '',
-  tagline: 'Descripción pendiente.',
-  description: 'Descripción pendiente.',
+  tagline: '',
+  description: '',
   date: null,
   formUrl: null,
   photos: [],
@@ -90,7 +92,11 @@ const pendingEvent = (slug: string, title: string): WitEvent => ({
 const EVENT_LIST: WitEvent[] = [
   pendingEvent('journey-to-internship-warmup', 'Journey to Internship: Warm-up'),
   pendingEvent('hackwitu', 'HackWITU'),
-  pendingEvent('empowerhack', 'EmpowerHack'),
+  {
+    ...pendingEvent('empowerhack', 'EmpowerHack'),
+    description:
+      'Un hackathon dirigido a chicas de secundaria con el propósito de fomentar la participación de mujeres en la tecnología desde una temprana edad.',
+  },
   pendingEvent('reunion-nacional', 'Reunión Nacional'),
   {
     slug: 'hack4her',
@@ -98,7 +104,7 @@ const EVENT_LIST: WitEvent[] = [
     category: 'Hackathon',
     tagline: 'Un fin de semana para construir con causa.',
     description:
-      'Nuestro hackathon para impulsar a más mujeres en tecnología: equipos, mentoras y retos reales de la industria.',
+      'Hack4Her es un hackathon organizado por mujeres y dirigido a mujeres. El objetivo es fomentar la participación de mujeres en hackathons y en el área de la tecnología.',
     date: null,
     formUrl: null,
     photos: [],
@@ -115,7 +121,7 @@ const EVENT_LIST: WitEvent[] = [
     category: 'Programa',
     tagline: 'Puentes hacia grandes oportunidades.',
     description:
-      'Preparación y vinculación para conseguir tu primera práctica profesional: CV, entrevistas y contacto directo con empresas.',
+      'Las y los estudiantes del Tecnológico de Monterrey son invitados a una serie de conferencias y talleres impartidos por empresas con reconocimiento nacional y/o internacional con el objetivo de prepararse para internships.',
     date: null,
     // TODO: paste the Journey to Internship Google Form URL here.
     formUrl: null,
@@ -133,7 +139,7 @@ const EVENT_LIST: WitEvent[] = [
     category: 'Evento',
     tagline: 'Celebramos hoy para un mañana más justo.',
     description:
-      'Una jornada para reconocer a las mujeres en tecnología y abrir la conversación sobre la brecha de género.',
+      'Desayuno conmemorativo donde alumnas, docentes y profesionales dialogan sobre experiencias y liderazgo femenino. Un espacio para inspirar y visibilizar su impacto.',
     date: null,
     formUrl: null,
     photos: [],
@@ -150,7 +156,7 @@ const EVENT_LIST: WitEvent[] = [
     category: 'Carrera',
     tagline: 'Corremos por más mujeres en tecnología.',
     // TODO: fill in from the Instagram post (date, distance, cause).
-    description: 'Descripción pendiente.',
+    description: '',
     date: null,
     formUrl: null,
     photos: [],
@@ -194,20 +200,28 @@ export const nextEvent = () => (NEXT_EVENT ? EVENTS.find((e) => e.slug === NEXT_
 
 // ── Activities (Inicio teaser + Proyectos) ───────────────────
 
-/** Celestial icon per activity, see components/Celestial.tsx for the options. */
-const ACTIVITY_ICONS: Record<string, string> = {
-  hack4her: 'burst',
+/**
+ * Celestial icon per event, see components/Celestial.tsx for the options.
+ * There are 6 icons for 8 events: the two repeats sit far apart in the grid.
+ */
+const ACTIVITY_ICONS: Record<(typeof EVENT_ORDER)[number], string> = {
+  'journey-to-internship-warmup': 'moon',
+  hackwitu: 'burst',
   'journey-to-internship': 'constellation',
-  empowerhack: 'diamond',
   'dia-de-la-mujer': 'star',
+  empowerhack: 'diamond',
+  'reunion-nacional': 'planet',
+  hack4her: 'burst',
+  run4wit: 'moon',
 }
 
-export const ACTIVITIES = EVENTS.filter((e) => e.slug in ACTIVITY_ICONS).map((e) => ({
+/** One card per event, in EVENT_ORDER. */
+export const ACTIVITIES = EVENTS.map((e) => ({
   title: e.title,
   tagline: e.tagline,
   body: e.description,
   slug: e.slug,
-  icon: ACTIVITY_ICONS[e.slug],
+  icon: ACTIVITY_ICONS[e.slug as keyof typeof ACTIVITY_ICONS] ?? 'star',
 }))
 
 // ── WitCode ──────────────────────────────────────────────────
