@@ -26,10 +26,10 @@ cards; the design replaces them with a countdown panel and flip cards.
       exists), and the Impacto / Patrocinadores buttons. Backs: three metrics
       using `CountUp`, and a sponsor logo grid. Build it with
       `components/FlipCard.tsx`.
-- [ ] **Carousel.** Desktop: centered card with neighbours peeking and
+- [x] **Carousel.** Desktop: centered card with neighbours peeking and
       arrows + dots. Mobile: horizontal scroll with scroll-snap, one card
       visible and the next peeking ~24px.
-- [ ] **Deep links.** `/proyectos#<slug>` must scroll to that event's card and
+- [x] **Deep links.** `/proyectos#<slug>` must scroll to that event's card and
       pulse it once (periwinkle ring, ~600ms). The mobile register prompt and
       the "Conoce más" button both rely on this.
 - [ ] Mobile layout for the card: photo on top, content below. Same component
