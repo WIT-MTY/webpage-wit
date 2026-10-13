@@ -1,0 +1,86 @@
+/*
+  One-pass light sweep, shared by the nav links and the member cards.
+
+  - The band is a pre-rendered image (/fx/shine.svg), not a live gradient.
+  - Only transform and opacity animate. No blur, no backdrop-filter.
+  - Runs once per trigger (hover, keyboard focus, or a nav link becoming the
+    current page). No loops, so nothing runs when nobody is interacting.
+  - Hover only on devices that really hover, so touch gets no sticky effect.
+  - prefers-reduced-motion: no sweep at all.
+
+  Markup: put .host on the element, and inside it
+    <span class={track} aria-hidden="true"><span class={strip} /></span>
+  (navTrack / navStrip for nav links).
+*/
+.host {
+  position: relative;
+}
+
+.track {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.strip,
+.navStrip {
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: 0;
+  width: 45%;
+  background: url('/fx/shine.svg') center / 100% 100% no-repeat;
+  opacity: 0;
+  transform: translate3d(-120%, 0, 0) skewX(-18deg);
+}
+
+/* Nav: the band covers just the link text and peaks lower than the card glint. */
+.navTrack {
+  composes: track;
+  inset: -3px -6px;
+  border-radius: 4px;
+}
+
+/* Not `composes: strip`, so the card rules below never match nav links. */
+.navStrip {
+  width: 60%;
+}
+
+@media (hover: hover) {
+  .host:hover .strip {
+    animation: shine-sweep 900ms ease-out;
+  }
+  .host:hover .navStrip {
+    animation: shine-sweep-nav 900ms ease-out;
+  }
+}
+
+.host:focus-within .strip {
+  animation: shine-sweep 900ms ease-out;
+}
+
+.host:focus-visible .navStrip,
+.host[aria-current='page'] .navStrip {
+  animation: shine-sweep-nav 900ms ease-out;
+}
+
+@keyframes shine-sweep {
+  0% { opacity: 0; transform: translate3d(-120%, 0, 0) skewX(-18deg); }
+  15%, 80% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(300%, 0, 0) skewX(-18deg); }
+}
+
+@keyframes shine-sweep-nav {
+  0% { opacity: 0; transform: translate3d(-120%, 0, 0) skewX(-18deg); }
+  15%, 80% { opacity: 0.6; }
+  100% { opacity: 0; transform: translate3d(220%, 0, 0) skewX(-18deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .strip,
+  .navStrip {
+    display: none;
+  }
+}
