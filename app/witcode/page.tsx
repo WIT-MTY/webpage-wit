@@ -3,6 +3,7 @@ import PageHero from '@/components/PageHero'
 import PhotoFade from '@/components/PhotoFade'
 import CountUp from '@/components/CountUp'
 import Reveal from '@/components/Reveal'
+import ShineCard from '@/components/ShineCard'
 import CollabCTA from '@/components/CollabCTA'
 import { SocialIcon } from '@/components/SocialIcon'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
@@ -126,43 +127,47 @@ export default function WitCodePage() {
       <section data-lumi-anchor="right" className="pt-24">
         <Container className="grid gap-6 md:grid-cols-2">
           <Reveal>
-            <div className="glass h-full rounded-[2rem] p-8 sm:p-10">
-              <Heading as="h2" className="text-4xl">
-                Programa
-              </Heading>
-              <ul className="mt-8 mb-0 flex list-none flex-col gap-5 p-0">
-                {PROGRAMA.map((item) => (
-                  <li key={item} className="flex gap-4 text-[16px] font-light leading-relaxed text-white/80">
-                    <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-peri shadow-[0_0_10px_rgba(198,200,238,0.8)]" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ShineCard className="h-full" radius="rounded-[2rem]">
+              <div className="glass h-full rounded-[2rem] p-8 sm:p-10">
+                <Heading as="h2" className="text-4xl">
+                  Programa
+                </Heading>
+                <ul className="mt-8 mb-0 flex list-none flex-col gap-5 p-0">
+                  {PROGRAMA.map((item) => (
+                    <li key={item} className="flex gap-4 text-[16px] font-light leading-relaxed text-white/80">
+                      <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-peri shadow-[0_0_10px_rgba(198,200,238,0.8)]" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </ShineCard>
           </Reveal>
 
           <Reveal delay={120}>
-            <div
-              className="h-full rounded-[2rem] border border-white/10 p-8 sm:p-10"
-              style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.55) 0%, rgba(71,18,107,0.4) 60%, rgba(144,102,210,0.3) 100%)' }}
-            >
-              <Heading as="h2" className="text-4xl">
-                Impacto
-              </Heading>
-              <MicroLabel className="mt-6">Métricas anuales</MicroLabel>
-              <dl className="mt-6 mb-0 flex flex-col gap-5">
-                {WITCODE_STATS.map((s, i) => (
-                  <Reveal key={s.label} delay={240 + i * 120} className="flex items-baseline gap-5">
-                    <dt className="sr-only">{s.label}</dt>
-                    {/* Server HTML holds the final value; it counts up from 0 once on screen. */}
-                    <dd className="m-0 min-w-24 shrink-0 whitespace-nowrap font-display text-4xl font-extrabold tabular-nums text-peri">
-                      <CountUp value={s.value} duration={1200} />
-                    </dd>
-                    <dd className="m-0 text-[15px] font-light leading-snug text-white/80">{s.label}</dd>
-                  </Reveal>
-                ))}
-              </dl>
-            </div>
+            <ShineCard className="h-full" radius="rounded-[2rem]">
+              <div
+                className="h-full rounded-[2rem] border border-white/10 p-8 sm:p-10"
+                style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.55) 0%, rgba(71,18,107,0.4) 60%, rgba(144,102,210,0.3) 100%)' }}
+              >
+                <Heading as="h2" className="text-4xl">
+                  Impacto
+                </Heading>
+                <MicroLabel className="mt-6">Métricas anuales</MicroLabel>
+                <dl className="mt-6 mb-0 flex flex-col gap-5">
+                  {WITCODE_STATS.map((s, i) => (
+                    <Reveal key={s.label} delay={240 + i * 120} className="flex items-baseline gap-5">
+                      <dt className="sr-only">{s.label}</dt>
+                      {/* Server HTML holds the final value; it counts up from 0 once on screen. */}
+                      <dd className="m-0 min-w-24 shrink-0 whitespace-nowrap font-display text-4xl font-extrabold tabular-nums text-peri">
+                        <CountUp value={s.value} duration={1200} />
+                      </dd>
+                      <dd className="m-0 text-[15px] font-light leading-snug text-white/80">{s.label}</dd>
+                    </Reveal>
+                  ))}
+                </dl>
+              </div>
+            </ShineCard>
           </Reveal>
         </Container>
       </section>

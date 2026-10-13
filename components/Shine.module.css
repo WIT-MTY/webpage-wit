@@ -1,5 +1,6 @@
 /*
-  One-pass light sweep, shared by the nav links and the member cards.
+  One-pass light sweep, shared by the nav links, the member cards and every
+  ShineCard (components/ShineCard.tsx, the reusable wrapper for any card).
 
   - The band is a pre-rendered image (/fx/shine.svg), not a live gradient.
   - Only transform and opacity animate. No blur, no backdrop-filter.
@@ -64,6 +65,11 @@
 .host:focus-visible .navStrip,
 .host[aria-current='page'] .navStrip {
   animation: shine-sweep-nav 900ms ease-out;
+}
+
+/* One pass when a ShineCard first scrolls into view; the class is removed after, so hover still replays it. */
+.played .strip {
+  animation: shine-sweep 900ms ease-out;
 }
 
 @keyframes shine-sweep {
