@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import MemberCard from './MemberCard'
-import { AREAS, GENERATIONS, MEMBERS, areaLabel, isShown, type AreaId, type Member } from '@/data/members'
+import { AREAS, CURRENT_GENERATION, GENERATIONS, MEMBERS, areaLabel, isShown, type AreaId, type Member } from '@/data/members'
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -27,17 +27,18 @@ export default function TeamExplorer() {
 
   const gen = useMemo(() => MEMBERS.filter((m) => isShown(m) && m.generation === generation), [generation])
   const leadership = gen.filter((m) => m.role === 'presidencia' || m.role === 'vicepresidencia')
-  const directors = AREAS.map((a) => gen.find((m) => m.role === 'director' && m.area === a.id)).filter(Boolean) as Member[]
-  const director = area ? gen.find((m) => m.role === 'director' && m.area === area) : undefined
+  // Some generations had two directors in one area (one per semester).
+  const directors = AREAS.flatMap((a) => gen.filter((m) => m.role === 'director' && m.area === a.id))
+  const areaDirectors = area ? directors.filter((m) => m.area === area) : []
   const coordinators = area ? gen.filter((m) => m.role === 'coordinador' && m.area === area) : []
-  // Only areas with someone to show get a chip.
-  const areas = AREAS.filter((a) => gen.some((m) => m.area === a.id))
-  const isNewest = generation === GENERATIONS[0]
+  // Only areas with a director or coordinator get a chip; leadership is always shown above.
+  const areas = AREAS.filter((a) => gen.some((m) => m.area === a.id && (m.role === 'director' || m.role === 'coordinador')))
+  const isCurrent = generation === CURRENT_GENERATION
 
   // Stable seed per person so their icon never changes between renders.
   const seed = (m: Member) => `${m.name}|${m.generation}|${m.role}|${m.area ?? ''}|${gen.indexOf(m)}`
 
-  const visibleCount = leadership.length + (area ? (director ? 1 : 0) + coordinators.length : directors.length)
+  const visibleCount = leadership.length + (area ? areaDirectors.length + coordinators.length : directors.length)
 
   if (GENERATIONS.length === 0) {
     return <p className="m-0 text-center text-[15px] font-light text-white/60">Pronto conocerás a nuestro equipo.</p>
@@ -108,9 +109,22 @@ export default function TeamExplorer() {
           </ul>
         ) : (
           <div className="flex flex-col items-center">
-            {director ? (
-              <div className="w-full max-w-xs">
-                <MemberCard m={director} seed={seed(director)} size="md" highlight />
+            <h3 className="m-0 mb-8 text-center font-display text-xl font-bold text-white">
+              {areaLabel(area)}
+              {isCurrent && (
+                <span className="font-light text-white/60">
+                  {' · '}
+                  {coordinators.length} {coordinators.length === 1 ? 'coordinadora' : 'coordinadoras'}
+                </span>
+              )}
+            </h3>
+            {areaDirectors.length > 0 ? (
+              <div className="flex w-full flex-wrap justify-center gap-4">
+                {areaDirectors.map((m) => (
+                  <div key={seed(m)} className="w-full max-w-xs">
+                    <MemberCard m={m} seed={seed(m)} size="md" highlight />
+                  </div>
+                ))}
               </div>
             ) : (
               <p className="m-0 text-white/60">Dirección por anunciar.</p>
@@ -122,15 +136,15 @@ export default function TeamExplorer() {
                   className="my-8 h-10 w-px"
                   style={{ background: 'linear-gradient(to bottom, rgba(198,200,238,0.5), transparent)' }}
                 />
-                <ul className="m-0 flex w-full max-w-4xl list-none flex-wrap justify-center gap-4 p-0">
+                <ul className="m-0 flex w-full max-w-5xl list-none flex-wrap justify-center gap-3 p-0">
                   {coordinators.map((m, i) => (
-                    <li key={seed(m)} className="w-[calc(50%-0.5rem)] md:w-[calc(33.333%-0.667rem)] lg:w-[calc(25%-0.75rem)]">
-                      <MemberCard m={m} seed={seed(m)} delay={80 + i * 45} />
+                    <li key={seed(m)} className="w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-0.5rem)] lg:w-[calc(20%-0.6rem)]">
+                      <MemberCard m={m} seed={seed(m)} size="xs" delay={80 + i * 30} />
                     </li>
                   ))}
                 </ul>
               </>
-            ) : isNewest ? (
+            ) : isCurrent ? (
               <p className="mt-8 mb-0 text-center text-[15px] font-light text-white/55">
                 Pronto conocerás al equipo de coordinación de esta área.
               </p>
