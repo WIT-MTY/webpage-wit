@@ -1,85 +1,252 @@
 'use client'
 
-import { useRef } from 'react'
-import { useTypewriter, type Segment, type TypeStep } from '@/hooks/useTypewriter'
-import { Caret } from './Typewriter'
+import { useEffect, useRef } from 'react'
+import styles from './HeroTypewriter.module.css'
 
 /*
-  Inicio's "Tech needs ___" line. Starts as the original "Tech needs WIT",
-  tries a few fillers, and lands on "Tech needs you!".
+  Inicio's "Tech needs ___" line: types "Tech needs WIT", tries a couple of
+  fillers, and lands on "Tech needs you!".
 
-  - Server HTML (and no-JS) shows "Tech needs WIT".
-  - Plays once per session; afterwards, and under prefers-reduced-motion,
-    "Tech needs you!" shows immediately.
-  - Layout: an invisible copy of the final line sizes the box; the animated
-    line sits on top of it, left-aligned and unwrapped, so longer fillers run
-    past the right edge instead of moving anything.
+  - Text is written straight to the DOM (textContent / classList), so typing
+    causes no React re-renders. The spans below have no React children, so
+    React never overwrites what the timeline wrote.
+  - Plays once per session. Afterwards, and under prefers-reduced-motion,
+    "Tech needs you!" is written immediately, with no caret.
+  - Stops while the tab is hidden and resumes where it left off.
+  - Layout: an invisible copy of the longest line ("Tech needs a rubber duck")
+    sizes the box, and on mobile the box always holds two lines, so nothing
+    around it moves.
 */
 
-const PAUSE = 700
-const PREFIX: Segment = { text: 'Tech needs ' }
-const WIT: Segment = { text: 'WIT', tone: 'accent' }
-const FINAL: Segment[] = [PREFIX, { text: 'you!', tone: 'accent' }]
-
-const swap = (from: string, to: Segment): TypeStep[] => [
-  { erase: from.length },
-  { pause: 250 },
-  { type: to.text, tone: to.tone },
-  { pause: PAUSE },
-]
-
-const STEPS: TypeStep[] = [
-  { pause: 900 },
-  ...swap('WIT', { text: 'coffee', tone: 'muted' }),
-  ...swap('coffee', WIT),
-  ...swap('WIT', { text: 'a rubber duck', tone: 'muted' }),
-  ...swap('a rubber duck', WIT),
-  ...swap('WIT', { text: 'fewer bugs', tone: 'muted' }),
-  { erase: 'fewer bugs'.length },
-  { pause: 250 },
-  { type: 'you!', tone: 'accent' },
-]
-
-const ACCENT: React.CSSProperties = {
-  background: 'linear-gradient(135deg, #c6c8ee 0%, #9066d2 45%, #ff5795 100%)',
-  WebkitBackgroundClip: 'text',
-  backgroundClip: 'text',
-  color: 'transparent',
+/** Every timing in the animation, in ms. Tune here. */
+const TIMING = {
+  /** Step 1: caret blinks alone before anything is typed. */
+  START_MS: 400,
+  /** Step 2: "Tech needs ", per character. */
+  TYPE_FAST_MS: 55,
+  /** Random ± added to every per-character delay. */
+  JITTER_MS: 20,
+  /** Step 3: "WIT", per character. */
+  TYPE_SLOW_MS: 140,
+  /** Step 3: hold on "Tech needs WIT", caret blinking. */
+  HOLD_WIT_MS: 1400,
+  /** Step 4: how long "WIT" stays highlighted before it is deleted. */
+  SELECT_WIT_MS: 350,
+  /** Step 5: pause before "coffee". */
+  DELETE_PAUSE_COFFEE_MS: 250,
+  TYPE_COFFEE_MS: 70,
+  HOLD_COFFEE_MS: 700,
+  SELECT_COFFEE_MS: 250,
+  /** Step 6: pause before "a rubber duck". */
+  DELETE_PAUSE_DUCK_MS: 200,
+  TYPE_DUCK_MS: 60,
+  HOLD_DUCK_MS: 800,
+  SELECT_DUCK_MS: 250,
+  /** Step 7: suspense beat, caret blinking alone. */
+  SUSPENSE_MS: 900,
+  /** Step 8: "you", per character. */
+  TYPE_YOU_MS: 130,
+  /** Step 8: gap between "you" and the "!". */
+  BANG_GAP_MS: 180,
+  /** Step 9: caret keeps blinking this long, then fades out. */
+  FINAL_HOLD_MS: 2500,
 }
 
-function Line({ segments }: { segments: Segment[] }) {
-  return segments.map((s, i) => (
-    <span key={i} style={s.tone === 'accent' ? ACCENT : undefined} className={s.tone === 'muted' ? 'text-peri/55' : undefined}>
-      {s.text}
-    </span>
-  ))
+const FINAL_TEXT = 'Tech needs you!'
+const LONGEST = 'Tech needs a rubber duck'
+const ONCE_KEY = 'wit-hero-typed'
+
+type Els = { prefix: HTMLSpanElement; sel: HTMLSpanElement; word: HTMLSpanElement; bang: HTMLSpanElement; caret: HTMLSpanElement }
+/** One timeline step: wait `wait` ms, then `run`. */
+type Op = { wait: number; run?: (els: Els) => void }
+
+const jitter = (ms: number) => Math.max(0, ms + (Math.random() * 2 - 1) * TIMING.JITTER_MS)
+
+const idle = (on: boolean): Op => ({ wait: 0, run: (e) => e.caret.classList.toggle(styles.idle, on) })
+const pause = (ms: number): Op[] => [idle(true), { wait: ms }]
+
+const type = (target: 'prefix' | 'word' | 'bang', text: string, perChar: number): Op[] => [
+  idle(false),
+  ...[...text].map((ch) => ({ wait: jitter(perChar), run: (e: Els) => void (e[target].textContent += ch) })),
+]
+
+const tone = (t: 'accent' | 'muted'): Op => ({
+  wait: 0,
+  run: (e) => {
+    e.word.classList.toggle(styles.accent, t === 'accent')
+    e.word.classList.toggle(styles.muted, t === 'muted')
+  },
+})
+
+/** Highlight the word like a selection, then delete it in one go. */
+const selectAndDelete = (ms: number): Op[] => [
+  idle(false),
+  { wait: 0, run: (e) => e.sel.classList.add(styles.selected) },
+  {
+    wait: ms,
+    run: (e) => {
+      e.word.textContent = ''
+      e.sel.classList.remove(styles.selected)
+    },
+  },
+]
+
+const T = TIMING
+const TIMELINE: Op[] = [
+  ...pause(T.START_MS),
+  ...type('prefix', 'Tech needs ', T.TYPE_FAST_MS),
+  tone('accent'),
+  ...type('word', 'WIT', T.TYPE_SLOW_MS),
+  ...pause(T.HOLD_WIT_MS),
+  ...selectAndDelete(T.SELECT_WIT_MS),
+  ...pause(T.DELETE_PAUSE_COFFEE_MS),
+  tone('muted'),
+  ...type('word', 'coffee', T.TYPE_COFFEE_MS),
+  ...pause(T.HOLD_COFFEE_MS),
+  ...selectAndDelete(T.SELECT_COFFEE_MS),
+  ...pause(T.DELETE_PAUSE_DUCK_MS),
+  ...type('word', 'a rubber duck', T.TYPE_DUCK_MS),
+  ...pause(T.HOLD_DUCK_MS),
+  ...selectAndDelete(T.SELECT_DUCK_MS),
+  ...pause(T.SUSPENSE_MS),
+  tone('accent'),
+  ...type('word', 'you', T.TYPE_YOU_MS),
+  { wait: T.BANG_GAP_MS, run: (e) => void (e.bang.textContent = '!') },
+  { wait: 0, run: (e) => e.bang.classList.add(styles.pop) },
+  ...pause(T.FINAL_HOLD_MS),
+  { wait: 0, run: (e) => e.caret.classList.replace(styles.idle, styles.gone) },
+]
+
+function readPlayed() {
+  try {
+    return window.sessionStorage.getItem(ONCE_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+function markPlayed() {
+  try {
+    window.sessionStorage.setItem(ONCE_KEY, '1')
+  } catch {
+    // Storage blocked: it just plays again next time.
+  }
+}
+
+/** Straight to "Tech needs you!", no caret, no motion. */
+function showFinal(e: Els) {
+  e.prefix.textContent = 'Tech needs '
+  e.word.textContent = 'you'
+  e.word.className = styles.accent
+  e.bang.textContent = '!'
+  e.caret.style.display = 'none'
 }
 
 export default function HeroTypewriter() {
-  const ref = useRef<HTMLParagraphElement>(null)
-  const { segments, done, started } = useTypewriter({
-    ref,
-    initial: [PREFIX, WIT],
-    steps: STEPS,
-    final: FINAL,
-    onceKey: 'wit-hero-typed',
-  })
+  const rootRef = useRef<HTMLParagraphElement>(null)
+  const prefixRef = useRef<HTMLSpanElement>(null)
+  const selRef = useRef<HTMLSpanElement>(null)
+  const wordRef = useRef<HTMLSpanElement>(null)
+  const bangRef = useRef<HTMLSpanElement>(null)
+  const caretRef = useRef<HTMLSpanElement>(null)
+
+  useEffect(() => {
+    const root = rootRef.current
+    const els = {
+      prefix: prefixRef.current,
+      sel: selRef.current,
+      word: wordRef.current,
+      bang: bangRef.current,
+      caret: caretRef.current,
+    }
+    if (!root || !els.prefix || !els.sel || !els.word || !els.bang || !els.caret) return
+    const e = els as Els
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || readPlayed()) {
+      showFinal(e)
+      return
+    }
+
+    let i = 0
+    let timer: number | undefined
+    let dueAt = 0
+    /** Time left on the current wait when the tab was hidden. */
+    let remaining: number | null = null
+    let started = false
+
+    const schedule = (ms: number) => {
+      dueAt = performance.now() + ms
+      timer = window.setTimeout(next, ms)
+    }
+    // Runs every zero-wait op right away, then waits for the next timed one.
+    function next() {
+      timer = undefined
+      ops[i++].run?.(e)
+      while (i < ops.length && ops[i].wait === 0) ops[i++].run?.(e)
+      if (i < ops.length) schedule(ops[i].wait)
+      else stopListening()
+    }
+    // `next` runs ops[i] after its wait; a leading dummy op makes the first wait apply.
+    const ops: Op[] = [{ wait: 0 }, ...TIMELINE]
+
+    const onVisibility = () => {
+      if (!started) return
+      if (document.visibilityState === 'hidden') {
+        if (timer === undefined) return
+        window.clearTimeout(timer)
+        timer = undefined
+        remaining = Math.max(0, dueAt - performance.now())
+      } else if (remaining !== null) {
+        const ms = remaining
+        remaining = null
+        dueAt = performance.now() + ms
+        timer = window.setTimeout(next, ms)
+      }
+    }
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting || started) return
+        started = true
+        io.disconnect()
+        markPlayed()
+        if (document.visibilityState === 'visible') next()
+        else remaining = 0
+      },
+      { threshold: 0.5 },
+    )
+    io.observe(root)
+    document.addEventListener('visibilitychange', onVisibility)
+
+    function stopListening() {
+      io.disconnect()
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+    return () => {
+      window.clearTimeout(timer)
+      stopListening()
+    }
+  }, [])
 
   return (
     <p
-      ref={ref}
+      ref={rootRef}
       lang="en"
-      className="relative m-0 mb-10 whitespace-nowrap font-light italic uppercase tracking-[0.35em] text-white/88"
+      className="relative m-0 mb-10 min-h-[3.2em] font-light italic uppercase leading-[1.6] tracking-[0.35em] text-white/88 sm:min-h-0 sm:whitespace-nowrap"
       style={{ fontSize: 'clamp(11px, 1.2vw, 15px)' }}
     >
-      <span className="sr-only">Tech needs you!</span>
+      <span className="sr-only">{FINAL_TEXT}</span>
+      {/* Sizes the box: the longest line the animation ever shows. */}
       <span className="invisible" aria-hidden="true">
-        <Line segments={FINAL} />
+        {LONGEST}
       </span>
-      <span className="absolute top-0 left-0" aria-hidden="true">
-        <Line segments={segments} />
-        {/* No caret when the line was shown finished from the start. */}
-        {(started || !done) && <Caret finished={done} />}
+      <span className="absolute inset-0 text-left" aria-hidden="true">
+        <span ref={prefixRef} />
+        <span ref={selRef}>
+          <span ref={wordRef} />
+        </span>
+        <span ref={bangRef} className={`${styles.bang} ${styles.accent}`} />
+        <span ref={caretRef} className={`${styles.caret} ${styles.idle}`} />
       </span>
     </p>
   )
