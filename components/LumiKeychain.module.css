@@ -157,6 +157,49 @@
   transform: translate3d(-130%, 0, 0) rotate(18deg);
 }
 
+/* Firefly glow on her belly: pulses once per flash. Pre-rendered image. */
+.firefly {
+  position: absolute;
+  left: 50%;
+  top: 73%;
+  width: 140%;
+  aspect-ratio: 1;
+  margin: -70% 0 0 -70%; /* % of width, so it is centered on that point */
+  background: url('/fx/firefly-glow.svg') center / 100% 100% no-repeat;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/*
+  Flash outline on a page block: an overlay clipped to just the block's
+  border ring (padding = ring width, the content box is masked out). Inside
+  it, a small ring-of-light image centered on Lumi scales up, so the border
+  lights where the ring crosses it. The mask never moves; only .wave does.
+*/
+.outline {
+  position: absolute;
+  inset: 0;
+  padding: 2px; /* ring width */
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+
+.wave {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 256px;
+  height: 256px;
+  margin: -128px 0 0 -128px; /* JS sets left/top to Lumi's position; this centers it there */
+  background: url('/fx/flash-ring.svg') center / 100% 100% no-repeat;
+  opacity: 0;
+  transform: scale(0);
+}
+
 .bubble {
   position: absolute;
   top: calc(100% + 8px);
@@ -201,7 +244,9 @@
   .charm {
     will-change: auto;
   }
-  .streak {
+  .streak,
+  .firefly,
+  .wave {
     display: none;
   }
 }

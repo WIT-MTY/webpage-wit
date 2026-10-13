@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Expanding ring of firefly light. Bright band near the edge, clear center. -->
+  <defs>
+    <radialGradient id="g" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffd6ec" stop-opacity="0"/>
+      <stop offset="0.72" stop-color="#ffd6ec" stop-opacity="0"/>
+      <stop offset="0.88" stop-color="#fff2fa" stop-opacity="1"/>
+      <stop offset="0.94" stop-color="#d9ccff" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#d9ccff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="128" cy="128" r="128" fill="url(#g)"/>
+</svg>

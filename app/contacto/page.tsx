@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import PageHero from '@/components/PageHero'
-import LumiKeychain, { FlashTrack } from '@/components/LumiKeychain'
+import LumiKeychain, { FlashOutline } from '@/components/LumiKeychain'
 import { SocialIcon } from '@/components/SocialIcon'
 import { Container, MicroLabel } from '@/components/ui'
 import { ADDRESS, CONTACT_EMAIL, SOCIALS } from '@/lib/site'
@@ -28,9 +28,9 @@ export default function ContactoPage() {
       </div>
 
       <Container className="grid gap-5 md:grid-cols-3">
-        {/* data-lumi-flash: Lumi's flash sweeps across these blocks on load and on click. */}
+        {/* data-lumi-flash: Lumi's flash lights these blocks' outlines on load and on click. */}
         <div data-lumi-flash="" className="glass relative rounded-3xl p-8 md:col-span-2">
-          <FlashTrack />
+          <FlashOutline />
           <MicroLabel className="mb-5">Correo</MicroLabel>
           {CONTACT_EMAIL ? (
             <a
@@ -54,7 +54,7 @@ export default function ContactoPage() {
                   data-lumi-flash=""
                   className="glass-strong relative inline-flex items-center gap-3 rounded-full px-5 py-3 text-[14px] text-white/85 transition-colors hover:text-peri"
                 >
-                  <FlashTrack />
+                  <FlashOutline />
                   <SocialIcon name={s.label} />
                   <span>
                     {s.label} <span className="text-white/45">{s.handle}</span>
@@ -70,7 +70,7 @@ export default function ContactoPage() {
           className="relative rounded-3xl border border-white/10 p-8"
           style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.5) 0%, rgba(71,18,107,0.4) 100%)' }}
         >
-          <FlashTrack />
+          <FlashOutline />
           <MicroLabel className="mb-5">Dirección</MicroLabel>
           <address className="not-italic">
             {ADDRESS.map((line, i) => (
