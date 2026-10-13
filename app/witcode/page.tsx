@@ -2,8 +2,9 @@ import type { Metadata } from 'next'
 import PageHero from '@/components/PageHero'
 import PhotoFrame from '@/components/PhotoFrame'
 import CollabCTA from '@/components/CollabCTA'
-import { Container, Heading, MicroLabel } from '@/components/ui'
-import { WITCODE_DESCRIPTION, WITCODE_STATS } from '@/lib/site'
+import { SocialIcon } from '@/components/SocialIcon'
+import { Button, Container, Heading, MicroLabel } from '@/components/ui'
+import { WITCODE_APPLY_URL, WITCODE_DESCRIPTION, WITCODE_INSTAGRAM_URL, WITCODE_STATS } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'WitCode',
@@ -45,6 +46,36 @@ export default function WitCodePage() {
               {p}
             </p>
           ))}
+          <div className="mt-10 flex flex-wrap gap-3">
+            {WITCODE_APPLY_URL ? (
+              // TODO(kat): confirm the button label once applications open.
+              <Button href={WITCODE_APPLY_URL} external>
+                Aplicar
+              </Button>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="cursor-not-allowed rounded-full border border-white/15 bg-white/[0.06] px-7 py-3.5 text-[12px] font-medium uppercase tracking-[0.2em] text-white/55"
+              >
+                Convocatoria no abierta por ahora
+              </button>
+            )}
+            {WITCODE_INSTAGRAM_URL && (
+              <Button
+                href={WITCODE_INSTAGRAM_URL}
+                external
+                variant="glass"
+                ariaLabel="Síguenos en Instagram @witcode.mty (se abre en una pestaña nueva)"
+              >
+                <SocialIcon name="Instagram" size={16} />
+                {/* One text run, so it wraps as a sentence on narrow screens. */}
+                <span>
+                  Síguenos en Instagram <span className="normal-case tracking-normal">@witcode.mty</span>
+                </span>
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="relative">

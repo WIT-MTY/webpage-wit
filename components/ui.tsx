@@ -6,10 +6,12 @@ type ButtonProps = {
   variant?: 'primary' | 'glass'
   external?: boolean
   className?: string
+  /** Accessible name, when the visible text needs more context (e.g. "opens in a new tab"). */
+  ariaLabel?: string
 }
 
 /** The landing page's two pill buttons: glowing gradient, and glass. */
-export function Button({ href, children, variant = 'primary', external, className = '' }: ButtonProps) {
+export function Button({ href, children, variant = 'primary', external, className = '', ariaLabel }: ButtonProps) {
   const base =
     'inline-flex items-center justify-center gap-2 rounded-full px-9 py-3.5 text-[12px] font-medium uppercase tracking-[0.2em] no-underline transition-transform duration-200 hover:-translate-y-0.5'
   const styles =
@@ -20,13 +22,13 @@ export function Button({ href, children, variant = 'primary', external, classNam
 
   if (external) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className={cls}>
+      <a href={href} target="_blank" rel="noopener noreferrer" aria-label={ariaLabel} className={cls}>
         {children}
       </a>
     )
   }
   return (
-    <Link href={href} className={cls}>
+    <Link href={href} aria-label={ariaLabel} className={cls}>
       {children}
     </Link>
   )
