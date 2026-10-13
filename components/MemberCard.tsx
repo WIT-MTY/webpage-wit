@@ -3,27 +3,27 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import FlipCard from '@/components/FlipCard'
-import Celestial, { celestialFor } from './Celestial'
-import { roleLabel, type Member } from '@/data/members'
+import { areaLabel, initials, type Member } from '@/data/members'
 
-type Size = 'lg' | 'md' | 'sm'
+type Size = 'lg' | 'md' | 'sm' | 'xs'
 
-export function Avatar({ m, size, seed }: { m: Member; size: Size; seed: string }) {
-  const px = size === 'lg' ? 104 : size === 'md' ? 84 : 68
+export function Avatar({ m, size }: { m: Member; size: Size }) {
+  const px = size === 'lg' ? 104 : size === 'md' ? 84 : size === 'sm' ? 68 : 52
   return (
     <span
-      className="relative flex shrink-0 items-center justify-center overflow-hidden rounded-full text-peri"
+      className="relative flex shrink-0 items-center justify-center overflow-hidden rounded-full font-display font-bold text-white"
       style={{
         width: px,
         height: px,
-        background: 'radial-gradient(circle at 32% 28%, rgba(124,34,199,0.55), rgba(45,8,90,0.9) 70%)',
+        fontSize: Math.round(px * 0.34),
+        background: 'linear-gradient(135deg, #7c22c7 0%, #47126b 100%)',
         boxShadow: '0 0 0 1px rgba(198,200,238,0.18), 0 0 30px rgba(124,34,199,0.35)',
       }}
     >
       {m.photo ? (
         <Image src={m.photo} alt={m.name} fill sizes={`${px}px`} className="object-cover" />
       ) : (
-        <Celestial kind={celestialFor(seed)} size={Math.round(px * 0.36)} />
+        <span aria-hidden="true">{initials(m)}</span>
       )}
     </span>
   )
@@ -48,16 +48,31 @@ export default function MemberCard({
 }: MemberCardProps) {
   const [side, setSide] = useState<'front' | 'back'>('front')
   const hasBio = Boolean(m.bio)
+  const compact = size === 'xs'
+  const area = areaLabel(m.area)
+  // Area, then the optional title under it.
+  const roleText = [area, m.title].filter(Boolean).join(' · ')
 
   const cardContent = (
     <>
-      <Avatar m={m} size={size} seed={seed} />
-      <span className="mt-4 block font-display text-[19px] font-bold leading-tight text-white">
+      <Avatar m={m} size={size} />
+      <span
+        className={`block w-full break-words hyphens-auto font-display font-bold leading-tight text-white ${
+          compact ? 'mt-3 text-[15px]' : 'mt-4 text-[19px]'
+        }`}
+      >
         {m.name}
       </span>
-      <span className="mt-1.5 block text-[14px] font-light text-white/65">
-        {roleLabel(m)}
-      </span>
+      {area && (
+        <span className={`mt-1.5 block w-full break-words font-light text-white/65 ${compact ? 'text-[12px]' : 'text-[14px]'}`}>
+          {area}
+        </span>
+      )}
+      {m.title && (
+        <span className={`mt-0.5 block w-full break-words font-light text-white/50 ${compact ? 'text-[12px]' : 'text-[13px]'}`}>
+          {m.title}
+        </span>
+      )}
     </>
   )
 
@@ -70,7 +85,9 @@ export default function MemberCard({
           /* ── FRONT SIDE ────────────────────────────────── */
           front: (
             <div
-              className={`glass flex h-full w-full flex-col items-center justify-between rounded-3xl px-5 py-7 text-center ${
+              className={`glass flex h-full w-full flex-col items-center justify-between rounded-3xl text-center ${
+                compact ? 'px-3 py-5' : 'px-5 py-7'
+              } ${
                 highlight ? 'border-peri/45 shadow-[0_0_40px_rgba(124,34,199,0.35)]' : ''
               }`}
             >
@@ -79,7 +96,7 @@ export default function MemberCard({
                   type="button"
                   onClick={onSelect}
                   className="flex w-full cursor-pointer flex-col items-center text-center transition-opacity hover:opacity-90"
-                  aria-label={`${m.name}, ${roleLabel(m)}.`}
+                  aria-label={`${m.name}, ${roleText}.`}
                 >
                   {cardContent}
                 </button>
@@ -90,7 +107,7 @@ export default function MemberCard({
               )}
 
               {/* Bottom "Dónde está hoy?" Button */}
-              <div className="mt-6 border-t border-white/10 pt-3 w-full flex justify-center">
+              <div className={`${compact ? 'mt-4' : 'mt-6'} border-t border-white/10 pt-3 w-full flex justify-center`}>
                 {hasBio ? (
                   <button
                     type="button"
@@ -150,7 +167,7 @@ export default function MemberCard({
                     {m.name}
                   </span>
                   <span className="block text-[12px] font-light text-white/65">
-                    {roleLabel(m)}
+                    {roleText}
                   </span>
                 </div>
 
