@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import PageHero from '@/components/PageHero'
+import LumiKeychain, { FlashOutline } from '@/components/LumiKeychain'
 import { SocialIcon } from '@/components/SocialIcon'
 import { Container, MicroLabel } from '@/components/ui'
 import { ADDRESS, CONTACT_EMAIL, SOCIALS } from '@/lib/site'
@@ -12,18 +13,24 @@ export const metadata: Metadata = {
 export default function ContactoPage() {
   return (
     <>
-      <PageHero
-        label="Contáctanos"
-        title="Hablemos"
-        intro="¿Quieres colaborar, patrocinar un evento o unirte a la comunidad? Escríbenos."
-        shapes={[
-          { shape: 'slab', depth: 'far', size: 280, rotate: -16, opacity: 0.4, pos: { top: '14%', right: '-1%' }, motion: 'slow', duration: 13, hideBelow: 'lg' },
-          { shape: 'loop', depth: 'mid', size: 140, rotate: 18, opacity: 0.85, pos: { top: '22%', left: '8%' }, motion: 'medium', duration: 10, hideBelow: 'md' },
-        ]}
-      />
+      {/* Under 640px the keychain hangs above the heading, so the hero starts lower. */}
+      <div className="relative max-sm:pt-40">
+        <LumiKeychain />
+        <PageHero
+          label="Contáctanos"
+          title="Hablemos"
+          intro="¿Quieres colaborar, patrocinar un evento o unirte a la comunidad? Escríbenos."
+          shapes={[
+            { shape: 'slab', depth: 'far', size: 280, rotate: -16, opacity: 0.4, pos: { top: '14%', right: '-1%' }, motion: 'slow', duration: 13, hideBelow: 'lg' },
+            { shape: 'loop', depth: 'mid', size: 140, rotate: 18, opacity: 0.85, pos: { top: '22%', left: '8%' }, motion: 'medium', duration: 10, hideBelow: 'md' },
+          ]}
+        />
+      </div>
 
       <Container className="grid gap-5 md:grid-cols-3">
-        <div className="glass rounded-3xl p-8 md:col-span-2">
+        {/* data-lumi-flash: Lumi's flash lights these blocks' outlines on load and on click. */}
+        <div data-lumi-flash="" className="glass relative rounded-3xl p-8 md:col-span-2">
+          <FlashOutline />
           <MicroLabel className="mb-5">Correo</MicroLabel>
           {CONTACT_EMAIL ? (
             <a
@@ -44,8 +51,10 @@ export default function ContactoPage() {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="glass-strong inline-flex items-center gap-3 rounded-full px-5 py-3 text-[14px] text-white/85 transition-colors hover:text-peri"
+                  data-lumi-flash=""
+                  className="glass-strong relative inline-flex items-center gap-3 rounded-full px-5 py-3 text-[14px] text-white/85 transition-colors hover:text-peri"
                 >
+                  <FlashOutline />
                   <SocialIcon name={s.label} />
                   <span>
                     {s.label} <span className="text-white/45">{s.handle}</span>
@@ -57,9 +66,11 @@ export default function ContactoPage() {
         </div>
 
         <div
-          className="rounded-3xl border border-white/10 p-8"
+          data-lumi-flash=""
+          className="relative rounded-3xl border border-white/10 p-8"
           style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.5) 0%, rgba(71,18,107,0.4) 100%)' }}
         >
+          <FlashOutline />
           <MicroLabel className="mb-5">Dirección</MicroLabel>
           <address className="not-italic">
             {ADDRESS.map((line, i) => (

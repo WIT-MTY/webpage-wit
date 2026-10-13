@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { HACK4HER_URL, NAV_LINKS } from '@/lib/site'
+import shine from './Shine.module.css'
 
 function ArrowUpRight() {
   return (
@@ -82,10 +83,14 @@ export default function Nav() {
                 <Link
                   href={link.href}
                   aria-current={active ? 'page' : undefined}
-                  className={`relative whitespace-nowrap text-[12px] font-medium uppercase tracking-[0.08em] transition-colors duration-200 hover:text-peri ${
+                  className={`${shine.host} whitespace-nowrap text-[12px] font-medium uppercase tracking-[0.08em] transition-colors duration-200 hover:text-peri ${
                     active ? 'text-peri' : 'text-white/78'
                   }`}
                 >
+                  {/* One light pass on hover, keyboard focus, or when it becomes the current page. */}
+                  <span className={shine.navTrack} aria-hidden="true">
+                    <span className={shine.navStrip} />
+                  </span>
                   {link.label}
                   {active && (
                     <span className="absolute -bottom-2 left-1/2 h-[3px] w-[3px] -translate-x-1/2 rounded-full bg-peri shadow-[0_0_8px_rgba(198,200,238,0.9)]" />

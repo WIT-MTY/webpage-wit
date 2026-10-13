@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import FlipCard from '@/components/FlipCard'
 import { areaLabel, initials, type Member } from '@/data/members'
+import shine from './Shine.module.css'
 
 type Size = 'lg' | 'md' | 'sm' | 'xs'
 
@@ -85,12 +86,16 @@ export default function MemberCard({
           /* ── FRONT SIDE ────────────────────────────────── */
           front: (
             <div
-              className={`glass flex h-full w-full flex-col items-center justify-between rounded-3xl text-center ${
+              className={`${shine.host} glass flex h-full w-full flex-col items-center justify-between rounded-3xl text-center ${
                 compact ? 'px-3 py-5' : 'px-5 py-7'
               } ${
                 highlight ? 'border-peri/45 shadow-[0_0_40px_rgba(124,34,199,0.35)]' : ''
               }`}
             >
+              {/* Glint: one light pass on hover or focus. */}
+              <span className={shine.track} aria-hidden="true">
+                <span className={shine.strip} />
+              </span>
               {onSelect ? (
                 <button
                   type="button"
