@@ -4,13 +4,7 @@ import CollabCTA from '@/components/CollabCTA'
 import PhotoFrame from '@/components/PhotoFrame'
 import FloatingShapes from '@/components/FloatingShapes'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
-import { COLLAGE_PHOTOS } from '@/lib/site'
-
-const WITCODE_STATS = [
-  { value: '94', label: 'participantes' },
-  { value: '76', label: 'universitarias en servicio social' },
-  { value: '90%', label: 'de permanencia en los talleres' },
-]
+import { COLLAGE_PHOTOS, WITCODE_DESCRIPTION, WITCODE_STATS } from '@/lib/site'
 
 export default function Home() {
   return (
@@ -94,21 +88,22 @@ export default function Home() {
                 <MicroLabel className="mb-6">Servicio social</MicroLabel>
                 <Heading className="text-[clamp(2.4rem,5vw,4rem)]">WitCode</Heading>
                 <p className="mt-6 mb-10 max-w-md text-[17px] font-light leading-[1.75] text-white/78">
-                  Talleres de programación para alumnas de secundaria de la escuela Ciudad de los Niños, impartidos por
-                  estudiantes del Tec.
+                  {WITCODE_DESCRIPTION[0]}
                 </p>
                 <Button href="/witcode">Conoce WitCode</Button>
               </div>
-              <dl className="m-0 grid gap-4">
-                {WITCODE_STATS.map((s) => (
-                  <div key={s.label} className="flex items-baseline gap-5 border-b border-white/10 pb-4 last:border-0">
-                    <dt className="sr-only">{s.label}</dt>
-                    <dd className="m-0 min-w-28 shrink-0 whitespace-nowrap font-display text-5xl font-extrabold text-peri">{s.value}</dd>
-                    <dd className="m-0 text-[15px] font-light text-white/75">{s.label}</dd>
-                  </div>
-                ))}
-                <p className="m-0 text-xs font-light text-white/45">Cifras totales del 2024.</p>
-              </dl>
+              <div>
+                <MicroLabel className="mb-6">Métricas anuales</MicroLabel>
+                <dl className="m-0 grid gap-4">
+                  {WITCODE_STATS.map((s) => (
+                    <div key={s.label} className="flex items-baseline gap-5 border-b border-white/10 pb-4 last:border-0">
+                      <dt className="sr-only">{s.label}</dt>
+                      <dd className="m-0 min-w-28 shrink-0 whitespace-nowrap font-display text-5xl font-extrabold text-peri">{s.value}</dd>
+                      <dd className="m-0 text-[15px] font-light text-white/75">{s.label}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
             </div>
           </div>
         </Container>

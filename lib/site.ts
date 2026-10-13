@@ -11,7 +11,7 @@ export const NAV_LINKS = [
   { label: 'Inicio', href: '/' },
   { label: 'Proyectos', href: '/proyectos' },
   { label: 'WitCode', href: '/witcode' },
-  { label: 'Aliados', href: '/aliados' },
+  { label: 'Aliados estratégicos', href: '/aliados' },
   { label: 'Integrantes', href: '/integrantes' },
   { label: 'Contáctanos', href: '/contacto' },
 ] as const
@@ -49,6 +49,8 @@ export type WitEvent = {
   category: string
   tagline: string
   description: string
+  /** ISO date of the event. Null until it is confirmed. */
+  date: string | null
   /** Google Form for this event. Null hides the sign-up button. */
   formUrl: string | null
   /** Photos for the card carousel: put files in /public/photos. */
@@ -58,7 +60,38 @@ export type WitEvent = {
   sponsors: (string | null)[]
 }
 
-export const EVENTS: WitEvent[] = [
+/** The order events are listed in, everywhere. */
+export const EVENT_ORDER = [
+  'journey-to-internship-warmup',
+  'hackwitu',
+  'journey-to-internship',
+  'dia-de-la-mujer',
+  'empowerhack',
+  'reunion-nacional',
+  'hack4her',
+  'run4wit',
+] as const
+
+/** Placeholder for an event we only know the name of. */
+const pendingEvent = (slug: string, title: string): WitEvent => ({
+  slug,
+  title,
+  // TODO: category, tagline, description and date.
+  category: '',
+  tagline: 'Descripción pendiente.',
+  description: 'Descripción pendiente.',
+  date: null,
+  formUrl: null,
+  photos: [],
+  metrics: [],
+  sponsors: [],
+})
+
+const EVENT_LIST: WitEvent[] = [
+  pendingEvent('journey-to-internship-warmup', 'Journey to Internship: Warm-up'),
+  pendingEvent('hackwitu', 'HackWITU'),
+  pendingEvent('empowerhack', 'EmpowerHack'),
+  pendingEvent('reunion-nacional', 'Reunión Nacional'),
   {
     slug: 'hack4her',
     title: 'Hack4Her',
@@ -66,6 +99,7 @@ export const EVENTS: WitEvent[] = [
     tagline: 'Un fin de semana para construir con causa.',
     description:
       'Nuestro hackathon para impulsar a más mujeres en tecnología: equipos, mentoras y retos reales de la industria.',
+    date: null,
     formUrl: null,
     photos: [],
     metrics: [
@@ -76,28 +110,13 @@ export const EVENTS: WitEvent[] = [
     sponsors: [null, null, null, null, null, null],
   },
   {
-    slug: 'conferencias',
-    title: 'Conferencias',
-    category: 'Evento',
-    tagline: 'Voces que inspiran nuevos caminos.',
-    description:
-      'Mujeres de la industria y la academia comparten su trayectoria, sus aprendizajes y el camino que las llevó a donde están.',
-    formUrl: null,
-    photos: [],
-    metrics: [
-      { value: '—', label: 'asistentes' },
-      { value: '—', label: 'ponentes' },
-      { value: '—', label: 'ediciones' },
-    ],
-    sponsors: [null, null, null],
-  },
-  {
     slug: 'journey-to-internship',
     title: 'Journey to Internship',
     category: 'Programa',
     tagline: 'Puentes hacia grandes oportunidades.',
     description:
       'Preparación y vinculación para conseguir tu primera práctica profesional: CV, entrevistas y contacto directo con empresas.',
+    date: null,
     // TODO: paste the Journey to Internship Google Form URL here.
     formUrl: null,
     photos: [],
@@ -109,28 +128,13 @@ export const EVENTS: WitEvent[] = [
     sponsors: [null, null, null],
   },
   {
-    slug: 'talleres',
-    title: 'Talleres',
-    category: 'Evento',
-    tagline: 'Herramientas para crear sin límites.',
-    description:
-      'Sesiones prácticas para aprender haciendo, desde tus primeras líneas de código hasta proyectos completos.',
-    formUrl: null,
-    photos: [],
-    metrics: [
-      { value: '—', label: 'talleres' },
-      { value: '—', label: 'asistentes' },
-      { value: '—', label: 'horas' },
-    ],
-    sponsors: [null, null, null],
-  },
-  {
     slug: 'dia-de-la-mujer',
     title: 'Día de la Mujer',
     category: 'Evento',
     tagline: 'Celebramos hoy para un mañana más justo.',
     description:
       'Una jornada para reconocer a las mujeres en tecnología y abrir la conversación sobre la brecha de género.',
+    date: null,
     formUrl: null,
     photos: [],
     metrics: [
@@ -147,6 +151,7 @@ export const EVENTS: WitEvent[] = [
     tagline: 'Corremos por más mujeres en tecnología.',
     // TODO: fill in from the Instagram post (date, distance, cause).
     description: 'Descripción pendiente.',
+    date: null,
     formUrl: null,
     photos: [],
     metrics: [
@@ -157,6 +162,11 @@ export const EVENTS: WitEvent[] = [
     sponsors: [null, null, null],
   },
 ]
+
+const orderOf = (slug: string) => (EVENT_ORDER as readonly string[]).indexOf(slug)
+
+/** All events, sorted by EVENT_ORDER. */
+export const EVENTS: WitEvent[] = [...EVENT_LIST].sort((a, b) => orderOf(a.slug) - orderOf(b.slug))
 
 /**
  * The upcoming event, shown in the "Próximo evento" panel and the mobile
@@ -172,7 +182,7 @@ export const NEXT_EVENT: {
   /** Google Apps Script URL that returns { count } for this event's form. */
   countUrl: string | null
 } | null = {
-  slug: 'journey-to-internship',
+  slug: 'journey-to-internship-warmup',
   date: null,
   whereWhen: 'Fecha y lugar por confirmar',
   registrationOpen: true,
@@ -186,9 +196,9 @@ export const nextEvent = () => (NEXT_EVENT ? EVENTS.find((e) => e.slug === NEXT_
 
 /** Celestial icon per activity, see components/Celestial.tsx for the options. */
 const ACTIVITY_ICONS: Record<string, string> = {
-  conferencias: 'burst',
+  hack4her: 'burst',
   'journey-to-internship': 'constellation',
-  talleres: 'diamond',
+  empowerhack: 'diamond',
   'dia-de-la-mujer': 'star',
 }
 
@@ -200,19 +210,56 @@ export const ACTIVITIES = EVENTS.filter((e) => e.slug in ACTIVITY_ICONS).map((e)
   icon: ACTIVITY_ICONS[e.slug],
 }))
 
+// ── WitCode ──────────────────────────────────────────────────
+
+/** Annual metrics, shown on /witcode and the Inicio band. */
+export const WITCODE_STATS = [
+  { value: '34', label: 'estudiantes universitarios haciendo su servicio social' },
+  { value: '92%', label: 'de permanencia en los talleres' },
+  { value: '5', label: 'años cambiando vidas' },
+]
+
+/** Program description, one string per paragraph. Verbatim, do not edit. */
+export const WITCODE_DESCRIPTION = [
+  'WitCode no es solo un programa de servicio social; es el lugar donde la tecnología abre la puerta a un mundo de posibilidades para quienes más lo necesitan.',
+  'Nacido del grupo estudiantil WIT (Women in Technology) en el Tecnológico de Monterrey, WitCode toma inspiración de iniciativas globales como Hour of Code y la transforma en una herramienta de aprendizaje y visión.',
+  'Aquí, estudiantes universitarios se convierten en mentores para niñas de la escuela “Ciudad de los Niños”. Más allá de enseñar a programar con plataformas interactivas como Scratch, WitCode tiene la misión de decirle a cada niña y joven que pertenecen aquí, que su voz cuenta, que sus ideas tienen el poder de cambiar el futuro y que la brecha de género y la brecha digital se cierran comenzando por su propia convicción.',
+]
+
 // ── Allies ───────────────────────────────────────────────────
 
 export type Ally = {
   name: string
-  /** Logo in /public/aliados. Without one, the name shows as text. */
+  /** Logo file name in /public/aliados, without extension (.png, .jpg and
+   *  .webp are detected). Null or a missing file shows the name as text. */
   logo: string | null
   note?: string
   /** true = "Aliados actuales", false = the past-allies wall. */
   current: boolean
+  /** Years of the alliance. Shown under the name when present. */
+  years?: string
+  /** true = the logo already spells the name, so no caption is shown. */
+  nameInLogo?: boolean
+  /** Tile background behind the logo. Default white. */
+  tileBg?: 'black'
+  /** Wide horizontal lockup: less padding so it fills the tile width. */
+  wideLogo?: boolean
 }
 
 export const ALLIES: Ally[] = [
-  { name: 'Tecnológico de Monterrey', logo: null, note: 'Aliado académico', current: true },
+  { name: 'Arca Continental', logo: 'arca-continental', current: true },
+  { name: 'Peckers', logo: 'peckers', current: true, tileBg: 'black' },
+  { name: 'Heineken', logo: 'heineken', current: true },
+  { name: 'Apex Systems', logo: 'apex-systems', current: true },
+  {
+    name: 'Escuela de Ingeniería y Ciencias',
+    logo: 'escuela-ingenieria-ciencias',
+    current: true,
+    nameInLogo: true,
+    wideLogo: true,
+  },
+  { name: 'Ingenia', logo: 'ingenia', current: true },
+  { name: 'Carrier', logo: 'carrier', current: true },
 ]
 
 // ── Lumi ─────────────────────────────────────────────────────

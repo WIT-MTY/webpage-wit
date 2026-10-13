@@ -16,12 +16,12 @@ two cards into tabs.
       card with a tab switcher: a glass pill that slides between the tabs when
       you click. Keyboard accessible (arrow keys move between tabs,
       `role="tablist"`).
-- [ ] **Impacto numbers** use `CountUp` (94, 76, 90%).
+- [ ] **Impacto numbers** use `CountUp` (34, 92%, 5), from `WITCODE_STATS` in `lib/site.ts`.
 - [ ] **Cohort photo** with the "Bienvenida WitCode" caption: use `PhotoFrame`
       and add the real photo to `public/photos/`.
 
 ## Watch out
 
-- The numbers are real and from 2024. Keep "En cifras totales del 2024" next to
-  them so nobody reads them as current.
+- The numbers are real annual metrics. Keep the "Métricas anuales" label next to
+  them.
 - The slide animation on the tab pill should be `transform` only.
