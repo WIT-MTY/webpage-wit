@@ -297,8 +297,6 @@ export type Ally = {
   current: boolean
   /** Years of the alliance. Shown under the name when present. */
   years?: string
-  /** true = the logo already spells the name, so no caption is shown. */
-  nameInLogo?: boolean
   /** Tile background behind the logo. Default white. */
   tileBg?: 'black'
   /** Wide horizontal lockup: less padding so it fills the tile width. */
@@ -314,7 +312,6 @@ export const ALLIES: Ally[] = [
     name: 'Escuela de Ingeniería y Ciencias',
     logo: 'escuela-ingenieria-ciencias',
     current: true,
-    nameInLogo: true,
     wideLogo: true,
   },
   { name: 'Ingenia', logo: 'ingenia', current: true },

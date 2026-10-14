@@ -115,7 +115,7 @@ export default function TerminalContact({ lines, summary }: { lines: TerminalLin
         <span className="h-3 w-3 rounded-full bg-peri/70" />
         <span className="ml-3 text-[12px] text-white/45">wit@tec ~ contacto</span>
       </div>
-      <div className="bg-black/30 px-5 py-6 text-[13px] leading-relaxed sm:px-8 sm:text-[14px]">
+      <div className="min-w-0 bg-black/30 px-5 py-6 text-[clamp(0.8rem,3.4vw,0.875rem)] leading-relaxed sm:px-8">
         <p className="m-0 text-white/90" aria-hidden="true">
           <span className="text-wit-pink">&gt; </span>
           <span ref={typedRef}>{COMMAND}</span>
@@ -129,7 +129,7 @@ export default function TerminalContact({ lines, summary }: { lines: TerminalLin
               ref={(el) => {
                 lineRefs.current[i] = el
               }}
-              className="break-words text-white/75 transition-opacity duration-300"
+              className="min-w-0 text-white/75 transition-opacity duration-300 [overflow-wrap:anywhere]"
             >
               <span className="text-[#73edaa]" aria-hidden="true">
                 ✔{' '}
@@ -138,7 +138,7 @@ export default function TerminalContact({ lines, summary }: { lines: TerminalLin
               <a
                 href={l.href}
                 {...(l.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                className="text-white underline decoration-peri/40 underline-offset-4 transition-colors hover:text-peri"
+                className="tracking-[-0.02em] text-white underline decoration-peri/40 underline-offset-4 transition-colors hover:text-peri"
               >
                 {l.text}
               </a>

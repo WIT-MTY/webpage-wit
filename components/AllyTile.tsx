@@ -22,7 +22,12 @@ export default function AllyTile({ ally: a, logo }: { ally: Ally; logo: string |
           </div>
         )}
       </ShineCard>
-      {logo && !a.nameInLogo && <span className="mt-4 text-[11px] uppercase tracking-[0.25em] text-peri/65">{a.name}</span>}
+      {/* Every ally gets its name under the logo; long names wrap. A name-only tile already shows it inside. */}
+      {logo && (
+        <span className="mt-4 max-w-full text-center text-[11px] uppercase leading-snug tracking-[0.2em] text-balance break-words text-peri/65">
+          {a.name}
+        </span>
+      )}
       {a.years && <span className="mt-1 text-[11px] tracking-[0.15em] text-white/50">{a.years}</span>}
     </>
   )

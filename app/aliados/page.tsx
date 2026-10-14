@@ -4,11 +4,11 @@ import type { Metadata } from 'next'
 import PageHero from '@/components/PageHero'
 import AllyCTA from '@/components/AllyCTA'
 import AllyTile from '@/components/AllyTile'
-import Celestial from '@/components/Celestial'
+import Celestial, { type CelestialKind } from '@/components/Celestial'
 import LogoConveyor from '@/components/LogoConveyor'
 import Typewriter from '@/components/Typewriter'
-import { Container, Heading, MicroLabel } from '@/components/ui'
-import { ALLIES } from '@/lib/site'
+import { Button, Container, Heading, MicroLabel } from '@/components/ui'
+import { ACTIVITIES, ALLIES, CONTACT_EMAIL } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Aliados estratégicos',
@@ -24,8 +24,12 @@ function resolveLogo(base: string | null): string | null {
   return ext ? `/aliados/${base}${ext}` : null
 }
 
+/** Sponsoring: mail with the subject filled in, or the contact page while there is no email. */
+const SPONSOR_HREF = CONTACT_EMAIL
+  ? `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Patrocinio de eventos WIT')}`
+  : '/contacto'
+
 const WAYS = [
-  { title: 'Patrocina un evento', body: 'Haz posible Hack4Her, el Día de la Mujer y nuestros eventos.', icon: 'star' as const },
   { title: 'Comparte tu experiencia', body: 'Imparte un taller o una charla para nuestra comunidad.', icon: 'burst' as const },
   { title: 'Abre puertas', body: 'Súmate a Journey to Internship con prácticas y mentorías.', icon: 'constellation' as const },
 ]
@@ -77,7 +81,34 @@ export default function AliadosPage() {
       <section data-lumi-anchor="left" className="pt-28">
         <Container>
           <Heading className="mb-10 text-center text-[clamp(2rem,4.5vw,3.25rem)]">Formas de colaborar</Heading>
-          <ul className="m-0 grid list-none gap-5 p-0 md:grid-cols-3">
+
+          {/* Sponsoring: every event, from EVENTS (name + its own tagline). */}
+          <div className="glass rounded-3xl p-6 sm:p-8 lg:p-10">
+            <span className="mb-5 block text-peri">
+              <Celestial kind="star" size={26} />
+            </span>
+            <h3 className="m-0 font-display text-[clamp(1.6rem,3.2vw,2.25rem)] font-bold text-white">Haz posible nuestros eventos</h3>
+            <ul className="mt-8 mb-0 grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-3">
+              {ACTIVITIES.map((e) => (
+                <li key={e.slug} className="glass-strong flex min-w-0 items-start gap-3 rounded-2xl p-4">
+                  <span className="mt-0.5 shrink-0 text-peri/80">
+                    <Celestial kind={e.icon as CelestialKind} size={18} />
+                  </span>
+                  <span className="min-w-0 [overflow-wrap:anywhere]">
+                    <span className="block font-display text-[17px] font-bold text-white">{e.title}</span>
+                    {e.tagline && <span className="mt-1 block text-[14px] font-light leading-snug text-white/70">{e.tagline}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8">
+              <Button href={SPONSOR_HREF} className="w-full sm:w-auto">
+                Quiero patrocinar
+              </Button>
+            </div>
+          </div>
+
+          <ul className="m-0 mt-5 grid list-none gap-5 p-0 md:grid-cols-2">
             {WAYS.map((w) => (
               <li key={w.title} className="glass rounded-3xl p-8">
                 <span className="mb-5 block text-peri">

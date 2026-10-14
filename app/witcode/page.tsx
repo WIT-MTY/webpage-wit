@@ -8,7 +8,8 @@ import RingPulse from '@/components/RingPulse'
 import CollabCTA from '@/components/CollabCTA'
 import { SocialIcon } from '@/components/SocialIcon'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
-import { WITCODE_APPLY_URL, WITCODE_DESCRIPTION, WITCODE_INSTAGRAM_URL, WITCODE_PHOTOS, WITCODE_STATS } from '@/lib/site'
+import { CONTACT_EMAIL, WITCODE_APPLY_URL, WITCODE_DESCRIPTION, WITCODE_INSTAGRAM_URL, WITCODE_PHOTOS, WITCODE_STATS } from '@/lib/site'
+import AllyCTA from '@/components/AllyCTA'
 
 export const metadata: Metadata = {
   title: 'WitCode',
@@ -175,6 +176,15 @@ export default function WitCodePage() {
           </Reveal>
         </Container>
       </section>
+
+      {/* Ally band, same component as Aliados. Mail with the subject filled in, or the contact page without an email. */}
+      <AllyCTA
+        id="witcode-aliado-title"
+        heading="¿Quieres ser aliado estratégico de WitCode?"
+        line="Escríbenos y conversemos cómo sumarte."
+        label="Escríbenos"
+        href={CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Aliado estratégico WitCode')}` : '/contacto'}
+      />
 
       <CollabCTA />
     </>
