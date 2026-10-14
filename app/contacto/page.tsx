@@ -8,6 +8,7 @@ import MagneticLink from '@/components/MagneticLink'
 import Reveal from '@/components/Reveal'
 import ShineCard from '@/components/ShineCard'
 import Spotlight from '@/components/Spotlight'
+import TerminalContact, { type TerminalLine } from '@/components/TerminalContact'
 import { Container, MicroLabel } from '@/components/ui'
 import { ADDRESS, ADDRESS_MAP_URL, CONTACT_EMAIL, SOCIALS } from '@/lib/site'
 
@@ -25,6 +26,19 @@ export default function ContactoPage() {
 
   const instagram = SOCIALS.find((s) => s.label === 'Instagram')
   const otherSocials = SOCIALS.filter((s) => s !== instagram)
+  const linkedin = SOCIALS.find((s) => s.label === 'LinkedIn')
+
+  // Terminal lines, all from lib/site.ts. LinkedIn shows its URL slug (wit-mty).
+  const addressText = ADDRESS.join(', ')
+  const terminalLines: TerminalLine[] = [
+    ...(CONTACT_EMAIL ? [{ key: 'correo', label: 'correo', text: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` }] : []),
+    ...(instagram ? [{ key: 'instagram', label: 'instagram', text: instagram.handle, href: instagram.href, external: true }] : []),
+    ...(linkedin
+      ? [{ key: 'linkedin', label: 'linkedin', text: new URL(linkedin.href).pathname.split('/').filter(Boolean).pop() ?? linkedin.handle, href: linkedin.href, external: true }]
+      : []),
+    ...(ADDRESS_MAP_URL ? [{ key: 'ubicacion', label: 'ubicación', text: addressText, href: ADDRESS_MAP_URL, external: true }] : []),
+  ]
+  const terminalSummary = `Contacto de WIT. ${terminalLines.map((l) => `${l.label}: ${l.text.replace(/\.$/, '')}`).join('. ')}.`
 
   return (
     <>
@@ -146,6 +160,12 @@ export default function ContactoPage() {
           </ShineCard>
         </Reveal>
       </Container>
+
+      <section aria-label="Contacto en terminal" className="pt-16">
+        <Container>
+          <TerminalContact lines={terminalLines} summary={terminalSummary} />
+        </Container>
+      </section>
     </>
   )
 }
