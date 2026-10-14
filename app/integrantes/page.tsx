@@ -5,6 +5,7 @@ import Countdown from '@/components/Countdown'
 import StarField from '@/components/StarField'
 import FloatingShapes from '@/components/FloatingShapes'
 import RingPulse from '@/components/RingPulse'
+import { RevealGroup } from '@/components/Reveal'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
 import { RECRUITMENT_NOTE, RECRUITMENT_OPENS_AT, SOCIALS } from '@/lib/site'
 
@@ -47,6 +48,8 @@ export default function IntegrantesPage() {
           ]}
         />
         <Container className="relative flex flex-col items-center text-center">
+          {/* Touch only: each part fades up in turn (RevealGroup); desktop is unchanged. */}
+          <RevealGroup>
           <MicroLabel className="mb-6">Reclutamiento</MicroLabel>
           <Heading
             className="text-[clamp(4rem,14vw,9.5rem)] !leading-[0.9]"
@@ -74,6 +77,7 @@ export default function IntegrantesPage() {
               </Button>
             </RingPulse>
           </div>
+          </RevealGroup>
         </Container>
       </section>
     </>

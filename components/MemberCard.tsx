@@ -1,9 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import FlipCard from '@/components/FlipCard'
 import { areaLabel, initials, type Member } from '@/data/members'
+import { SHINE_TILT } from '@/lib/motion-flags'
+import { onceInView } from '@/lib/inView'
+import { touchMotion } from '@/lib/touch'
 import shine from './Shine.module.css'
 
 type Size = 'lg' | 'md' | 'sm' | 'xs'
@@ -57,6 +60,26 @@ export default function MemberCard({
   delay = 0,
 }: MemberCardProps) {
   const [side, setSide] = useState<'front' | 'back'>('front')
+  const frontRef = useRef<HTMLDivElement>(null)
+
+  // Touch devices have no hover glint: one pass on first view instead, plus a
+  // tap press when the whole card is a button (onSelect).
+  const pressable = Boolean(onSelect)
+  useEffect(() => {
+    const front = frontRef.current
+    if (!front || !touchMotion()) return
+    if (pressable) front.classList.add(shine.press)
+    if (!SHINE_TILT) return () => front.classList.remove(shine.press)
+    const strip = front.querySelector<HTMLElement>(`.${shine.strip}`)
+    const onEnd = () => front.classList.remove(shine.played)
+    strip?.addEventListener('animationend', onEnd)
+    const stop = onceInView(front, () => front.classList.add(shine.played), 0.6)
+    return () => {
+      stop()
+      strip?.removeEventListener('animationend', onEnd)
+      front.classList.remove(shine.press, shine.played)
+    }
+  }, [pressable])
   const hasBio = Boolean(m.bio)
   const compact = size === 'xs'
   const area = areaLabel(m.area)
@@ -95,6 +118,7 @@ export default function MemberCard({
           /* ── FRONT SIDE ────────────────────────────────── */
           front: (
             <div
+              ref={frontRef}
               className={`${shine.host} glass flex h-full w-full flex-col items-center justify-between rounded-3xl text-center ${
                 compact ? 'px-3 py-5' : 'px-5 py-7'
               } ${

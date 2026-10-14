@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import MemberCard from './MemberCard'
+import { RevealGroup } from './Reveal'
 import { AREAS, CURRENT_GENERATION, GENERATIONS, MEMBERS, areaLabel, isShown, type AreaId, type Member } from '@/data/members'
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
@@ -73,9 +74,15 @@ export default function TeamExplorer() {
 
       {/* Presidency */}
       <div key={`lead-${generation}`} className="mx-auto mt-12 grid max-w-2xl gap-5 sm:grid-cols-2">
-        {leadership.map((m, i) => (
-          <MemberCard key={seed(m)} m={m} seed={seed(m)} size="lg" delay={i * 60} />
-        ))}
+        {/* Touch only: cards below the fold fade up as they arrive. Remounts with the key, so it re-scans. */}
+        <RevealGroup>
+          {/* Wrapper: the card's own rise animation (fill: both) would override the reveal's styles. */}
+          {leadership.map((m, i) => (
+            <div key={seed(m)} data-reveal="">
+              <MemberCard m={m} seed={seed(m)} size="lg" delay={i * 60} />
+            </div>
+          ))}
+        </RevealGroup>
       </div>
 
       {/* Area filter */}
@@ -99,10 +106,11 @@ export default function TeamExplorer() {
 
       {/* Directors grid, or one area's director + coordinators */}
       <div key={`${generation}-${area ?? 'all'}`} className="mt-12">
+        <RevealGroup>
         {area === null ? (
           <ul className="m-0 grid list-none grid-cols-2 gap-4 p-0 md:grid-cols-3 lg:grid-cols-6">
             {directors.map((m, i) => (
-              <li key={seed(m)}>
+              <li key={seed(m)} data-reveal="">
                 <MemberCard m={m} seed={seed(m)} onSelect={() => setArea(m.area!)} delay={i * 45} />
               </li>
             ))}
@@ -121,7 +129,7 @@ export default function TeamExplorer() {
             {areaDirectors.length > 0 ? (
               <div className="flex w-full flex-wrap justify-center gap-4">
                 {areaDirectors.map((m) => (
-                  <div key={seed(m)} className="w-full max-w-xs">
+                  <div key={seed(m)} data-reveal="" className="w-full max-w-xs">
                     <MemberCard m={m} seed={seed(m)} size="md" highlight />
                   </div>
                 ))}
@@ -138,7 +146,7 @@ export default function TeamExplorer() {
                 />
                 <ul className="m-0 flex w-full max-w-5xl list-none flex-wrap justify-center gap-3 p-0">
                   {coordinators.map((m, i) => (
-                    <li key={seed(m)} className="w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-0.5rem)] lg:w-[calc(20%-0.6rem)]">
+                    <li key={seed(m)} data-reveal="" className="w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-0.5rem)] lg:w-[calc(20%-0.6rem)]">
                       <MemberCard m={m} seed={seed(m)} size="xs" delay={80 + i * 30} />
                     </li>
                   ))}
@@ -151,6 +159,7 @@ export default function TeamExplorer() {
             ) : null}
           </div>
         )}
+        </RevealGroup>
       </div>
     </div>
   )

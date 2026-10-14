@@ -10,6 +10,7 @@
 
 import FloatingShapes, { type FloatingShape } from './FloatingShapes'
 import HeroTypewriter from './HeroTypewriter'
+import RingPulse from './RingPulse'
 import { Button } from './ui'
 import { MARQUEE_MOTION, MARQUEE_PHOTOS } from '@/lib/site'
 
@@ -138,10 +139,15 @@ export default function HomeHero() {
         <HeroTypewriter />
 
         <div className="flex flex-col items-center gap-4 sm:flex-row">
-          <Button href="/integrantes#unete">Únete</Button>
-          <Button href="#sobre-nosotras" variant="glass">
-            Conoce más
-          </Button>
+          {/* Touch only: ring flash once in view and a tap press; desktop is unchanged. */}
+          <RingPulse touchOnly>
+            <Button href="/integrantes#unete">Únete</Button>
+          </RingPulse>
+          <RingPulse touchOnly>
+            <Button href="#sobre-nosotras" variant="glass">
+              Conoce más
+            </Button>
+          </RingPulse>
         </div>
       </div>
 

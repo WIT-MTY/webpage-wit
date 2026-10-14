@@ -5,6 +5,7 @@ import CountUp from '@/components/CountUp'
 import Reveal from '@/components/Reveal'
 import ShineCard from '@/components/ShineCard'
 import RingPulse from '@/components/RingPulse'
+import { RevealGroup } from '@/components/Reveal'
 import CollabCTA from '@/components/CollabCTA'
 import { SocialIcon } from '@/components/SocialIcon'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
@@ -53,9 +54,16 @@ export default function WitCodePage() {
       {/* data-lumi-anchor: where Lumi sits while this part is mid-screen (LumiCompanion). */}
       <div data-lumi-anchor="left">
         <Container className="grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start">
+          {/*
+            Touch only (RevealGroup): the marked parts fade up as they arrive; the
+            later paragraphs already have their own Reveal. Desktop is unchanged.
+          */}
+          <RevealGroup>
           <div className="glass rounded-[2rem] p-8 sm:p-10">
-            <MicroLabel className="mb-5">Propósito</MicroLabel>
-            <p className="m-0 font-display text-[clamp(1.35rem,2.4vw,1.75rem)] font-semibold leading-snug text-white">
+            <div data-reveal="">
+              <MicroLabel className="mb-5">Propósito</MicroLabel>
+            </div>
+            <p data-reveal="" className="m-0 font-display text-[clamp(1.35rem,2.4vw,1.75rem)] font-semibold leading-snug text-white">
               {WITCODE_DESCRIPTION[0]}
             </p>
             {WITCODE_DESCRIPTION.slice(1).map((p, i) => (
@@ -63,12 +71,14 @@ export default function WitCodePage() {
                 <p className="mt-6 mb-0 text-[16px] font-light leading-[1.75] text-white/75">{p}</p>
               </Reveal>
             ))}
-            <div className="mt-10 flex flex-wrap gap-3">
+            <div data-reveal="" className="mt-10 flex flex-wrap gap-3">
               {WITCODE_APPLY_URL ? (
                 // TODO(kat): confirm the button label once applications open.
-                <Button href={WITCODE_APPLY_URL} external>
-                  Aplicar
-                </Button>
+                <RingPulse touchOnly>
+                  <Button href={WITCODE_APPLY_URL} external>
+                    Aplicar
+                  </Button>
+                </RingPulse>
               ) : (
                 <button
                   type="button"
@@ -104,7 +114,7 @@ export default function WitCodePage() {
             text on desktop. Static: the rotation is not animated.
           */}
           <div className="flex flex-col gap-5 md:relative md:block md:pb-48 lg:sticky lg:top-28">
-            <div className="relative md:w-[86%]">
+            <div data-reveal="" className="relative md:w-[86%]">
               <PhotoFade
                 photos={big.photos}
                 alt={big.alt}
@@ -114,7 +124,7 @@ export default function WitCodePage() {
               <PhotoCaption className="bottom-6 left-7 max-w-[10ch] text-[clamp(1.6rem,3vw,2.25rem)]">{big.caption}</PhotoCaption>
             </div>
             {/* Solid backing so the translucent placeholder doesn't show the big block through it. */}
-            <div className="relative rounded-3xl bg-night md:absolute md:right-0 md:bottom-0 md:w-[50%] md:rotate-3">
+            <div data-reveal="" className="relative rounded-3xl bg-night md:absolute md:right-0 md:bottom-0 md:w-[50%] md:rotate-3">
               {/* Offset so the two blocks never change at the same moment. */}
               <PhotoFade
                 photos={small.photos}
@@ -126,6 +136,7 @@ export default function WitCodePage() {
               <PhotoCaption className="bottom-5 left-6 max-w-[14ch] text-[clamp(1.1rem,1.8vw,1.35rem)]">{small.caption}</PhotoCaption>
             </div>
           </div>
+          </RevealGroup>
         </Container>
       </div>
 
@@ -178,6 +189,7 @@ export default function WitCodePage() {
       </section>
 
       {/* Ally band, same component as Aliados. Mail with the subject filled in, or the contact page without an email. */}
+      <RevealGroup>
       <AllyCTA
         id="witcode-aliado-title"
         heading="¿Quieres ser aliado estratégico de WitCode?"
@@ -185,8 +197,11 @@ export default function WitCodePage() {
         label="Escríbenos"
         href={CONTACT_EMAIL ? `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Aliado estratégico WitCode')}` : '/contacto'}
       />
+      </RevealGroup>
 
-      <CollabCTA />
+      <RevealGroup>
+        <CollabCTA />
+      </RevealGroup>
     </>
   )
 }

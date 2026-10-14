@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { touchMotion } from '@/lib/touch'
+import styles from './Spotlight.module.css'
 
 const SIZE = 480
 
@@ -14,10 +16,14 @@ const SIZE = 480
   - Only on devices with a fine pointer that hovers; nothing on touch or under
     prefers-reduced-motion (the element is never shown).
 
+  - Touch (`drift`, TOUCH_MOTION): the glow drifts slowly around the card on
+    its own, paused while scrolling and off-screen (Spotlight.module.css).
+    Use `drift` on one card per page, so only one loop runs.
+
   Put it as the first child of a `relative` card; it clips itself to the
   card's rounded corners.
 */
-export default function Spotlight() {
+export default function Spotlight({ drift = false }: { drift?: boolean }) {
   const wrapRef = useRef<HTMLSpanElement>(null)
   const glowRef = useRef<HTMLSpanElement>(null)
 
@@ -26,6 +32,10 @@ export default function Spotlight() {
     const glow = glowRef.current
     const card = wrap?.parentElement
     if (!wrap || !glow || !card) return
+    if (drift && touchMotion()) {
+      wrap.classList.add(styles.touch)
+      return () => wrap.classList.remove(styles.touch)
+    }
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
@@ -59,15 +69,23 @@ export default function Spotlight() {
       card.removeEventListener('pointermove', onMove)
       card.removeEventListener('pointerleave', onLeave)
     }
-  }, [])
+  }, [drift])
 
   return (
-    <span ref={wrapRef} className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]" aria-hidden="true">
-      <span
-        ref={glowRef}
-        className="absolute top-0 left-0 transition-opacity duration-300 will-change-transform"
-        style={{ width: SIZE, height: SIZE, opacity: 0, background: "url('/fx/spotlight.svg') center / contain no-repeat" }}
-      />
+    <span
+      ref={wrapRef}
+      className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]"
+      aria-hidden="true"
+      data-ambient-group=""
+    >
+      {/* .drift only animates on touch; on desktop it is a plain full-size layer. */}
+      <span className={styles.drift} data-ambient="">
+        <span
+          ref={glowRef}
+          className={`${styles.glow} absolute top-0 left-0 transition-opacity duration-300 will-change-transform`}
+          style={{ width: SIZE, height: SIZE, opacity: 0, background: "url('/fx/spotlight.svg') center / contain no-repeat" }}
+        />
+      </span>
     </span>
   )
 }

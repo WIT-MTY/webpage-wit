@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from 'react'
 import { SHINE_TILT } from '@/lib/motion-flags'
+import { onceInView } from '@/lib/inView'
+import { touchMotion } from '@/lib/touch'
 import shine from './Shine.module.css'
 
 const MAX_TILT_DEG = 4
@@ -13,6 +15,8 @@ const MAX_TILT_DEG = 4
   - Glint: Shine.module.css's band (a pre-rendered image moved by transform),
     clipped to the card's corners. Plays on hover, on keyboard focus inside
     the card, and once the first time the card is mostly on screen.
+  - Touch (TOUCH_MOTION): no tilt; cards that are a single link or button scale
+    to 0.97 while pressed (Shine.module.css .press).
   - Tilt (desktop, fine pointer): up to 4° toward the pointer, one update
     per frame, with perspective on the outer wrapper. `tilt={false}` for
     cards that move on their own (e.g. the Aliados conveyor).
@@ -44,15 +48,11 @@ export default function ShineCard({
     const strip = host.querySelector<HTMLElement>(`.${shine.strip}`)
     const onEnd = () => host.classList.remove(shine.played)
     strip?.addEventListener('animationend', onEnd)
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return
-        io.disconnect()
-        host.classList.add(shine.played)
-      },
-      { threshold: 0.6 },
-    )
-    io.observe(host)
+    const stopView = onceInView(host, () => host.classList.add(shine.played), 0.6)
+
+    // Touch: a quick press, only on cards that are one link or button (not cards that hold several).
+    const press = touchMotion() && Boolean(inner.firstElementChild?.matches('a, button'))
+    if (press) inner.classList.add(shine.press)
 
     // Tilt toward the pointer.
     let raf = 0
@@ -82,7 +82,8 @@ export default function ShineCard({
     }
 
     return () => {
-      io.disconnect()
+      stopView()
+      if (press) inner.classList.remove(shine.press)
       strip?.removeEventListener('animationend', onEnd)
       cancelAnimationFrame(raf)
       host.removeEventListener('pointermove', onMove)
