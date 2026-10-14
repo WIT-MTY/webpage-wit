@@ -4,11 +4,11 @@ import type { Metadata } from 'next'
 import PageHero from '@/components/PageHero'
 import AllyCTA from '@/components/AllyCTA'
 import AllyTile from '@/components/AllyTile'
-import Celestial from '@/components/Celestial'
+import Celestial, { type CelestialKind } from '@/components/Celestial'
 import LogoConveyor from '@/components/LogoConveyor'
 import Typewriter from '@/components/Typewriter'
-import { Container, Heading, MicroLabel } from '@/components/ui'
-import { ALLIES } from '@/lib/site'
+import { Button, Container, Heading, MicroLabel } from '@/components/ui'
+import { ACTIVITIES, ALLIES, CONTACT_EMAIL, SPONSOR_BENEFITS, SPONSOR_INTRO, SPONSOR_OTHER_WAYS } from '@/lib/site'
 
 export const metadata: Metadata = {
   title: 'Aliados estratégicos',
@@ -24,8 +24,23 @@ function resolveLogo(base: string | null): string | null {
   return ext ? `/aliados/${base}${ext}` : null
 }
 
+/** Sponsoring: mail with the subject filled in, or the contact page while there is no email. */
+const SPONSOR_HREF = CONTACT_EMAIL
+  ? `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Patrocinio de eventos WIT')}`
+  : '/contacto'
+
+/**
+ * Grid classes that center the last row when it isn't full: a lone card on
+ * tablet (4 tracks, cards span 2), a lone card or a pair on desktop (6 tracks).
+ */
+function centerOrphans(i: number, n: number) {
+  const tablet = n % 2 === 1 && i === n - 1 ? 'sm:col-start-2' : ''
+  const desktop =
+    n % 3 === 1 && i === n - 1 ? 'lg:col-start-3' : n % 3 === 2 && i === n - 2 ? 'lg:col-start-2' : tablet ? 'lg:col-start-auto' : ''
+  return `${tablet} ${desktop}`
+}
+
 const WAYS = [
-  { title: 'Patrocina un evento', body: 'Haz posible Hack4Her, el Día de la Mujer y nuestros eventos.', icon: 'star' as const },
   { title: 'Comparte tu experiencia', body: 'Imparte un taller o una charla para nuestra comunidad.', icon: 'burst' as const },
   { title: 'Abre puertas', body: 'Súmate a Journey to Internship con prácticas y mentorías.', icon: 'constellation' as const },
 ]
@@ -77,7 +92,66 @@ export default function AliadosPage() {
       <section data-lumi-anchor="left" className="pt-28">
         <Container>
           <Heading className="mb-10 text-center text-[clamp(2rem,4.5vw,3.25rem)]">Formas de colaborar</Heading>
-          <ul className="m-0 grid list-none gap-5 p-0 md:grid-cols-3">
+
+          {/* Sponsoring: intro, why, and how to join each event. Copy lives in lib/site.ts (SPONSOR_*, sponsorHow). */}
+          <div className="glass rounded-3xl p-5 sm:p-8 lg:p-10">
+            <span className="mb-5 block text-peri">
+              <Celestial kind="star" size={26} />
+            </span>
+            <h3 className="m-0 font-display text-[clamp(1.6rem,3.2vw,2.25rem)] font-bold text-white">Haz posible nuestros eventos</h3>
+            <p className="mt-4 mb-0 max-w-2xl text-[16px] font-light leading-relaxed text-white/75">{SPONSOR_INTRO}</p>
+
+            <ul className="mt-8 mb-0 grid list-none gap-3 p-0 sm:grid-cols-3">
+              {SPONSOR_BENEFITS.map((b) => (
+                <li key={b.title} className="flex min-w-0 items-start gap-3 rounded-2xl border border-peri/20 bg-peri/[0.06] p-4">
+                  <span className="mt-0.5 shrink-0 text-wit-pink/80">
+                    <Celestial kind={b.icon} size={18} />
+                  </span>
+                  <span className="min-w-0 [overflow-wrap:anywhere]">
+                    <span className="block text-[13px] font-semibold uppercase tracking-[0.14em] text-white">{b.title}</span>
+                    <span className="mt-1 block text-[14px] font-light leading-snug text-white/70">{b.body}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            {/*
+              Equal-height cards (auto-rows-fr) once they sit side by side: 1 column on phones, 2 on tablets
+              (4-track grid, span 2), 3 on desktop (6-track grid, span 2). The
+              tracks let a lone last card (or a last pair) start mid-row, centered.
+            */}
+            <ul className="mt-6 mb-0 grid list-none gap-3 p-0 sm:auto-rows-fr sm:grid-cols-4 lg:grid-cols-6">
+              {ACTIVITIES.map((e, i) => (
+                <li
+                  key={e.slug}
+                  className={`glass-strong flex min-w-0 items-start gap-3 rounded-2xl p-4 sm:col-span-2 ${centerOrphans(i, ACTIVITIES.length)}`}
+                >
+                  <span className="mt-0.5 shrink-0 text-peri/80">
+                    <Celestial kind={e.icon as CelestialKind} size={18} />
+                  </span>
+                  <span className="min-w-0 [overflow-wrap:anywhere]">
+                    <span className="block font-display text-[17px] font-bold text-white">{e.title}</span>
+                    {e.sponsorHow && (
+                      <>
+                        <span className="mt-2 block text-[10px] uppercase tracking-[0.2em] text-peri/60">Cómo puedes sumarte</span>
+                        <span className="mt-1 block text-[14px] font-light leading-snug text-white/75">{e.sponsorHow}</span>
+                      </>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-8">
+              {/* Less side padding on phones so the label stays on one line at 320px. */}
+              <Button href={SPONSOR_HREF} className="w-full px-5! sm:w-auto sm:px-9!">
+                Quiero patrocinar
+              </Button>
+              <p className="mt-3 mb-0 text-[14px] font-light text-white/60">{SPONSOR_OTHER_WAYS}</p>
+            </div>
+          </div>
+
+          <ul className="m-0 mt-5 grid list-none gap-5 p-0 md:grid-cols-2">
             {WAYS.map((w) => (
               <li key={w.title} className="glass rounded-3xl p-8">
                 <span className="mb-5 block text-peri">

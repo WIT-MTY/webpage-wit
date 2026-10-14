@@ -63,7 +63,7 @@ export default function ContactoPage() {
         {/* data-lumi-flash: Lumi's flash lights these blocks' outlines on load, on click and on copy. */}
 
         {/* Primary card: the email. Static gradient border (padding-box / border-box backgrounds). */}
-        <Reveal onLoad className="md:col-span-2 md:row-span-2">
+        <Reveal onLoad className="min-w-0 md:col-span-2 md:row-span-2">
           <ShineCard className="h-full" radius="rounded-[2rem]">
             <div
               data-lumi-flash=""
@@ -76,14 +76,14 @@ export default function ContactoPage() {
             >
               <FlashOutline />
               <Spotlight />
-              <div className="relative">
+              <div className="relative min-w-0">
                 <MicroLabel className="mb-6">Correo</MicroLabel>
                 {CONTACT_EMAIL ? (
                   <>
                     <a
                       id="correo"
                       href={`mailto:${CONTACT_EMAIL}`}
-                      className="break-all font-display text-[clamp(1.9rem,4.4vw,3.4rem)] font-bold leading-tight text-white transition-colors hover:text-peri"
+                      className="block min-w-0 font-display text-[clamp(0.9rem,4vw,3.4rem)] font-bold leading-tight tracking-[-0.01em] text-white transition-colors [overflow-wrap:anywhere] hover:text-peri"
                     >
                       {CONTACT_EMAIL}
                     </a>
@@ -92,14 +92,14 @@ export default function ContactoPage() {
                     </div>
                   </>
                 ) : (
-                  <p className="m-0 font-display text-[clamp(1.9rem,4.4vw,3.4rem)] font-bold text-white/60">Por confirmar</p>
+                  <p className="m-0 font-display text-[clamp(0.9rem,4vw,3.4rem)] font-bold text-white/60">Por confirmar</p>
                 )}
               </div>
             </div>
           </ShineCard>
         </Reveal>
 
-        <Reveal onLoad delay={120}>
+        <Reveal onLoad delay={120} className="min-w-0">
           <ShineCard className="h-full" radius="rounded-3xl">
             <div data-lumi-flash="" className="glass relative h-full rounded-3xl p-8">
               <FlashOutline />
@@ -130,7 +130,7 @@ export default function ContactoPage() {
           </ShineCard>
         </Reveal>
 
-        <Reveal onLoad delay={240}>
+        <Reveal onLoad delay={240} className="min-w-0">
           <ShineCard className="h-full" radius="rounded-3xl">
             <div
               data-lumi-flash=""
