@@ -299,9 +299,22 @@ export type Ally = {
   years?: string
   /** Tile background behind the logo. Default white. */
   tileBg?: 'black'
+  /**
+   * Solid tile color (CSS color) that overrides tileBg. Use it when the logo
+   * sits on a flat color square, so the square blends into the tile.
+   */
+  tileColor?: string
   /** Wide horizontal lockup: less padding so it fills the tile width. */
   wideLogo?: boolean
 }
+
+/**
+ * The flat purple behind the Ingenia emblem, sampled from
+ * public/aliados/ingenia.jpg (median of its outer 8px band, every pixel
+ * 91,34,139). Its tile uses it, so the logo's square disappears into the card.
+ * Re-sample if the logo file changes.
+ */
+export const INGENIA_PURPLE = '#5b228b'
 
 export const ALLIES: Ally[] = [
   { name: 'Arca Continental', logo: 'arca-continental', current: true },
@@ -314,7 +327,7 @@ export const ALLIES: Ally[] = [
     current: true,
     wideLogo: true,
   },
-  { name: 'Ingenia', logo: 'ingenia', current: true },
+  { name: 'Ingenia', logo: 'ingenia', current: true, tileColor: INGENIA_PURPLE },
   { name: 'Carrier', logo: 'carrier', current: true },
 ]
 

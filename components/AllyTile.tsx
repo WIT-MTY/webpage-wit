@@ -10,8 +10,9 @@ export default function AllyTile({ ally: a, logo }: { ally: Ally; logo: string |
         {logo ? (
           <div
             className={`flex aspect-[3/2] w-full items-center justify-center rounded-2xl ${
-              a.tileBg === 'black' ? 'bg-black' : 'bg-white'
+              a.tileColor ? '' : a.tileBg === 'black' ? 'bg-black' : 'bg-white'
             } ${a.wideLogo ? 'px-3 py-4' : 'p-5'}`}
+            style={a.tileColor ? { backgroundColor: a.tileColor } : undefined}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- ally logos, mixed formats */}
             <img src={logo} alt={`Logotipo de ${a.name}`} className="h-full w-full object-contain" />
