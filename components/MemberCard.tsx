@@ -22,7 +22,16 @@ export function Avatar({ m, size }: { m: Member; size: Size }) {
       }}
     >
       {m.photo ? (
-        <Image src={m.photo} alt={m.name} fill sizes={`${px}px`} className="object-cover" />
+        // Square headshot cropped to the circle; fixed size, so no layout shift.
+        <Image
+          src={m.photo}
+          alt={`Foto de ${m.name}`}
+          width={px}
+          height={px}
+          sizes={`${px}px`}
+          loading="lazy"
+          className="h-full w-full object-cover"
+        />
       ) : (
         <span aria-hidden="true">{initials(m)}</span>
       )}
