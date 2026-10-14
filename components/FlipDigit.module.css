@@ -1,66 +1,155 @@
 /*
-  One countdown digit that flips when it changes. Transform and opacity only.
-  The old face tips forward and down (rotateX) and fades; the new one drops
-  in from the top (rotateX) as it fades in. 450ms, matching FLIP_MS in
-  FlipDigit.tsx. Nothing here is data-ambient, so MotionGovernor never
-  switches it off. prefers-reduced-motion: the digit just swaps.
+  Split-flap countdown digit. Transform and opacity only.
+
+  The card is two clipped halves of the same glyph (top shows its upper
+  half, bottom its lower half). On a change, two flaps are mounted for
+  450ms (FLIP_MS in FlipDigit.tsx):
+    1. top flap, old digit:    rotateX 0 → -90deg, hinge at its bottom, 220ms ease-in
+    2. bottom flap, new digit: rotateX 90 → 0deg, hinge at its top, 230ms ease-out, after 1
+  Underneath, the static top already shows the new digit and the static
+  bottom still shows the old one until flap 2 lands. Each flap carries a
+  pre-rendered shade (/fx/flap-shade.svg) whose opacity follows the turn.
+  will-change is only on the flaps, which exist only while flipping.
+  Nothing here is data-ambient, so MotionGovernor never switches it off.
+
+  prefers-reduced-motion: the split card is hidden and a plain glyph shows.
 */
 .digit {
   position: relative;
   display: inline-block;
-  width: 0.62em;
+  width: 0.72em;
+  height: 1.2em;
+  font-variant-numeric: lining-nums tabular-nums; /* lining: Playfair's default old-style figures sit low in the card */
+  line-height: 1.2em;
   text-align: center;
-  font-variant-numeric: tabular-nums;
-  perspective: 300px;
+  vertical-align: middle;
 }
 
-.face {
-  display: inline-block;
-  transform-origin: 50% 0;
-  backface-visibility: hidden;
-}
-
-.in {
-  animation: flip-in 450ms ease-out both;
-}
-
-.flap {
+.card {
   position: absolute;
   inset: 0;
-  transform-origin: 50% 100%;
+  perspective: 400px;
+}
+
+/* The readable digit: visually hidden behind the card (screen readers still get it), shown plain with reduced motion. */
+.plain {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* A half: clips the full-height glyph inside it. */
+.half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
   backface-visibility: hidden;
-  animation: flip-down 450ms cubic-bezier(0.55, 0, 0.75, 0.4) both;
+}
+
+.top {
+  top: 0;
+  border-radius: 0.12em 0.12em 0 0;
+  background: #2a1250;
+}
+
+.bottom {
+  top: 50%;
+  border-radius: 0 0 0.12em 0.12em;
+  background: #22103f;
+}
+
+/* The full glyph, positioned so both halves line up exactly. */
+.glyph {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1.2em;
+  top: 0;
+}
+
+.bottom .glyph {
+  top: -0.6em;
+}
+
+.flapTop {
+  transform-origin: 50% 100%;
+  will-change: transform;
+  animation: flap-top 220ms ease-in both;
+}
+
+.flapBottom {
+  transform-origin: 50% 0;
+  will-change: transform;
+  animation: flap-bottom 230ms ease-out 220ms both;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: url('/fx/flap-shade.svg') center / 100% 100% no-repeat;
   pointer-events: none;
 }
 
-@keyframes flip-down {
+.flapTop .shade {
+  animation: shade-in 220ms ease-in both;
+}
+
+/* The bottom flap's shade is mirrored: darkest at its hinge (top). */
+.flapBottom .shade {
+  transform: scaleY(-1);
+  animation: shade-out 230ms ease-out 220ms both;
+}
+
+@keyframes flap-top {
   from {
     transform: rotateX(0deg);
-    opacity: 1;
   }
   to {
     transform: rotateX(-90deg);
-    opacity: 0;
   }
 }
 
-@keyframes flip-in {
-  0%,
-  40% {
+@keyframes flap-bottom {
+  from {
     transform: rotateX(90deg);
+  }
+  to {
+    transform: rotateX(0deg);
+  }
+}
+
+@keyframes shade-in {
+  from {
     opacity: 0;
   }
-  100% {
-    transform: rotateX(0deg);
+  to {
     opacity: 1;
+  }
+}
+
+@keyframes shade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .in {
-    animation: none;
-  }
-  .flap {
+  .card {
     display: none;
+  }
+  .plain {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
   }
 }

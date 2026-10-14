@@ -14,11 +14,23 @@ function canFlip(el: HTMLElement | null) {
   return r.bottom > 0 && r.top < window.innerHeight && r.right > 0 && r.left < window.innerWidth
 }
 
+/** One clipped half of a split-flap card, showing its half of `char`. */
+function Half({ char, part, className = '', children }: { char: string; part: 'top' | 'bottom'; className?: string; children?: React.ReactNode }) {
+  return (
+    <span className={`${styles.half} ${styles[part]} ${className}`}>
+      <span className={styles.glyph}>{char}</span>
+      {children}
+    </span>
+  )
+}
+
 /**
- * A single countdown character. When `value` changes, the previous face
- * flips down and fades while the new one flips in (FlipDigit.module.css).
+ * A single split-flap countdown character (FlipDigit.module.css). When
+ * `value` changes, the old top half flips down onto the new digit, then the
+ * new bottom half flips down into place.
  *
- * - The current value is always rendered; the flap is only an overlay.
+ * - With no flip running, both static halves show the current value; the
+ *   flaps are overlays that exist only during a flip.
  * - At most one flap at a time: a new value replaces the active flap.
  * - The flap is removed after FLIP_MS or on animationend, whichever comes
  *   first, so it can never get stuck if its animation doesn't run.
@@ -56,20 +68,29 @@ export default function FlipDigit({ value }: { value: string }) {
 
   return (
     <span ref={rootRef} className={styles.digit}>
-      {/* Re-keyed per flip so its flip-in restarts; namespaced so it never collides with the flap's key. */}
-      <span key={flap ? `face-${flap.id}` : 'face'} className={`${styles.face} ${flap ? styles.in : ''}`}>
-        {value}
+      {/* prefers-reduced-motion: CSS shows this plain glyph instead of the card. */}
+      <span className={styles.plain}>{value}</span>
+      <span className={styles.card} aria-hidden="true">
+        {/* Static halves: the new top shows at once; the old bottom stays until the bottom flap lands. */}
+        <Half char={value} part="top" />
+        <Half char={flap ? flap.char : value} part="bottom" />
+        {flap && (
+          <>
+            <Half key={`flap-top-${flap.id}`} char={flap.char} part="top" className={styles.flapTop}>
+              <span className={styles.shade} />
+            </Half>
+            {/* The last animation to finish; ends the flip (the timeout is the fallback). */}
+            <span
+              key={`flap-bottom-${flap.id}`}
+              className={`${styles.half} ${styles.bottom} ${styles.flapBottom}`}
+              onAnimationEnd={(e) => e.target === e.currentTarget && endFlap(flap.id)}
+            >
+              <span className={styles.glyph}>{value}</span>
+              <span className={styles.shade} />
+            </span>
+          </>
+        )}
       </span>
-      {flap && (
-        <span
-          key={`flap-${flap.id}`}
-          className={styles.flap}
-          onAnimationEnd={(e) => e.target === e.currentTarget && endFlap(flap.id)}
-          aria-hidden="true"
-        >
-          {flap.char}
-        </span>
-      )}
     </span>
   )
 }

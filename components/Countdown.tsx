@@ -103,7 +103,19 @@ export function CountdownCells({
       {cells.map(([k, cellLabel], i) => (
         <div key={k} className="flex items-start gap-2 sm:gap-4">
           <div className="flex flex-col items-center">
-            <span className="glass-strong flex h-[72px] w-[68px] items-center justify-center rounded-2xl font-display text-3xl font-extrabold tabular-nums text-white sm:h-24 sm:w-24 sm:text-5xl">
+            <span
+              className={`glass-strong flex h-[72px] w-[68px] items-center justify-center rounded-2xl font-display text-3xl font-extrabold tabular-nums text-white sm:h-24 sm:w-24 sm:text-5xl ${
+                variant === 'flip' ? 'relative gap-[0.06em]' : ''
+              }`}
+            >
+              {variant === 'flip' && (
+                // Split-flap seam and its two pins, static. Hidden with reduced motion (plain digits then).
+                <span className="pointer-events-none absolute inset-x-0 top-1/2 z-10 motion-reduce:hidden" aria-hidden="true">
+                  <span className="absolute inset-x-0 -top-px h-[2px] bg-black/55" />
+                  <span className="absolute -top-[3px] left-[5px] h-1.5 w-1.5 rounded-full bg-black/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]" />
+                  <span className="absolute -top-[3px] right-[5px] h-1.5 w-1.5 rounded-full bg-black/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]" />
+                </span>
+              )}
               {variant === 'flip'
                 ? [...(state === 'pending' ? '--' : String(state[k]).padStart(2, '0'))].map((ch, i, all) => (
                     // Keyed from the right, so the ones digit keeps its identity if days drop from 3 to 2 digits.
