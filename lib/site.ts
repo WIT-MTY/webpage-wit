@@ -70,6 +70,8 @@ export type WitEvent = {
   tagline: string
   /** Empty string = not written yet; the line is hidden on public cards. */
   description: string
+  /** "Cómo puedes sumarte" line on the Aliados sponsor cards. */
+  sponsorHow?: string
   /** Short highlights shown as chips in the Próximo evento panel. */
   chips?: string[]
   /** ISO date of the event. Null until it is confirmed. */
@@ -112,6 +114,8 @@ const pendingEvent = (slug: string, title: string): WitEvent => ({
 const EVENT_LIST: WitEvent[] = [
   {
     ...pendingEvent('hackwitu', 'HackWITu'),
+    // DRAFT: confirm with WIT leadership before launch
+    sponsorHow: 'Premios, mentoría para los equipos, talleres o apoyo con comida y merch.',
     aka: 'Hack4Prepa',
     category: 'Hackathon',
     tagline: 'No necesitas ser experta en STEM, ¡solo tener curiosidad, creatividad y ganas de intentarlo!',
@@ -125,17 +129,23 @@ const EVENT_LIST: WitEvent[] = [
   },
   {
     ...pendingEvent('empowerhack', 'EmpowerHack'),
+    // DRAFT: confirm with WIT leadership before launch
+    sponsorHow: 'Premios, mentoría y talleres para chicas de secundaria.',
     description:
       'Un hackathon dirigido a chicas de secundaria con el propósito de fomentar la participación de mujeres en la tecnología desde una temprana edad.',
   },
   {
     ...pendingEvent('reunion-nacional', 'Reunión Nacional'),
+    // DRAFT: confirm with WIT leadership before launch
+    sponsorHow: 'Patrocina paneles y coffee breaks, o participa como panelista.',
     // TODO confirm with Dana
     description:
       'Una reunión que invita a mujeres de todo el país: investigadoras, docentes, profesionistas, estudiantes y mujeres de todas las áreas STEM. Entre paneles y coffee breaks, conversamos sobre las adversidades y los retos que enfrentan las mujeres.',
   },
   {
     slug: 'hack4her',
+    // DRAFT: confirm with WIT leadership before launch
+    sponsorHow: 'Apoya el hackathon con premios, mentoría y retos de tu empresa.',
     title: 'Hack4Her',
     category: 'Hackathon',
     tagline: 'Un fin de semana para construir con causa.',
@@ -153,6 +163,8 @@ const EVENT_LIST: WitEvent[] = [
   },
   {
     slug: 'journey-to-internship',
+    // DRAFT: confirm with WIT leadership before launch
+    sponsorHow: 'Imparte una conferencia o taller y conecta con estudiantes que buscan su primer internship.',
     title: 'Journey to Internship',
     category: 'Programa',
     tagline: 'Puentes hacia grandes oportunidades.',
@@ -171,6 +183,8 @@ const EVENT_LIST: WitEvent[] = [
   },
   {
     slug: 'dia-de-la-mujer',
+    // DRAFT: confirm with WIT leadership before launch
+    sponsorHow: 'Apoya el desayuno conmemorativo o participa como ponente en el diálogo sobre liderazgo femenino.',
     title: 'Día de la Mujer',
     category: 'Evento',
     tagline: 'Celebramos hoy para un mañana más justo.',
@@ -188,6 +202,8 @@ const EVENT_LIST: WitEvent[] = [
   },
   {
     slug: 'run4wit',
+    // DRAFT: confirm with WIT leadership before launch
+    sponsorHow: 'Apoya la carrera con kits de corredor, premios o hidratación.',
     title: 'Run4WIT',
     category: 'Carrera',
     tagline: 'Corremos por más mujeres en tecnología.',
@@ -261,6 +277,7 @@ const ACTIVITY_ICONS: Record<(typeof EVENT_ORDER)[number], string> = {
 export const ACTIVITIES = EVENTS.map((e) => ({
   title: e.title,
   tagline: e.tagline,
+  sponsorHow: e.sponsorHow,
   body: e.description,
   slug: e.slug,
   icon: ACTIVITY_ICONS[e.slug as keyof typeof ACTIVITY_ICONS] ?? 'star',
@@ -268,6 +285,22 @@ export const ACTIVITIES = EVENTS.map((e) => ({
 
 /** The events featured in the Inicio carousel, in this order. */
 export const INICIO_FEATURED = ['hack4her', 'journey-to-internship', 'empowerhack', 'dia-de-la-mujer'] as const
+
+// ── Sponsoring (Aliados, "Haz posible nuestros eventos") ──────
+
+// DRAFT: confirm with WIT leadership before launch
+export const SPONSOR_INTRO =
+  'Cada evento de WIT es posible gracias a aliados que creen en el talento femenino en tecnología. Elige el evento que más te interese y conversemos cómo sumarte.'
+
+// DRAFT: confirm with WIT leadership before launch
+export const SPONSOR_BENEFITS = [
+  { title: 'Visibilidad', body: 'Tu marca frente a la comunidad estudiantil del Tec de Monterrey.', icon: 'star' },
+  { title: 'Networking', body: 'Conexión directa con talento joven en STEM.', icon: 'constellation' },
+  { title: 'Impacto', body: 'Contribuyes a cerrar la brecha de género en tecnología.', icon: 'burst' },
+] as const
+
+// DRAFT: confirm with WIT leadership before launch
+export const SPONSOR_OTHER_WAYS = 'También puedes escribirnos para proponer otra forma de colaborar.'
 
 // ── WitCode ──────────────────────────────────────────────────
 
