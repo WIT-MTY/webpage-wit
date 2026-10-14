@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type RefObject } from 'react'
+import FlipDigit from './FlipDigit'
 
 export type Parts = { d: number; h: number; m: number; s: number }
 
@@ -76,8 +77,20 @@ export function useCountdown(target: string | null, ref?: RefObject<Element | nu
   return state
 }
 
-/** The big four-cell readout: Días, Horas, Min, Seg. */
-export function CountdownCells({ state, label }: { state: Parts | 'pending'; label: string }) {
+/**
+ * The big four-cell readout: Días, Horas, Min, Seg.
+ * variant="flip": every cell shows two fixed-width digits ("--" before
+ * mount) and only the digits that change flip (FlipDigit).
+ */
+export function CountdownCells({
+  state,
+  label,
+  variant = 'plain',
+}: {
+  state: Parts | 'pending'
+  label: string
+  variant?: 'plain' | 'flip'
+}) {
   const cells: [keyof Parts, string][] = [
     ['d', 'Días'],
     ['h', 'Horas'],
@@ -91,7 +104,14 @@ export function CountdownCells({ state, label }: { state: Parts | 'pending'; lab
         <div key={k} className="flex items-start gap-2 sm:gap-4">
           <div className="flex flex-col items-center">
             <span className="glass-strong flex h-[72px] w-[68px] items-center justify-center rounded-2xl font-display text-3xl font-extrabold tabular-nums text-white sm:h-24 sm:w-24 sm:text-5xl">
-              {state === 'pending' ? '–' : String(state[k]).padStart(k === 'd' ? 1 : 2, '0')}
+              {variant === 'flip'
+                ? [...(state === 'pending' ? '--' : String(state[k]).padStart(2, '0'))].map((ch, i, all) => (
+                    // Keyed from the right, so the ones digit keeps its identity if days drop from 3 to 2 digits.
+                    <FlipDigit key={all.length - i} value={ch} />
+                  ))
+                : state === 'pending'
+                  ? '–'
+                  : String(state[k]).padStart(k === 'd' ? 1 : 2, '0')}
             </span>
             <span className="mt-3 text-[10px] uppercase tracking-[0.3em] text-white/50">{cellLabel}</span>
           </div>

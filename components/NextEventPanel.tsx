@@ -6,6 +6,7 @@ import { Button, Container, Heading, MicroLabel } from './ui'
 import { NEXT_EVENT, nextEvent } from '@/lib/site'
 import { eventWhen } from '@/lib/eventDate'
 import { useRegistrationCount } from '@/lib/useRegistrationCount'
+import { FLIP_COUNTDOWN } from '@/lib/motion-flags'
 
 /** "Próximo evento" panel at the top of Proyectos. Reads NEXT_EVENT; renders nothing without one. */
 export default function NextEventPanel() {
@@ -54,7 +55,9 @@ export default function NextEventPanel() {
             </div>
 
             <div className="flex flex-col items-center gap-10">
-              {showCountdown && <CountdownCells state={state} label={`Tiempo para ${ev.title}`} />}
+              {showCountdown && (
+                <CountdownCells state={state} label={`Tiempo para ${ev.title}`} variant={FLIP_COUNTDOWN ? 'flip' : 'plain'} />
+              )}
               {NEXT_EVENT.countUrl && (
                 <p className="m-0 flex items-center gap-2 text-[14px]">
                   <span className="inline-block h-[7px] w-[7px] rounded-full bg-[#73edaa] shadow-[0_0_5px_#73edaa]" />
