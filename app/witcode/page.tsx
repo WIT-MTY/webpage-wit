@@ -4,6 +4,7 @@ import PhotoFade from '@/components/PhotoFade'
 import CountUp from '@/components/CountUp'
 import Reveal from '@/components/Reveal'
 import ShineCard from '@/components/ShineCard'
+import RingPulse from '@/components/RingPulse'
 import CollabCTA from '@/components/CollabCTA'
 import { SocialIcon } from '@/components/SocialIcon'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
@@ -77,18 +78,21 @@ export default function WitCodePage() {
                 </button>
               )}
               {WITCODE_INSTAGRAM_URL && (
-                <Button
-                  href={WITCODE_INSTAGRAM_URL}
-                  external
-                  variant="glass"
-                  ariaLabel="Síguenos en Instagram @witcode.mty (se abre en una pestaña nueva)"
-                >
-                  <SocialIcon name="Instagram" size={16} />
-                  {/* One text run, so it wraps as a sentence on narrow screens. */}
-                  <span>
-                    Síguenos en Instagram <span className="normal-case tracking-normal">@witcode.mty</span>
-                  </span>
-                </Button>
+                // Same one-shot ring flash as the Instagram buttons on Integrantes and Contáctanos.
+                <RingPulse>
+                  <Button
+                    href={WITCODE_INSTAGRAM_URL}
+                    external
+                    variant="glass"
+                    ariaLabel="Síguenos en Instagram @witcode.mty (se abre en una pestaña nueva)"
+                  >
+                    <SocialIcon name="Instagram" size={16} />
+                    {/* One text run, so it wraps as a sentence on narrow screens. */}
+                    <span>
+                      Síguenos en Instagram <span className="normal-case tracking-normal">@witcode.mty</span>
+                    </span>
+                  </Button>
+                </RingPulse>
               )}
             </div>
           </div>
