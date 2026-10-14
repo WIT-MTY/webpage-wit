@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type RefObject } from 'react'
+import { Fragment, useEffect, useRef, useState, type RefObject } from 'react'
 import FlipDigit from './FlipDigit'
 import { FLIP_COUNTDOWN } from '@/lib/motion-flags'
 
@@ -80,8 +80,15 @@ export function useCountdown(target: string | null, ref?: RefObject<Element | nu
 
 /**
  * The big four-cell readout: Días, Horas, Min, Seg.
- * variant="flip": every cell shows two fixed-width digits ("--" before
- * mount) and only the digits that change flip (FlipDigit).
+ *
+ * Fluid: a 7-column grid (4 equal tile columns, 3 colon columns) that always
+ * fits one row, down to 320px screens. Each tile is square, capped at 96px,
+ * and its numerals are sized from the column width (container query units),
+ * so the flip cards, seam and pins scale with it. Two rows: tiles and colons
+ * share the first, so the colons sit at the tiles' middle; labels the second.
+ *
+ * variant="flip": every cell shows at least two fixed-width digits ("--"
+ * before mount) and only the digits that change flip (FlipDigit).
  */
 export function CountdownCells({
   state,
@@ -98,39 +105,67 @@ export function CountdownCells({
     ['m', 'Min'],
     ['s', 'Seg'],
   ]
+  const text = (k: keyof Parts) =>
+    variant === 'flip'
+      ? state === 'pending'
+        ? '--'
+        : String(state[k]).padStart(2, '0')
+      : state === 'pending'
+        ? '–'
+        : String(state[k]).padStart(k === 'd' ? 1 : 2, '0')
 
   return (
-    <div className="flex items-start justify-center gap-2 sm:gap-4" role="timer" aria-label={label}>
+    <div
+      className="mx-auto grid w-full max-w-[29rem] grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-x-1 sm:gap-x-2"
+      role="timer"
+      aria-label={label}
+    >
+      {/* Row 1: tiles and colons. */}
+      {cells.map(([k], i) => {
+        const value = text(k)
+        return (
+          <Fragment key={k}>
+            {/* The container the tile's font-size is measured against (cqi). */}
+            <div className="@container flex min-w-0 justify-center">
+              <span
+                className={`glass-strong relative flex aspect-square w-full max-w-24 items-center justify-center rounded-[17%] font-display font-extrabold tabular-nums text-white ${
+                  // Three digits (100+ days) get a smaller size so they still fit the tile.
+                  value.length > 2 ? 'text-[clamp(12px,34cqi,40px)]' : 'text-[clamp(14px,48cqi,48px)]'
+                } ${variant === 'flip' ? 'gap-[0.06em] px-[0.12em]' : ''}`}
+              >
+                {variant === 'flip' && (
+                  // Split-flap seam and its two pins, static, sized in em so they scale with the tile.
+                  // Hidden with reduced motion (plain digits then).
+                  <span className="pointer-events-none absolute inset-x-0 top-1/2 z-10 motion-reduce:hidden" aria-hidden="true">
+                    <span className="absolute inset-x-0 top-0 h-[max(1px,0.04em)] -translate-y-1/2 bg-black/55" />
+                    <span className="absolute top-0 left-[6%] h-[max(3px,0.12em)] w-[max(3px,0.12em)] -translate-y-1/2 rounded-full bg-black/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]" />
+                    <span className="absolute top-0 right-[6%] h-[max(3px,0.12em)] w-[max(3px,0.12em)] -translate-y-1/2 rounded-full bg-black/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]" />
+                  </span>
+                )}
+                {variant === 'flip'
+                  ? [...value].map((ch, j, all) => (
+                      // Keyed from the right, so the ones digit keeps its identity if days drop from 3 to 2 digits.
+                      <FlipDigit key={all.length - j} value={ch} />
+                    ))
+                  : value}
+              </span>
+            </div>
+            {i < cells.length - 1 && (
+              <span className="text-[clamp(14px,4vw,24px)] leading-none text-peri/40" aria-hidden="true">
+                :
+              </span>
+            )}
+          </Fragment>
+        )
+      })}
+      {/* Row 2: labels under their tiles; empty cells under the colons. */}
       {cells.map(([k, cellLabel], i) => (
-        <div key={k} className="flex items-start gap-2 sm:gap-4">
-          <div className="flex flex-col items-center">
-            <span
-              className={`glass-strong flex h-[72px] items-center justify-center rounded-2xl font-display text-3xl font-extrabold tabular-nums text-white sm:h-24 sm:text-5xl ${
-                // Flip: same size for two digits, but it grows for a third (100+ days) instead of overflowing.
-                variant === 'flip' ? 'relative min-w-[68px] gap-[0.06em] px-[0.2em] sm:min-w-24' : 'w-[68px] sm:w-24'
-              }`}
-            >
-              {variant === 'flip' && (
-                // Split-flap seam and its two pins, static. Hidden with reduced motion (plain digits then).
-                <span className="pointer-events-none absolute inset-x-0 top-1/2 z-10 motion-reduce:hidden" aria-hidden="true">
-                  <span className="absolute inset-x-0 -top-px h-[2px] bg-black/55" />
-                  <span className="absolute -top-[3px] left-[5px] h-1.5 w-1.5 rounded-full bg-black/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]" />
-                  <span className="absolute -top-[3px] right-[5px] h-1.5 w-1.5 rounded-full bg-black/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]" />
-                </span>
-              )}
-              {variant === 'flip'
-                ? [...(state === 'pending' ? '--' : String(state[k]).padStart(2, '0'))].map((ch, i, all) => (
-                    // Keyed from the right, so the ones digit keeps its identity if days drop from 3 to 2 digits.
-                    <FlipDigit key={all.length - i} value={ch} />
-                  ))
-                : state === 'pending'
-                  ? '–'
-                  : String(state[k]).padStart(k === 'd' ? 1 : 2, '0')}
-            </span>
-            <span className="mt-3 text-[10px] uppercase tracking-[0.3em] text-white/50">{cellLabel}</span>
-          </div>
-          {i < cells.length - 1 && <span className="mt-6 text-2xl text-peri/40 sm:mt-8" aria-hidden="true">:</span>}
-        </div>
+        <Fragment key={`label-${k}`}>
+          <span className="mt-2 min-w-0 text-center text-[9px] uppercase tracking-[0.12em] text-white/50 sm:mt-3 sm:text-[10px] sm:tracking-[0.3em]">
+            {cellLabel}
+          </span>
+          {i < cells.length - 1 && <span aria-hidden="true" />}
+        </Fragment>
       ))}
     </div>
   )
@@ -147,7 +182,7 @@ export default function Countdown({ target, note }: { target: string | null; not
   const state = useCountdown(target, ref)
 
   return (
-    <div ref={ref} className="flex flex-col items-center">
+    <div ref={ref} className="flex w-full flex-col items-center">
       {state === 'done' ? (
         <p className="m-0 font-display text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-peri">Las aplicaciones ya abrieron</p>
       ) : state !== 'none' ? (

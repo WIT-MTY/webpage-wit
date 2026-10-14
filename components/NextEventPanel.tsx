@@ -24,17 +24,18 @@ export default function NextEventPanel() {
   return (
     <section ref={ref} id="proximo-evento" aria-labelledby="proximo-evento-title" className="scroll-mt-24 pb-20">
       <Container>
-        <div className="glass relative overflow-hidden rounded-[2rem] p-8 sm:p-12 lg:p-16">
+        <div className="glass relative w-full max-w-full overflow-hidden rounded-[2rem] p-5 sm:p-8 md:p-12 lg:p-16">
           <div
             className="pointer-events-none absolute inset-0"
             style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.4) 0%, rgba(144,102,210,0.12) 60%, transparent 100%)' }}
             aria-hidden="true"
           />
-          <div className="relative grid gap-12 lg:grid-cols-[1.15fr_1fr] lg:items-center">
-            <div>
+          {/* Stacked on phones (info, countdown, button); two columns from tablet up. min-w-0 lets the columns shrink. */}
+          <div className="relative grid min-w-0 gap-10 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:items-center md:gap-12">
+            <div className="min-w-0 [overflow-wrap:anywhere]">
               <MicroLabel className="mb-6">Próximo evento</MicroLabel>
               <div id="proximo-evento-title">
-                <Heading className="text-[clamp(2.4rem,5.5vw,4.25rem)]">{ev.title}</Heading>
+                <Heading className="text-[clamp(2rem,5.5vw,4.25rem)]">{ev.title}</Heading>
               </div>
               {ev.tagline && <p className="mt-4 mb-0 text-[17px] font-light leading-relaxed text-peri/90">{ev.tagline}</p>}
               {when && (
@@ -46,7 +47,7 @@ export default function NextEventPanel() {
               {ev.chips && ev.chips.length > 0 && (
                 <ul className="mt-8 mb-0 flex list-none flex-wrap gap-2.5 p-0">
                   {ev.chips.map((c) => (
-                    <li key={c} className="glass-strong rounded-full px-4 py-2 text-[13px] text-white/85">
+                    <li key={c} className="glass-strong max-w-full rounded-full px-4 py-2 text-[13px] text-white/85">
                       {c}
                     </li>
                   ))}
@@ -54,7 +55,7 @@ export default function NextEventPanel() {
               )}
             </div>
 
-            <div className="flex flex-col items-center gap-10">
+            <div className="flex w-full min-w-0 flex-col items-center gap-8 md:gap-10">
               {showCountdown && (
                 <CountdownCells state={state} label={`Tiempo para ${ev.title}`} variant={FLIP_COUNTDOWN ? 'flip' : 'plain'} />
               )}
@@ -69,12 +70,12 @@ export default function NextEventPanel() {
                 <button
                   type="button"
                   disabled
-                  className="cursor-not-allowed rounded-full border border-white/15 bg-white/[0.06] px-9 py-3.5 text-[12px] font-medium uppercase tracking-[0.2em] text-white/55"
+                  className="w-full cursor-not-allowed rounded-full border border-white/15 bg-white/[0.06] px-9 py-3.5 text-[12px] font-medium uppercase tracking-[0.2em] text-white/55 sm:w-auto"
                 >
                   Registro cerrado
                 </button>
               ) : (
-                <Button href={ev.formUrl} external>
+                <Button href={ev.formUrl} external className="w-full sm:w-auto">
                   Registrarme
                 </Button>
               )}
