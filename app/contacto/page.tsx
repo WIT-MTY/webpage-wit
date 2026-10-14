@@ -6,6 +6,7 @@ import CopyEmail from '@/components/CopyEmail'
 import InstagramHero from '@/components/InstagramHero'
 import MagneticLink from '@/components/MagneticLink'
 import Reveal from '@/components/Reveal'
+import RingPulse from '@/components/RingPulse'
 import ShineCard from '@/components/ShineCard'
 import Spotlight from '@/components/Spotlight'
 import TerminalContact, { type TerminalLine } from '@/components/TerminalContact'
@@ -75,7 +76,8 @@ export default function ContactoPage() {
               }}
             >
               <FlashOutline />
-              <Spotlight />
+              {/* drift: on touch the glow wanders on its own; only this card, so one loop at a time. */}
+              <Spotlight drift />
               <div className="relative min-w-0">
                 <MicroLabel className="mb-6">Correo</MicroLabel>
                 {CONTACT_EMAIL ? (
@@ -88,7 +90,10 @@ export default function ContactoPage() {
                       {CONTACT_EMAIL}
                     </a>
                     <div className="mt-10">
-                      <CopyEmail email={CONTACT_EMAIL} targetId="correo" />
+                      {/* Touch only: ring flash on first view and a tap press. */}
+                      <RingPulse touchOnly className="w-full sm:w-auto">
+                        <CopyEmail email={CONTACT_EMAIL} targetId="correo" />
+                      </RingPulse>
                     </div>
                   </>
                 ) : (

@@ -17,7 +17,8 @@
     area        See AREAS below.
     title       Optional. Shown under the area (e.g. 'Directora de Software').
                 Historical wording lives here, not in `area`.
-    photo       Optional. Put the image in /public/team and write '/team/nombre.jpg'.
+    photo       Optional. Square image in /public/integrantes, written as
+                '/integrantes/nombre-apellido.webp' (lowercase, no accents).
                 Without a photo the card shows the person's initials.
     initials    Optional. Overrides the auto initials when the name is ambiguous.
     bio         Optional. 2-3 lines the member writes herself: where she works
@@ -58,14 +59,14 @@ export type Member = {
 
 export const MEMBERS: Member[] = [
   // ── 2026-2027 ─────────────────────────────────────────────
-  { name: 'Dana Sangines', generation: '2026-2027', role: 'presidencia', area: 'presidencia', title: 'Presidenta' },
-  { name: 'Daniela Chávez', generation: '2026-2027', role: 'vicepresidencia', area: 'vicepresidencia', title: 'Vicepresidenta' },
+  { name: 'Dana Sangines', generation: '2026-2027', role: 'presidencia', area: 'presidencia', title: 'Presidenta', photo: '/integrantes/dana-sangines.webp' },
+  { name: 'Daniela Chávez', generation: '2026-2027', role: 'vicepresidencia', area: 'vicepresidencia', title: 'Vicepresidenta', photo: '/integrantes/daniela-chavez-ibarra.webp' },
   { name: 'Catalina Mendoza', generation: '2026-2027', role: 'director', area: 'marketing', title: 'Directora de Marketing' },
-  { name: 'MaryGaby Castañeda', generation: '2026-2027', role: 'director', area: 'finanzas', title: 'Directora de Finanzas' },
-  { name: 'Vanessa Mecott', generation: '2026-2027', role: 'director', area: 'proyectos', title: 'Directora de Proyectos' },
-  { name: 'Regina Gutiérrez', generation: '2026-2027', role: 'director', area: 'responsabilidad-social', title: 'Directora de Responsabilidad Social' },
-  { name: 'Antonella Apanco', generation: '2026-2027', role: 'director', area: 'vinculacion', title: 'Directora de Vinculación' },
-  { name: 'Katherine MacLean', generation: '2026-2027', role: 'director', area: 'software', title: 'Directora de Software' },
+  { name: 'MaryGaby Castañeda', generation: '2026-2027', role: 'director', area: 'finanzas', title: 'Directora de Finanzas', photo: '/integrantes/marian-gabriela-castaneda.webp' },
+  { name: 'Vanessa Mecott', generation: '2026-2027', role: 'director', area: 'proyectos', title: 'Directora de Proyectos', photo: '/integrantes/vanessa-mecott.webp' },
+  { name: 'Regina Gutiérrez', generation: '2026-2027', role: 'director', area: 'responsabilidad-social', title: 'Directora de Responsabilidad Social', photo: '/integrantes/regina-gutierrez.webp' },
+  { name: 'Antonella Apanco', generation: '2026-2027', role: 'director', area: 'vinculacion', title: 'Directora de Vinculación', photo: '/integrantes/antonella-apanco.webp' },
+  { name: 'Katherine MacLean', generation: '2026-2027', role: 'director', area: 'software', title: 'Directora de Software', photo: '/integrantes/katherine-maclean.webp' },
 
   { name: 'Paola Micaela Vizcarra', generation: '2026-2027', role: 'coordinador', area: 'proyectos', title: 'Coordinadora de Proyectos' },
   { name: 'Zuhri Regalado', generation: '2026-2027', role: 'coordinador', area: 'proyectos', title: 'Coordinadora de Proyectos' },

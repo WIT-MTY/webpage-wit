@@ -1,3 +1,4 @@
+import RingPulse from './RingPulse'
 import { Button, Heading } from './ui'
 import styles from './AllyCTA.module.css'
 
@@ -48,12 +49,14 @@ export default function AllyCTA({
             data-ambient=""
             className={`${styles.glow} pointer-events-none absolute top-1/2 left-1/2 w-[340px] max-w-none -translate-x-1/2 -translate-y-1/2 select-none`}
           />
-          {/* Static gradient ring around the button. */}
-          <span className="relative block rounded-full bg-[linear-gradient(135deg,#c6c8ee_0%,#9066d2_45%,#ff5795_100%)] p-[1.5px]">
-            <Button href={href} className="hover:translate-y-0!">
-              {label}
-            </Button>
-          </span>
+          {/* Static gradient ring around the button. Touch only: ring flash on first view and a tap press. */}
+          <RingPulse touchOnly>
+            <span className="relative block rounded-full bg-[linear-gradient(135deg,#c6c8ee_0%,#9066d2_45%,#ff5795_100%)] p-[1.5px]">
+              <Button href={href} className="hover:translate-y-0!">
+                {label}
+              </Button>
+            </span>
+          </RingPulse>
         </div>
       </div>
     </section>

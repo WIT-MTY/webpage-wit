@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { touchMotion } from '@/lib/touch'
+import shine from './Shine.module.css'
 
 /** How far the link leans toward the pointer at its edge, in px. */
 const PULL = 6
@@ -10,8 +12,8 @@ const SCALE = 1.04
 
 /**
  * An external link that leans toward the pointer and lifts slightly on hover.
- * Transform only, one update per frame. Fine-pointer devices only; nothing
- * on touch or under prefers-reduced-motion.
+ * Transform only, one update per frame. Fine-pointer devices only; touch
+ * gets a tap press instead (TOUCH_MOTION). Nothing under prefers-reduced-motion.
  */
 export default function MagneticLink({
   href,
@@ -27,6 +29,11 @@ export default function MagneticLink({
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    // Touch: no pointer to follow, just a tap press.
+    if (touchMotion()) {
+      el.classList.add(shine.press)
+      return () => el.classList.remove(shine.press)
+    }
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 

@@ -4,19 +4,35 @@
 
   Default: a faint steady ring (also the no-JS and reduced-motion state).
   .play: three pulses, then it settles back on the faint ring. One-shot.
+  .flashOnly (touchOnly): no ring at rest; on touch devices .play runs the
+  same three pulses from nothing and fades back to nothing.
 */
 .ring {
   position: relative;
   display: inline-block;
 }
 
-.ring::before {
+.ring::before,
+.flashOnly::before {
   content: '';
   position: absolute;
   inset: -20px;
   background: url('/fx/ig-ring.svg') center / 100% 100% no-repeat;
   opacity: 0.35;
   pointer-events: none;
+}
+
+.flashOnly {
+  position: relative;
+  display: inline-block;
+}
+
+.flashOnly::before {
+  opacity: 0;
+}
+
+.flashOnly.play::before {
+  animation: ring-flash 900ms ease-in-out 3;
 }
 
 .play::before {
@@ -28,8 +44,14 @@
   50% { opacity: 1; transform: scale(1.06); }
 }
 
+@keyframes ring-flash {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .play::before {
+  .play::before,
+  .flashOnly.play::before {
     animation: none;
   }
 }

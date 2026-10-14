@@ -7,6 +7,7 @@
   - Runs once per trigger (hover, keyboard focus, or a nav link becoming the
     current page). No loops, so nothing runs when nobody is interacting.
   - Hover only on devices that really hover, so touch gets no sticky effect.
+    Touch gets the one pass on first view instead (.played), plus .press.
   - prefers-reduced-motion: no sweep at all.
 
   Markup: put .host on the element, and inside it
@@ -82,6 +83,20 @@
   0% { opacity: 0; transform: translate3d(-120%, 0, 0) skewX(-18deg); }
   15%, 80% { opacity: 0.6; }
   100% { opacity: 0; transform: translate3d(220%, 0, 0) skewX(-18deg); }
+}
+
+/*
+  Tap press (touch devices). JS adds .press only on touch, with TOUCH_MOTION
+  on and no reduced-motion preference, so desktop never gets it. Quick in,
+  short ease back out.
+*/
+.press {
+  transition: transform 200ms ease-out;
+}
+
+.press:active {
+  transform: scale(0.97);
+  transition-duration: 90ms;
 }
 
 @media (prefers-reduced-motion: reduce) {

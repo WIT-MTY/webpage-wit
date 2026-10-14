@@ -3,6 +3,9 @@ import EventCarousel from '@/components/EventCarousel'
 import CollabCTA from '@/components/CollabCTA'
 import PhotoFrame from '@/components/PhotoFrame'
 import FloatingShapes from '@/components/FloatingShapes'
+import CountUp from '@/components/CountUp'
+import RingPulse from '@/components/RingPulse'
+import { RevealGroup } from '@/components/Reveal'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
 import { COLLAGE_PHOTOS, WITCODE_DESCRIPTION, WITCODE_STATS } from '@/lib/site'
 
@@ -14,6 +17,8 @@ export default function Home() {
       {/* Sobre nosotras */}
       <section id="sobre-nosotras" data-lumi-anchor="right" className="scroll-mt-24 pt-24">
         <Container className="grid items-center gap-16 lg:grid-cols-[1fr_1.05fr]">
+          {/* RevealGroup / RingPulse touchOnly: touch devices only (fade-up on scroll, ring flash); desktop is unchanged. */}
+          <RevealGroup>
           <div>
             <MicroLabel className="mb-6">Sobre nosotras</MicroLabel>
             <Heading className="text-[clamp(2.4rem,5.5vw,4.25rem)]">Una comunidad que abre camino</Heading>
@@ -22,9 +27,11 @@ export default function Home() {
               comunidad de mujeres que busca atender la brecha de género en el ámbito de la tecnología.
             </p>
             <div className="mt-10">
-              <Button href="/integrantes" variant="glass">
-                Conócenos
-              </Button>
+              <RingPulse touchOnly>
+                <Button href="/integrantes" variant="glass">
+                  Conócenos
+                </Button>
+              </RingPulse>
             </div>
           </div>
 
@@ -55,12 +62,14 @@ export default function Home() {
               className="overflow-visible"
             />
           </div>
+          </RevealGroup>
         </Container>
       </section>
 
       {/* Proyectos */}
       <section data-lumi-anchor="left" className="pt-32">
         <Container>
+          <RevealGroup>
           <div className="mb-12 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <div>
               <MicroLabel className="mb-6">Proyectos</MicroLabel>
@@ -72,16 +81,20 @@ export default function Home() {
           </div>
           <EventCarousel />
           <div className="mt-10 flex justify-center">
-            <Button href="/proyectos" variant="glass">
-              Ver todos los proyectos
-            </Button>
+            <RingPulse touchOnly>
+              <Button href="/proyectos" variant="glass">
+                Ver todos los proyectos
+              </Button>
+            </RingPulse>
           </div>
+          </RevealGroup>
         </Container>
       </section>
 
       {/* WitCode */}
       <section data-lumi-anchor="right" className="pt-32">
         <Container>
+          <RevealGroup>
           <div className="glass relative overflow-hidden rounded-[2rem] p-8 sm:p-12 lg:p-16">
             <div
               className="pointer-events-none absolute inset-0"
@@ -89,21 +102,26 @@ export default function Home() {
               aria-hidden="true"
             />
             <div className="relative grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-center">
-              <div>
+              <div data-reveal="">
                 <MicroLabel className="mb-6">Servicio social</MicroLabel>
                 <Heading className="text-[clamp(2.4rem,5vw,4rem)]">WitCode</Heading>
                 <p className="mt-6 mb-10 max-w-md text-[17px] font-light leading-[1.75] text-white/78">
                   {WITCODE_DESCRIPTION[0]}
                 </p>
-                <Button href="/witcode">Conoce WitCode</Button>
+                <RingPulse touchOnly>
+                  <Button href="/witcode">Conoce WitCode</Button>
+                </RingPulse>
               </div>
               <div>
                 <MicroLabel className="mb-6">Métricas anuales</MicroLabel>
                 <dl className="m-0 grid gap-4">
                   {WITCODE_STATS.map((s) => (
-                    <div key={s.label} className="flex items-baseline gap-5 border-b border-white/10 pb-4 last:border-0">
+                    <div key={s.label} data-reveal="" className="flex items-baseline gap-5 border-b border-white/10 pb-4 last:border-0">
                       <dt className="sr-only">{s.label}</dt>
-                      <dd className="m-0 min-w-28 shrink-0 whitespace-nowrap font-display text-5xl font-extrabold text-peri">{s.value}</dd>
+                      {/* Same count-up as WitCode: server HTML holds the final value; it counts from 0 once on screen. */}
+                      <dd className="m-0 min-w-28 shrink-0 whitespace-nowrap font-display text-5xl font-extrabold text-peri">
+                        <CountUp value={s.value} duration={1200} />
+                      </dd>
                       <dd className="m-0 text-[15px] font-light text-white/75">{s.label}</dd>
                     </div>
                   ))}
@@ -111,10 +129,13 @@ export default function Home() {
               </div>
             </div>
           </div>
+          </RevealGroup>
         </Container>
       </section>
 
-      <CollabCTA />
+      <RevealGroup>
+        <CollabCTA />
+      </RevealGroup>
     </>
   )
 }

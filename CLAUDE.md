@@ -60,3 +60,8 @@ invented content, no shared file touched, and I can explain every line.
 ## Working style
 Tell me your plan before making multi-file changes. Small commits with English
 messages. Don't install packages without asking.
+
+## Git
+Never run `git add`, `git commit`, `git push`, or change branches unless I
+explicitly ask for it in that same message. Leave all changes uncommitted for
+me to review.

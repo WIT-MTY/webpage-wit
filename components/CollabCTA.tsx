@@ -1,4 +1,5 @@
 import FloatingShapes from './FloatingShapes'
+import RingPulse from './RingPulse'
 import { Button, Heading } from './ui'
 
 export default function CollabCTA() {
@@ -21,7 +22,10 @@ export default function CollabCTA() {
           <p className="mx-auto mt-6 mb-10 max-w-lg text-[17px] font-light leading-relaxed text-white/75">
             Juntas podemos seguir creando oportunidades y hacer florecer más talento en tecnología.
           </p>
-          <Button href="/contacto">Contáctanos</Button>
+          {/* Touch only: ring flash on first view and a tap press. */}
+          <RingPulse touchOnly>
+            <Button href="/contacto">Contáctanos</Button>
+          </RingPulse>
         </div>
       </div>
     </section>

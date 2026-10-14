@@ -21,3 +21,6 @@ export const FLIP_COUNTDOWN = true
 
 /** Contáctanos Instagram hero button (rotating ring, live dot, enter flash). Off: a plain pill like LinkedIn. */
 export const INSTAGRAM_HERO = true
+
+/** Touch-device motion: scroll reveals, glint on first view, tap press, button ring flash, drifting Contáctanos spotlight. Off: touch devices get the static versions. Desktop never changes. */
+export const TOUCH_MOTION = true

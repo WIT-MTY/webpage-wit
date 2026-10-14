@@ -1,0 +1,35 @@
+/*
+  Touch version of the Contáctanos spotlight: no pointer to follow, so the
+  glow drifts slowly around the card instead. Transform only, on one layer
+  (.drift); the glow itself is the same pre-rendered image.
+
+  - Only cards with `drift` get it, so a single loop runs on the page.
+  - .drift carries data-ambient and the wrapper data-ambient-group, so
+    MotionGovernor turns it off while scrolling and off-screen.
+  - JS adds .touch only on touch devices with TOUCH_MOTION on and no
+    reduced-motion preference. Desktop never gets these classes.
+*/
+.drift {
+  position: absolute;
+  inset: 0;
+}
+
+.touch .drift {
+  animation: spot-drift 16s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Centered on the card while it drifts; the desktop glow is positioned by JS instead. */
+.touch .glow {
+  top: 50%;
+  left: 50%;
+  margin: -240px 0 0 -240px;
+  opacity: 0.9 !important;
+}
+
+@keyframes spot-drift {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(28%, -22%, 0); }
+  50% { transform: translate3d(-6%, 24%, 0); }
+  75% { transform: translate3d(-30%, -10%, 0); }
+}

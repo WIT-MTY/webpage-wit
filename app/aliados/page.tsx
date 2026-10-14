@@ -6,6 +6,8 @@ import AllyCTA from '@/components/AllyCTA'
 import AllyTile from '@/components/AllyTile'
 import Celestial, { type CelestialKind } from '@/components/Celestial'
 import LogoConveyor from '@/components/LogoConveyor'
+import RingPulse from '@/components/RingPulse'
+import { RevealGroup } from '@/components/Reveal'
 import Typewriter from '@/components/Typewriter'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
 import { ACTIVITIES, ALLIES, CONTACT_EMAIL, SPONSOR_BENEFITS, SPONSOR_INTRO, SPONSOR_OTHER_WAYS } from '@/lib/site'
@@ -73,10 +75,13 @@ export default function AliadosPage() {
       {/* data-lumi-anchor: where Lumi sits while this part is mid-screen (LumiCompanion). */}
       <div data-lumi-anchor="center">
         <Container>
+          {/* RevealGroup / RingPulse touchOnly: touch devices only; desktop is unchanged. */}
+          <RevealGroup>
           <div className="mb-10 text-center">
             <MicroLabel className="mb-5">Diferentes talentos, mismo propósito</MicroLabel>
             <Heading className="text-[clamp(2.2rem,5vw,3.75rem)]">Aliados estratégicos</Heading>
           </div>
+          </RevealGroup>
           {/* Reduced motion: the static grid. Otherwise: the conveyor. CSS picks, so the server HTML already matches. */}
           <ul className="m-0 hidden list-none flex-wrap justify-center gap-5 p-0 motion-reduce:flex">
             {allies.map(({ ally, logo }) => (
@@ -91,19 +96,23 @@ export default function AliadosPage() {
 
       <section data-lumi-anchor="left" className="pt-28">
         <Container>
-          <Heading className="mb-10 text-center text-[clamp(2rem,4.5vw,3.25rem)]">Formas de colaborar</Heading>
+          {/* Touch: the marked items fade up as they arrive; the sponsor card's frame stays put. */}
+          <RevealGroup>
+          <div data-reveal="">
+            <Heading className="mb-10 text-center text-[clamp(2rem,4.5vw,3.25rem)]">Formas de colaborar</Heading>
+          </div>
 
           {/* Sponsoring: intro, why, and how to join each event. Copy lives in lib/site.ts (SPONSOR_*, sponsorHow). */}
           <div className="glass rounded-3xl p-5 sm:p-8 lg:p-10">
             <span className="mb-5 block text-peri">
               <Celestial kind="star" size={26} />
             </span>
-            <h3 className="m-0 font-display text-[clamp(1.6rem,3.2vw,2.25rem)] font-bold text-white">Haz posible nuestros eventos</h3>
-            <p className="mt-4 mb-0 max-w-2xl text-[16px] font-light leading-relaxed text-white/75">{SPONSOR_INTRO}</p>
+            <h3 data-reveal="" className="m-0 font-display text-[clamp(1.6rem,3.2vw,2.25rem)] font-bold text-white">Haz posible nuestros eventos</h3>
+            <p data-reveal="" className="mt-4 mb-0 max-w-2xl text-[16px] font-light leading-relaxed text-white/75">{SPONSOR_INTRO}</p>
 
             <ul className="mt-8 mb-0 grid list-none gap-3 p-0 sm:grid-cols-3">
               {SPONSOR_BENEFITS.map((b) => (
-                <li key={b.title} className="flex min-w-0 items-start gap-3 rounded-2xl border border-peri/20 bg-peri/[0.06] p-4">
+                <li key={b.title} data-reveal="" className="flex min-w-0 items-start gap-3 rounded-2xl border border-peri/20 bg-peri/[0.06] p-4">
                   <span className="mt-0.5 shrink-0 text-wit-pink/80">
                     <Celestial kind={b.icon} size={18} />
                   </span>
@@ -124,6 +133,7 @@ export default function AliadosPage() {
               {ACTIVITIES.map((e, i) => (
                 <li
                   key={e.slug}
+                  data-reveal=""
                   className={`glass-strong flex min-w-0 items-start gap-3 rounded-2xl p-4 sm:col-span-2 ${centerOrphans(i, ACTIVITIES.length)}`}
                 >
                   <span className="mt-0.5 shrink-0 text-peri/80">
@@ -142,18 +152,20 @@ export default function AliadosPage() {
               ))}
             </ul>
 
-            <div className="mt-8">
+            <div data-reveal="" className="mt-8">
               {/* Less side padding on phones so the label stays on one line at 320px. */}
-              <Button href={SPONSOR_HREF} className="w-full px-5! sm:w-auto sm:px-9!">
-                Quiero patrocinar
-              </Button>
+              <RingPulse touchOnly className="w-full sm:w-auto">
+                <Button href={SPONSOR_HREF} className="w-full px-5! sm:w-auto sm:px-9!">
+                  Quiero patrocinar
+                </Button>
+              </RingPulse>
               <p className="mt-3 mb-0 text-[14px] font-light text-white/60">{SPONSOR_OTHER_WAYS}</p>
             </div>
           </div>
 
           <ul className="m-0 mt-5 grid list-none gap-5 p-0 md:grid-cols-2">
             {WAYS.map((w) => (
-              <li key={w.title} className="glass rounded-3xl p-8">
+              <li key={w.title} data-reveal="" className="glass rounded-3xl p-8">
                 <span className="mb-5 block text-peri">
                   <Celestial kind={w.icon} size={26} />
                 </span>
@@ -162,10 +174,13 @@ export default function AliadosPage() {
               </li>
             ))}
           </ul>
+          </RevealGroup>
         </Container>
       </section>
 
-      <AllyCTA />
+      <RevealGroup>
+        <AllyCTA />
+      </RevealGroup>
     </>
   )
 }
