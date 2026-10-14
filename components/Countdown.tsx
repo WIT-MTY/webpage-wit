@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import FlipDigit from './FlipDigit'
+import { FLIP_COUNTDOWN } from '@/lib/motion-flags'
 
 export type Parts = { d: number; h: number; m: number; s: number }
 
@@ -104,8 +105,9 @@ export function CountdownCells({
         <div key={k} className="flex items-start gap-2 sm:gap-4">
           <div className="flex flex-col items-center">
             <span
-              className={`glass-strong flex h-[72px] w-[68px] items-center justify-center rounded-2xl font-display text-3xl font-extrabold tabular-nums text-white sm:h-24 sm:w-24 sm:text-5xl ${
-                variant === 'flip' ? 'relative gap-[0.06em]' : ''
+              className={`glass-strong flex h-[72px] items-center justify-center rounded-2xl font-display text-3xl font-extrabold tabular-nums text-white sm:h-24 sm:text-5xl ${
+                // Flip: same size for two digits, but it grows for a third (100+ days) instead of overflowing.
+                variant === 'flip' ? 'relative min-w-[68px] gap-[0.06em] px-[0.2em] sm:min-w-24' : 'w-[68px] sm:w-24'
               }`}
             >
               {variant === 'flip' && (
@@ -135,7 +137,8 @@ export function CountdownCells({
 }
 
 /**
- * Countdown to applications opening (Integrantes). Pauses while off-screen.
+ * Countdown to applications opening (Integrantes), split-flap when
+ * FLIP_COUNTDOWN is on. Pauses while off-screen.
  * Renders nothing without a target; once the target passes, the cells give
  * way to "Las aplicaciones ya abrieron".
  */
@@ -149,7 +152,7 @@ export default function Countdown({ target, note }: { target: string | null; not
         <p className="m-0 font-display text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-peri">Las aplicaciones ya abrieron</p>
       ) : state !== 'none' ? (
         <>
-          <CountdownCells state={state} label="Tiempo para que abran las aplicaciones" />
+          <CountdownCells state={state} label="Tiempo para que abran las aplicaciones" variant={FLIP_COUNTDOWN ? 'flip' : 'plain'} />
           <p className="mt-8 mb-0 text-[13px] font-light tracking-[0.04em] text-white/60">{note}</p>
         </>
       ) : null}
