@@ -2,8 +2,16 @@ import type { Metadata } from 'next'
 import PageHero from '@/components/PageHero'
 import LumiKeychain, { FlashOutline } from '@/components/LumiKeychain'
 import { SocialIcon } from '@/components/SocialIcon'
+import CopyEmail from '@/components/CopyEmail'
+import InstagramHero from '@/components/InstagramHero'
+import MagneticLink from '@/components/MagneticLink'
+import Reveal from '@/components/Reveal'
+import ShineCard from '@/components/ShineCard'
+import Spotlight from '@/components/Spotlight'
+import TerminalContact, { type TerminalLine } from '@/components/TerminalContact'
 import { Container, MicroLabel } from '@/components/ui'
 import { ADDRESS, ADDRESS_MAP_URL, CONTACT_EMAIL, SOCIALS } from '@/lib/site'
+import { INSTAGRAM_HERO } from '@/lib/motion-flags'
 
 export const metadata: Metadata = {
   title: 'Contáctanos',
@@ -16,6 +24,24 @@ export default function ContactoPage() {
       {line}
     </span>
   ))
+
+  const instagram = SOCIALS.find((s) => s.label === 'Instagram')
+  // INSTAGRAM_HERO off: Instagram goes back in the plain pill list.
+  const heroInstagram = INSTAGRAM_HERO ? instagram : undefined
+  const otherSocials = SOCIALS.filter((s) => s !== heroInstagram)
+  const linkedin = SOCIALS.find((s) => s.label === 'LinkedIn')
+
+  // Terminal lines, all from lib/site.ts. LinkedIn shows its URL slug (wit-mty).
+  const addressText = ADDRESS.join(', ')
+  const terminalLines: TerminalLine[] = [
+    ...(CONTACT_EMAIL ? [{ key: 'correo', label: 'correo', text: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` }] : []),
+    ...(instagram ? [{ key: 'instagram', label: 'instagram', text: instagram.handle, href: instagram.href, external: true }] : []),
+    ...(linkedin
+      ? [{ key: 'linkedin', label: 'linkedin', text: new URL(linkedin.href).pathname.split('/').filter(Boolean).pop() ?? linkedin.handle, href: linkedin.href, external: true }]
+      : []),
+    ...(ADDRESS_MAP_URL ? [{ key: 'ubicacion', label: 'ubicación', text: addressText, href: ADDRESS_MAP_URL, external: true }] : []),
+  ]
+  const terminalSummary = `Contacto de WIT. ${terminalLines.map((l) => `${l.label}: ${l.text.replace(/\.$/, '')}`).join('. ')}.`
 
   return (
     <>
@@ -33,70 +59,116 @@ export default function ContactoPage() {
         />
       </div>
 
-      <Container className="grid gap-5 md:grid-cols-3">
-        {/* data-lumi-flash: Lumi's flash lights these blocks' outlines on load and on click. */}
-        <div data-lumi-flash="" className="glass relative rounded-3xl p-8 md:col-span-2">
-          <FlashOutline />
-          <MicroLabel className="mb-5">Correo</MicroLabel>
-          {CONTACT_EMAIL ? (
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="break-all font-display text-[clamp(1.6rem,3.4vw,2.6rem)] font-bold text-white transition-colors hover:text-peri"
+      <Container className="grid gap-6 md:grid-cols-3">
+        {/* data-lumi-flash: Lumi's flash lights these blocks' outlines on load, on click and on copy. */}
+
+        {/* Primary card: the email. Static gradient border (padding-box / border-box backgrounds). */}
+        <Reveal onLoad className="md:col-span-2 md:row-span-2">
+          <ShineCard className="h-full" radius="rounded-[2rem]">
+            <div
+              data-lumi-flash=""
+              className="relative flex h-full flex-col justify-center rounded-[2rem] p-8 sm:p-12 lg:p-14"
+              style={{
+                border: '1.5px solid transparent',
+                background:
+                  'linear-gradient(135deg, rgba(100,17,173,0.45) 0%, rgba(30,10,58,0.85) 55%, rgba(71,18,107,0.6) 100%) padding-box, linear-gradient(135deg, #ff5795 0%, #9066d2 45%, #c6c8ee 100%) border-box',
+              }}
             >
-              {CONTACT_EMAIL}
-            </a>
-          ) : (
-            <p className="m-0 font-display text-[clamp(1.6rem,3.4vw,2.6rem)] font-bold text-white/60">Por confirmar</p>
-          )}
+              <FlashOutline />
+              <Spotlight />
+              <div className="relative">
+                <MicroLabel className="mb-6">Correo</MicroLabel>
+                {CONTACT_EMAIL ? (
+                  <>
+                    <a
+                      id="correo"
+                      href={`mailto:${CONTACT_EMAIL}`}
+                      className="break-all font-display text-[clamp(1.9rem,4.4vw,3.4rem)] font-bold leading-tight text-white transition-colors hover:text-peri"
+                    >
+                      {CONTACT_EMAIL}
+                    </a>
+                    <div className="mt-10">
+                      <CopyEmail email={CONTACT_EMAIL} targetId="correo" />
+                    </div>
+                  </>
+                ) : (
+                  <p className="m-0 font-display text-[clamp(1.9rem,4.4vw,3.4rem)] font-bold text-white/60">Por confirmar</p>
+                )}
+              </div>
+            </div>
+          </ShineCard>
+        </Reveal>
 
-          <MicroLabel className="mt-12 mb-5">Redes</MicroLabel>
-          <ul className="m-0 flex list-none flex-col gap-3 p-0 sm:flex-row sm:flex-wrap">
-            {SOCIALS.map((s) => (
-              <li key={s.label}>
-                <a
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-lumi-flash=""
-                  className="glass-strong relative inline-flex items-center gap-3 rounded-full px-5 py-3 text-[14px] text-white/85 transition-colors hover:text-peri"
-                >
-                  <FlashOutline />
-                  <SocialIcon name={s.label} />
-                  <span>
-                    {s.label} <span className="text-white/45">{s.handle}</span>
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Reveal onLoad delay={120}>
+          <ShineCard className="h-full" radius="rounded-3xl">
+            <div data-lumi-flash="" className="glass relative h-full rounded-3xl p-8">
+              <FlashOutline />
+              <Spotlight />
+              <div className="relative">
+                <MicroLabel className="mb-6">Redes</MicroLabel>
+                {/* Instagram is the hero action; the other networks follow as pills. */}
+                {heroInstagram && <InstagramHero href={heroInstagram.href} handle={heroInstagram.handle} />}
+                <ul className={`m-0 flex list-none flex-col items-start gap-3 p-0 ${heroInstagram ? 'mt-8' : ''}`}>
+                  {otherSocials.map((s) => (
+                    <li key={s.label}>
+                      <MagneticLink
+                        href={s.href}
+                        data-lumi-flash=""
+                        className="glass-strong relative inline-flex items-center gap-3 rounded-full px-5 py-3 text-[14px] text-white/85 hover:text-peri"
+                      >
+                        <FlashOutline />
+                        <SocialIcon name={s.label} />
+                        <span>
+                          {s.label} <span className="text-white/45">{s.handle}</span>
+                        </span>
+                      </MagneticLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </ShineCard>
+        </Reveal>
 
-        <div
-          data-lumi-flash=""
-          className="relative rounded-3xl border border-white/10 p-8"
-          style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.5) 0%, rgba(71,18,107,0.4) 100%)' }}
-        >
-          <FlashOutline />
-          <MicroLabel className="mb-5">Dirección</MicroLabel>
-          <address className="not-italic">
-            {/* The address opens Google Maps when there is a link; otherwise it is plain text. */}
-            {ADDRESS_MAP_URL ? (
-              <a
-                href={ADDRESS_MAP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${ADDRESS.join(', ')}. Ver en Google Maps (se abre en una pestaña nueva)`}
-                className="group block decoration-peri/50 underline-offset-4 hover:underline"
-              >
-                {addressLines}
-                <span className="mt-4 block text-[13px] font-medium text-peri group-hover:text-white">Ver en Google Maps ↗</span>
-              </a>
-            ) : (
-              addressLines
-            )}
-          </address>
-        </div>
+        <Reveal onLoad delay={240}>
+          <ShineCard className="h-full" radius="rounded-3xl">
+            <div
+              data-lumi-flash=""
+              className="relative h-full rounded-3xl border border-white/10 p-8"
+              style={{ background: 'linear-gradient(135deg, rgba(100,17,173,0.5) 0%, rgba(71,18,107,0.4) 100%)' }}
+            >
+              <FlashOutline />
+              <Spotlight />
+              <div className="relative">
+                <MicroLabel className="mb-6">Dirección</MicroLabel>
+                <address className="not-italic">
+                  {/* The address opens Google Maps when there is a link; otherwise it is plain text. */}
+                  {ADDRESS_MAP_URL ? (
+                    <a
+                      href={ADDRESS_MAP_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${ADDRESS.join(', ')}. Ver en Google Maps (se abre en una pestaña nueva)`}
+                      className="group block decoration-peri/50 underline-offset-4 hover:underline"
+                    >
+                      {addressLines}
+                      <span className="mt-4 block text-[13px] font-medium text-peri group-hover:text-white">Ver en Google Maps ↗</span>
+                    </a>
+                  ) : (
+                    addressLines
+                  )}
+                </address>
+              </div>
+            </div>
+          </ShineCard>
+        </Reveal>
       </Container>
+
+      <section aria-label="Contacto en terminal" className="pt-16">
+        <Container>
+          <TerminalContact lines={terminalLines} summary={terminalSummary} />
+        </Container>
+      </section>
     </>
   )
 }

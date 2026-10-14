@@ -1,0 +1,55 @@
+/*
+  Typing caret. Opacity only.
+
+  - Zero-width box, so it never pushes text around; the bar hangs off it.
+  - Blinks while the text is typing or paused. Like [data-ambient], it stops
+    (stays solid) while scrolling or off-screen.
+  - .finished: stops blinking and fades out once.
+  - prefers-reduced-motion: the typewriter never runs, and the caret is hidden.
+*/
+.caret {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 1em;
+  vertical-align: -0.12em;
+}
+
+.caret::after {
+  content: '';
+  position: absolute;
+  left: 0.08em;
+  top: 0;
+  bottom: 0;
+  width: 0.09em;
+  min-width: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  animation: caret-blink 1s steps(1, end) infinite;
+}
+
+.finished::after {
+  animation: caret-fade 600ms ease-out 900ms both;
+}
+
+/* Same rule as [data-ambient] (see MotionGovernor), for the pseudo-element. */
+:global(.is-scrolling) .caret:not(.finished)::after,
+:global([data-offscreen]) .caret:not(.finished)::after {
+  animation: none;
+}
+
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes caret-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret {
+    display: none;
+  }
+}

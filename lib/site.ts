@@ -336,13 +336,19 @@ export const LUMI_LINES: Record<string, string> = {
 
 /**
  * The two photo blocks beside the description on /witcode: the first is the
- * large one, the second the smaller overlapping one. Drop the files in
- * /public/witcode and set `src` to e.g. '/witcode/bienvenida.jpg'. While
- * `src` is null the dashed placeholder shows.
+ * large one, the second the smaller overlapping one. Each block crossfades
+ * through its `photos`. Drop the files in /public/witcode and add entries like
+ * { src: '/witcode/bienvenida.jpg', alt: '…' }. One photo = static; an empty
+ * list shows the dashed placeholder, described by `alt`.
  */
-export const WITCODE_PHOTOS: { src: string | null; alt: string; caption: string }[] = [
-  { src: null, alt: 'Generación de WitCode', caption: 'Bienvenida WitCode' },
-  { src: null, alt: 'Taller de WitCode con alumnas de Ciudad de los Niños', caption: 'Talleres con Ciudad de los Niños' },
+export const WITCODE_PHOTOS: {
+  caption: string
+  /** Placeholder description while `photos` is empty. */
+  alt: string
+  photos: { src: string; alt: string }[]
+}[] = [
+  { caption: 'Bienvenida WitCode', alt: 'Generación de WitCode', photos: [] },
+  { caption: 'Talleres con Ciudad de los Niños', alt: 'Taller de WitCode con alumnas de Ciudad de los Niños', photos: [] },
 ]
 
 /** Home collage. Drop files in /public/photos and fill `src`. */

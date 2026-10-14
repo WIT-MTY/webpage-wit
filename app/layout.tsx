@@ -9,6 +9,7 @@ import Footer from '@/components/Footer'
 import MotionGovernor from '@/components/MotionGovernor'
 import Lumi from '@/components/Lumi'
 import RegisterPrompt from '@/components/RegisterPrompt'
+import EasterEgg from '@/components/EasterEgg'
 
 export const metadata: Metadata = {
   title: {
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="contenido">{children}</main>
         <Lumi />
         <RegisterPrompt />
+        <EasterEgg />
         <Footer />
       </body>
     </html>

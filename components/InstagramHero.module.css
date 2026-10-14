@@ -1,0 +1,90 @@
+/*
+  Instagram hero button on Contáctanos. Transform and opacity only.
+
+  - Ring: a conic gradient on one square layer, painted once and only
+    rotated (6s per turn). The button's rounded clip shows just its edge,
+    and the solid inner fill covers the rest. It carries data-ambient, so
+    MotionGovernor stops it while scrolling and off-screen.
+  - Live dot: opacity + scale pulse, also data-ambient.
+  - prefers-reduced-motion: a static ring and a still dot.
+*/
+.clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.spin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 150%;
+  aspect-ratio: 1;
+  background: conic-gradient(from 0deg, #ff5795, #c13ec9, #7c22c7, #9066d2, #e0379a, #ff5795);
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation: ring-spin 6s linear infinite;
+  will-change: transform;
+}
+
+/* Inner fill: leaves a 2px ring of the gradient showing. */
+.fill {
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, #2d085a 0%, #1a0733 60%, #3a0f50 100%);
+}
+
+.dot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  background: #ff5795;
+}
+
+/* The pulse is a copy of the dot that grows and fades. */
+.dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: dot-pulse 2s ease-out infinite;
+}
+
+:global(.is-scrolling) .dot::after,
+:global([data-offscreen]) .dot::after {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes ring-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes dot-pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+  .dot::after {
+    display: none;
+  }
+}

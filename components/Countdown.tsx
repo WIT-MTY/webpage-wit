@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState, type RefObject } from 'react'
+import FlipDigit from './FlipDigit'
+import { FLIP_COUNTDOWN } from '@/lib/motion-flags'
 
 export type Parts = { d: number; h: number; m: number; s: number }
 
@@ -76,8 +78,20 @@ export function useCountdown(target: string | null, ref?: RefObject<Element | nu
   return state
 }
 
-/** The big four-cell readout: Días, Horas, Min, Seg. */
-export function CountdownCells({ state, label }: { state: Parts | 'pending'; label: string }) {
+/**
+ * The big four-cell readout: Días, Horas, Min, Seg.
+ * variant="flip": every cell shows two fixed-width digits ("--" before
+ * mount) and only the digits that change flip (FlipDigit).
+ */
+export function CountdownCells({
+  state,
+  label,
+  variant = 'plain',
+}: {
+  state: Parts | 'pending'
+  label: string
+  variant?: 'plain' | 'flip'
+}) {
   const cells: [keyof Parts, string][] = [
     ['d', 'Días'],
     ['h', 'Horas'],
@@ -90,8 +104,28 @@ export function CountdownCells({ state, label }: { state: Parts | 'pending'; lab
       {cells.map(([k, cellLabel], i) => (
         <div key={k} className="flex items-start gap-2 sm:gap-4">
           <div className="flex flex-col items-center">
-            <span className="glass-strong flex h-[72px] w-[68px] items-center justify-center rounded-2xl font-display text-3xl font-extrabold tabular-nums text-white sm:h-24 sm:w-24 sm:text-5xl">
-              {state === 'pending' ? '–' : String(state[k]).padStart(k === 'd' ? 1 : 2, '0')}
+            <span
+              className={`glass-strong flex h-[72px] items-center justify-center rounded-2xl font-display text-3xl font-extrabold tabular-nums text-white sm:h-24 sm:text-5xl ${
+                // Flip: same size for two digits, but it grows for a third (100+ days) instead of overflowing.
+                variant === 'flip' ? 'relative min-w-[68px] gap-[0.06em] px-[0.2em] sm:min-w-24' : 'w-[68px] sm:w-24'
+              }`}
+            >
+              {variant === 'flip' && (
+                // Split-flap seam and its two pins, static. Hidden with reduced motion (plain digits then).
+                <span className="pointer-events-none absolute inset-x-0 top-1/2 z-10 motion-reduce:hidden" aria-hidden="true">
+                  <span className="absolute inset-x-0 -top-px h-[2px] bg-black/55" />
+                  <span className="absolute -top-[3px] left-[5px] h-1.5 w-1.5 rounded-full bg-black/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]" />
+                  <span className="absolute -top-[3px] right-[5px] h-1.5 w-1.5 rounded-full bg-black/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]" />
+                </span>
+              )}
+              {variant === 'flip'
+                ? [...(state === 'pending' ? '--' : String(state[k]).padStart(2, '0'))].map((ch, i, all) => (
+                    // Keyed from the right, so the ones digit keeps its identity if days drop from 3 to 2 digits.
+                    <FlipDigit key={all.length - i} value={ch} />
+                  ))
+                : state === 'pending'
+                  ? '–'
+                  : String(state[k]).padStart(k === 'd' ? 1 : 2, '0')}
             </span>
             <span className="mt-3 text-[10px] uppercase tracking-[0.3em] text-white/50">{cellLabel}</span>
           </div>
@@ -103,7 +137,8 @@ export function CountdownCells({ state, label }: { state: Parts | 'pending'; lab
 }
 
 /**
- * Countdown to applications opening (Integrantes). Pauses while off-screen.
+ * Countdown to applications opening (Integrantes), split-flap when
+ * FLIP_COUNTDOWN is on. Pauses while off-screen.
  * Renders nothing without a target; once the target passes, the cells give
  * way to "Las aplicaciones ya abrieron".
  */
@@ -117,7 +152,7 @@ export default function Countdown({ target, note }: { target: string | null; not
         <p className="m-0 font-display text-[clamp(1.75rem,4vw,2.5rem)] font-bold text-peri">Las aplicaciones ya abrieron</p>
       ) : state !== 'none' ? (
         <>
-          <CountdownCells state={state} label="Tiempo para que abran las aplicaciones" />
+          <CountdownCells state={state} label="Tiempo para que abran las aplicaciones" variant={FLIP_COUNTDOWN ? 'flip' : 'plain'} />
           <p className="mt-8 mb-0 text-[13px] font-light tracking-[0.04em] text-white/60">{note}</p>
         </>
       ) : null}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type FocusEvent } from 'react'
 import { ActivityCard } from './ActivityGrid'
+import ShineCard from './ShineCard'
 import { ACTIVITIES, INICIO_FEATURED } from '@/lib/site'
 
 const FEATURED = INICIO_FEATURED.map((slug) => ACTIVITIES.find((a) => a.slug === slug)).filter(
@@ -104,7 +105,9 @@ export default function EventCarousel() {
       <div className="grid md:hidden" aria-live={paused ? 'polite' : 'off'}>
         {FEATURED.map((a, i) => (
           <Slide key={a.slug} active={i === index}>
-            <ActivityCard a={a} />
+            <ShineCard className="h-full">
+              <ActivityCard a={a} />
+            </ShineCard>
           </Slide>
         ))}
       </div>
@@ -113,7 +116,9 @@ export default function EventCarousel() {
           <Slide key={p} active={p === pair}>
             <div className="grid h-full grid-cols-2 gap-5">
               {cards.map((a) => (
-                <ActivityCard key={a.slug} a={a} />
+                <ShineCard key={a.slug} className="h-full">
+                  <ActivityCard a={a} />
+                </ShineCard>
               ))}
             </div>
           </Slide>

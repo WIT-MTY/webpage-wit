@@ -21,6 +21,7 @@ export default function PhotoFrame({
   style,
   sizes = '(min-width: 1024px) 400px, 80vw',
   priority,
+  loading,
 }: {
   src: string | null
   alt: string
@@ -28,6 +29,8 @@ export default function PhotoFrame({
   style?: React.CSSProperties
   sizes?: string
   priority?: boolean
+  /** next/image loading; default lazy. Ignored with `priority`. */
+  loading?: 'eager' | 'lazy'
 }) {
   const positioned = /(^|\s)(absolute|fixed|sticky)(\s|$)/.test(className)
   return (
@@ -36,7 +39,7 @@ export default function PhotoFrame({
       style={src ? { boxShadow: '0 20px 50px rgba(0,0,0,0.45)', ...style } : style}
     >
       {src ? (
-        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="object-cover" />
+        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} loading={priority ? undefined : loading} className="object-cover" />
       ) : (
         <div
           role="img"

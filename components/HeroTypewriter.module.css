@@ -1,0 +1,115 @@
+/*
+  Hero typing line. Transform and opacity only; the highlight is a class
+  toggle with no transition.
+*/
+
+/* Caret: zero-width box so it never moves text; the bar hangs off it. Solid by default (typing). */
+.caret {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 1em;
+  vertical-align: -0.12em;
+}
+
+.caret::after {
+  content: '';
+  position: absolute;
+  left: 0.08em;
+  top: 0;
+  bottom: 0;
+  width: 0.09em;
+  min-width: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+/* Idle: blinks. Stops (solid) while scrolling or off-screen, like [data-ambient]. */
+.idle::after {
+  animation: caret-blink 1s steps(1, end) infinite;
+}
+
+:global(.is-scrolling) .idle::after,
+:global([data-offscreen]) .idle::after {
+  animation: none;
+}
+
+/* Finished: one fade, then gone. */
+.gone::after {
+  animation: caret-fade 600ms ease-out both;
+}
+
+/* Text-selection look while a word is about to be deleted. */
+.selected {
+  background: rgba(124, 34, 199, 0.55);
+  border-radius: 2px;
+}
+
+/* Gradient accent for WIT, you and !. */
+.accent {
+  background: linear-gradient(135deg, #c6c8ee 0%, #9066d2 45%, #ff5795 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.muted {
+  color: rgb(198 200 238 / 0.55);
+}
+
+/* The "!": inline-block so it can scale. The glow is a pre-rendered image on a pseudo-element. */
+.bang {
+  position: relative;
+  display: inline-block;
+  transform-origin: 50% 70%;
+}
+
+.bang::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3.2em;
+  height: 3.2em;
+  margin: -1.6em 0 0 -1.6em;
+  background: url('/fx/firefly-glow.svg') center / contain no-repeat;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.pop {
+  animation: bang-pop 300ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
+
+.pop::before {
+  animation: bang-glow 700ms ease-out both;
+}
+
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes caret-fade {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes bang-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+
+@keyframes bang-glow {
+  0% { opacity: 0; }
+  30% { opacity: 0.7; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .caret,
+  .bang::before {
+    display: none;
+  }
+}

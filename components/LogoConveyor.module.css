@@ -1,0 +1,46 @@
+/*
+  Ally logo conveyor. One row, transform-only loop.
+
+  - The track holds the list twice; moving it -50% lands exactly where it
+    started, so the loop is seamless. Items use margin, not gap, so both
+    halves are the same width.
+  - Stops on hover/focus, and off-screen through MotionGovernor
+    ([data-offscreen] on the group). It keeps running while the page scrolls:
+    switching it off there would snap the row back to its first logo on every
+    scroll.
+  - Edge fades are a static mask on the viewport, nothing on the moving track.
+  - prefers-reduced-motion: the page shows the static grid instead.
+*/
+.viewport {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%);
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: conveyor 40s linear infinite;
+  will-change: transform;
+}
+
+.viewport:hover .track,
+.viewport:focus-within .track {
+  animation-play-state: paused;
+}
+
+:global([data-offscreen]) .track {
+  animation: none;
+  will-change: auto;
+}
+
+@keyframes conveyor {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+}

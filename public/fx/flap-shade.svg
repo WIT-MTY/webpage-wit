@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="8" height="64" viewBox="0 0 8 64" preserveAspectRatio="none">
+  <!-- Shade on a split-flap flap while it turns: darkest at the hinge edge. Stretched to the flap. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#05020c" stop-opacity="0.25"/>
+      <stop offset="1" stop-color="#05020c" stop-opacity="0.85"/>
+    </linearGradient>
+  </defs>
+  <rect width="8" height="64" fill="url(#g)"/>
+</svg>

@@ -1,0 +1,21 @@
+/*
+  Glow behind the Aliados CTA button: a pre-rendered image (/fx/cta-glow.svg),
+  only its opacity pulses. Marked data-ambient, so MotionGovernor stops it while
+  scrolling and off-screen. prefers-reduced-motion: static at its resting
+  opacity.
+*/
+.glow {
+  opacity: 0.6;
+  animation: cta-pulse 5s ease-in-out infinite;
+}
+
+@keyframes cta-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow {
+    animation: none;
+  }
+}
