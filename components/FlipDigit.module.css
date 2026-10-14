@@ -1,7 +1,9 @@
 /*
   One countdown digit that flips when it changes. Transform and opacity only.
-  The old face tips forward and down (rotateX) and fades; the new one fades
-  in under it. prefers-reduced-motion: the digit just swaps.
+  The old face tips forward and down (rotateX) and fades; the new one drops
+  in from the top (rotateX) as it fades in. 450ms, matching FLIP_MS in
+  FlipDigit.tsx. Nothing here is data-ambient, so MotionGovernor never
+  switches it off. prefers-reduced-motion: the digit just swaps.
 */
 .digit {
   position: relative;
@@ -14,6 +16,8 @@
 
 .face {
   display: inline-block;
+  transform-origin: 50% 0;
+  backface-visibility: hidden;
 }
 
 .in {
@@ -42,10 +46,12 @@
 
 @keyframes flip-in {
   0%,
-  35% {
+  40% {
+    transform: rotateX(90deg);
     opacity: 0;
   }
   100% {
+    transform: rotateX(0deg);
     opacity: 1;
   }
 }
