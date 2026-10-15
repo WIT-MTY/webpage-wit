@@ -32,7 +32,7 @@ cards; the design replaces them with a countdown panel and flip cards.
 - [x] **Deep links.** `/proyectos#<slug>` must scroll to that event's card and
       pulse it once (periwinkle ring, ~600ms). The mobile register prompt and
       the "Conoce más" button both rely on this.
-- [ ] Mobile layout for the card: photo on top, content below. Same component
+- [x] Mobile layout for the card: photo on top, content below. Same component
       with `md:` classes, not a second component.
 
 ## Watch out

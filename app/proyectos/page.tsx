@@ -360,27 +360,28 @@ function CardFace({ children }: { children: React.ReactNode }) {
 /**
  * Photo strip. With scroll markers: dots, no swipe (the carousel owns the swipe).
  * Without: CSS scroll-snap swipe + hint, as before. No photos: one PhotoFrame placeholder.
+ * Mobile: fixed 4:3 above the content. md+: left column, stretched to the content's height.
  */
 function PhotoStrip({ event }: { event: WitEvent }) {
   const photos: (string | null)[] = event.photos.length ? event.photos : [null]
   const many = photos.length > 1
   return (
-    <div className="relative">
+    <div className="relative md:min-h-64 md:w-[42%] md:shrink-0">
       <div
-        className={`flex snap-x snap-mandatory gap-3 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${many ? 'wit-photos' : ''}`}
+        className={`flex snap-x snap-mandatory gap-3 overflow-x-auto [scrollbar-width:none] md:h-full [&::-webkit-scrollbar]:hidden ${many ? 'wit-photos' : ''}`}
         {...(many ? { tabIndex: 0, role: 'region', 'aria-label': `Fotos de ${event.title}` } : {})}
       >
         {photos.map((src, i) => (
           <div
             key={src ?? `empty-${i}`}
             data-label={`Foto ${i + 1} de ${photos.length}`}
-            className="wit-photo w-full shrink-0 snap-center"
+            className="wit-photo w-full shrink-0 snap-center md:h-full"
           >
             <PhotoFrame
               src={src}
               alt={`${event.title}, foto ${i + 1}`}
-              sizes="(min-width: 768px) 560px, 90vw"
-              className="aspect-[4/3] w-full md:aspect-[16/9]"
+              sizes="(min-width: 768px) 400px, 90vw"
+              className="aspect-[4/3] w-full md:aspect-auto md:h-full"
             />
           </div>
         ))}
@@ -397,22 +398,27 @@ function PhotoStrip({ event }: { event: WitEvent }) {
 function EventFront({ event }: { event: WitEvent }) {
   return (
     <CardFace>
-      <PhotoStrip event={event} />
-      <p className="mt-6 mb-0 text-[11px] font-medium uppercase tracking-[0.3em] text-wit-pink/80">{event.category}</p>
-      <h3 className="mt-2 mb-0 font-display text-2xl font-bold text-white">{event.title}</h3>
-      <p className="mt-3 mb-0 text-[15px] font-light leading-relaxed text-white/70">{event.description}</p>
-      <div className="mt-auto flex flex-wrap gap-3 pt-7">
-        {event.formUrl && (
-          <Button href={event.formUrl} external className="w-full">
-            Registrarme ↗
-          </Button>
-        )}
-        <FlipLink slug={event.slug} side="impact">
-          Impacto
-        </FlipLink>
-        <FlipLink slug={event.slug} side="sponsors">
-          Patrocinadores
-        </FlipLink>
+      {/* Mobile: photo on top, content below. md+: photo left, content right. */}
+      <div className="flex flex-1 flex-col gap-6 md:flex-row">
+        <PhotoStrip event={event} />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <p className="m-0 text-[11px] font-medium uppercase tracking-[0.3em] text-wit-pink/80">{event.category}</p>
+          <h3 className="mt-2 mb-0 font-display text-2xl font-bold text-white">{event.title}</h3>
+          <p className="mt-3 mb-0 text-[15px] font-light leading-relaxed text-white/70">{event.description}</p>
+          <div className="mt-auto flex flex-wrap gap-3 pt-7">
+            {event.formUrl && (
+              <Button href={event.formUrl} external className="w-full">
+                Registrarme ↗
+              </Button>
+            )}
+            <FlipLink slug={event.slug} side="impact">
+              Impacto
+            </FlipLink>
+            <FlipLink slug={event.slug} side="sponsors">
+              Patrocinadores
+            </FlipLink>
+          </div>
+        </div>
       </div>
     </CardFace>
   )
