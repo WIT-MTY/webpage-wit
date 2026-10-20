@@ -24,12 +24,15 @@ const PROGRAMA = [
   'Modalidad en línea, con sesiones presenciales de inicio y clausura.',
 ]
 
-/** Caption laid over a photo block. */
+/**
+ * Caption on a solid strip under a photo block, so it never sits on a face.
+ * Centered and balanced; side padding keeps it off the edges and pb-6 (the
+ * card's rounded-3xl radius) clears the bottom corners.
+ */
 function PhotoCaption({ className, children }: { className: string; children: React.ReactNode }) {
   return (
     <p
-      className={`absolute m-0 font-display font-extrabold leading-none text-white ${className}`}
-      style={{ textShadow: '0 2px 20px rgba(0,0,0,0.6)' }}
+      className={`m-0 px-[clamp(20px,5vw,32px)] pt-3 pb-6 text-center font-display font-extrabold leading-tight text-balance text-white [overflow-wrap:anywhere] ${className}`}
     >
       {children}
     </p>
@@ -37,7 +40,7 @@ function PhotoCaption({ className, children }: { className: string; children: Re
 }
 
 export default function WitCodePage() {
-  const [big, small] = WITCODE_PHOTOS
+  const [group, workshop] = WITCODE_PHOTOS
   return (
     <>
       <PageHero
@@ -109,31 +112,35 @@ export default function WitCodePage() {
           </div>
 
           {/*
-            Two photo blocks: a large one and a smaller one that overlaps its
-            lower-right corner (md+). Stacked on mobile. Sticky beside the long
-            text on desktop. Static: the rotation is not animated.
+            Two photo blocks, stacked on mobile. From md: the class photo in front,
+            upper left; the group photo behind, lower right. The overlap only covers
+            the group photo's top-left corner (building and sculpture, no people).
+            No rotation or scaling, so both stay pixel-sharp. Sticky beside the long
+            text on desktop.
           */}
-          <div className="flex flex-col gap-5 md:relative md:block md:pb-48 lg:sticky lg:top-28">
-            <div data-reveal="" className="relative md:w-[86%]">
+          <div className="flex flex-col gap-6 md:block lg:sticky lg:top-28">
+            {/* Solid backing: the caption strip and the overlap read as one card over the group photo. */}
+            <div data-reveal="" className="relative z-10 rounded-3xl bg-night md:w-[62%]">
               <PhotoFade
-                photos={big.photos}
-                alt={big.alt}
+                photos={workshop.photos}
+                alt={workshop.alt}
                 className="aspect-[4/3] w-full"
-                sizes="(min-width: 1024px) 480px, (min-width: 768px) 86vw, 92vw"
+                quality={92}
+                sizes="(min-width: 1152px) 335px, (min-width: 1024px) 30vw, (min-width: 768px) 62vw, calc(100vw - 48px)"
               />
-              <PhotoCaption className="bottom-6 left-7 max-w-[10ch] text-[clamp(1.6rem,3vw,2.25rem)]">{big.caption}</PhotoCaption>
+              <PhotoCaption className="text-[clamp(1.1rem,1.8vw,1.35rem)]">{workshop.caption}</PhotoCaption>
             </div>
-            {/* Solid backing so the translucent placeholder doesn't show the big block through it. */}
-            <div data-reveal="" className="relative rounded-3xl bg-night md:absolute md:right-0 md:bottom-0 md:w-[50%] md:rotate-3">
+            <div data-reveal="" className="relative md:-mt-[12%] md:ml-auto md:w-[78%]">
               {/* Offset so the two blocks never change at the same moment. */}
               <PhotoFade
-                photos={small.photos}
-                alt={small.alt}
+                photos={group.photos}
+                alt={group.alt}
                 staggerOffset={2750}
-                className="aspect-[4/3] w-full md:aspect-[4/5]"
-                sizes="(min-width: 1024px) 280px, (min-width: 768px) 50vw, 92vw"
+                className="aspect-[4/3] w-full"
+                quality={92}
+                sizes="(min-width: 1152px) 421px, (min-width: 1024px) 37vw, (min-width: 768px) 78vw, calc(100vw - 48px)"
               />
-              <PhotoCaption className="bottom-5 left-6 max-w-[14ch] text-[clamp(1.1rem,1.8vw,1.35rem)]">{small.caption}</PhotoCaption>
+              <PhotoCaption className="text-[clamp(1.25rem,2.2vw,1.6rem)]">{group.caption}</PhotoCaption>
             </div>
           </div>
           </RevealGroup>

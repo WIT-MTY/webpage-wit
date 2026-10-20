@@ -22,6 +22,10 @@ export default function PhotoFrame({
   sizes = '(min-width: 1024px) 400px, 80vw',
   priority,
   loading,
+  unoptimized,
+  quality,
+  objectPosition,
+  children,
 }: {
   src: string | null
   alt: string
@@ -31,6 +35,14 @@ export default function PhotoFrame({
   priority?: boolean
   /** next/image loading; default lazy. Ignored with `priority`. */
   loading?: 'eager' | 'lazy'
+  /** Serve the file as-is, e.g. when a <video poster> points at the same URL and should hit the same cache entry. */
+  unoptimized?: boolean
+  /** next/image quality (default 75). */
+  quality?: number
+  /** CSS object-position, to keep the subject in frame when the slot crops the photo. */
+  objectPosition?: string
+  /** Layered over the image inside the frame (e.g. a video). Only rendered with a src. */
+  children?: React.ReactNode
 }) {
   const positioned = /(^|\s)(absolute|fixed|sticky)(\s|$)/.test(className)
   return (
@@ -39,7 +51,21 @@ export default function PhotoFrame({
       style={src ? { boxShadow: '0 20px 50px rgba(0,0,0,0.45)', ...style } : style}
     >
       {src ? (
-        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} loading={priority ? undefined : loading} className="object-cover" />
+        <>
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes={sizes}
+            priority={priority}
+            loading={priority ? undefined : loading}
+            unoptimized={unoptimized}
+            quality={quality}
+            className="object-cover"
+            style={objectPosition ? { objectPosition } : undefined}
+          />
+          {children}
+        </>
       ) : (
         <div
           role="img"

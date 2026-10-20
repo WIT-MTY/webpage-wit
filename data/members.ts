@@ -61,7 +61,7 @@ export const MEMBERS: Member[] = [
   // ── 2026-2027 ─────────────────────────────────────────────
   { name: 'Dana Sangines', generation: '2026-2027', role: 'presidencia', area: 'presidencia', title: 'Presidenta', photo: '/integrantes/dana-sangines.webp' },
   { name: 'Daniela Chávez', generation: '2026-2027', role: 'vicepresidencia', area: 'vicepresidencia', title: 'Vicepresidenta', photo: '/integrantes/daniela-chavez-ibarra.webp' },
-  { name: 'Catalina Mendoza', generation: '2026-2027', role: 'director', area: 'marketing', title: 'Directora de Marketing' },
+  { name: 'Catalina Mendoza', generation: '2026-2027', role: 'director', area: 'marketing', title: 'Directora de Marketing', photo: '/integrantes/catalina-mendoza.webp' },
   { name: 'MaryGaby Castañeda', generation: '2026-2027', role: 'director', area: 'finanzas', title: 'Directora de Finanzas', photo: '/integrantes/marian-gabriela-castaneda.webp' },
   { name: 'Vanessa Mecott', generation: '2026-2027', role: 'director', area: 'proyectos', title: 'Directora de Proyectos', photo: '/integrantes/vanessa-mecott.webp' },
   { name: 'Regina Gutiérrez', generation: '2026-2027', role: 'director', area: 'responsabilidad-social', title: 'Directora de Responsabilidad Social', photo: '/integrantes/regina-gutierrez.webp' },
