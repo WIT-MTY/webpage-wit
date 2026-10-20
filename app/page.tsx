@@ -2,12 +2,13 @@ import HomeHero from '@/components/HomeHero'
 import EventCarousel from '@/components/EventCarousel'
 import CollabCTA from '@/components/CollabCTA'
 import PhotoFrame from '@/components/PhotoFrame'
+import LoopVideo from '@/components/LoopVideo'
 import FloatingShapes from '@/components/FloatingShapes'
 import CountUp from '@/components/CountUp'
 import RingPulse from '@/components/RingPulse'
 import { RevealGroup } from '@/components/Reveal'
 import { Button, Container, Heading, MicroLabel } from '@/components/ui'
-import { COLLAGE_PHOTOS, WITCODE_DESCRIPTION, WITCODE_STATS } from '@/lib/site'
+import { ABOUT_PHOTO, ABOUT_VIDEO, WITCODE_DESCRIPTION, WITCODE_STATS } from '@/lib/site'
 
 export default function Home() {
   return (
@@ -35,25 +36,27 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Collage: three overlapping frames at slight angles */}
+          {/*
+            Collage: two overlapping frames on a diagonal. The Run4WIT loop top-left,
+            the officers photo over its lower-right corner, tilted the other way.
+            The burst fills the open bottom-left corner.
+          */}
           <div className="relative mx-auto h-[420px] w-full max-w-[520px] sm:h-[480px]">
-            <PhotoFrame
-              src={COLLAGE_PHOTOS[0].src}
-              alt={COLLAGE_PHOTOS[0].alt}
+            <LoopVideo
+              webm={ABOUT_VIDEO.webm}
+              mp4={ABOUT_VIDEO.mp4}
+              poster={ABOUT_VIDEO.poster}
+              alt={ABOUT_VIDEO.alt}
               className="absolute left-0 top-6 h-[62%] w-[62%]"
               style={{ transform: 'rotate(-4deg)' }}
+              sizes="(min-width: 640px) 330px, 62vw"
             />
             <PhotoFrame
-              src={COLLAGE_PHOTOS[1].src}
-              alt={COLLAGE_PHOTOS[1].alt}
-              className="absolute right-0 top-0 h-[50%] w-[48%]"
+              src={ABOUT_PHOTO.src}
+              alt={ABOUT_PHOTO.alt}
+              className="absolute bottom-0 right-0 h-[50%] w-[60%]"
               style={{ transform: 'rotate(3deg)' }}
-            />
-            <PhotoFrame
-              src={COLLAGE_PHOTOS[2].src}
-              alt={COLLAGE_PHOTOS[2].alt}
-              className="absolute bottom-0 right-[8%] h-[46%] w-[58%]"
-              style={{ transform: 'rotate(-1.5deg)' }}
+              sizes="(min-width: 640px) 320px, 60vw"
             />
             <FloatingShapes
               items={[

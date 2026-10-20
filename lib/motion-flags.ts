@@ -24,3 +24,6 @@ export const INSTAGRAM_HERO = true
 
 /** Touch-device motion: scroll reveals, glint on first view, tap press, button ring flash, drifting Contáctanos spotlight. Off: touch devices get the static versions. Desktop never changes. */
 export const TOUCH_MOTION = true
+
+/** Inicio's biggest collage photo is a muted Run4WIT loop (plays only on screen). Off: the poster as a plain photo. */
+export const INICIO_VIDEO = true

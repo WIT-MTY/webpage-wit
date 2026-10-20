@@ -378,28 +378,53 @@ export const LUMI_LINES: Record<string, string> = {
 // ── Photos ───────────────────────────────────────────────────
 
 /**
- * The two photo blocks beside the description on /witcode: the first is the
- * large one, the second the smaller overlapping one. Each block crossfades
+ * The two photo blocks beside the description on /witcode: the first sits
+ * behind, lower right; the second in front, upper left. Each block crossfades
  * through its `photos`. Drop the files in /public/witcode and add entries like
  * { src: '/witcode/bienvenida.jpg', alt: '…' }. One photo = static; an empty
- * list shows the dashed placeholder, described by `alt`.
+ * list shows the dashed placeholder, described by `alt`. `position` is an
+ * optional CSS object-position that keeps the subject in frame if cropped.
  */
 export const WITCODE_PHOTOS: {
   caption: string
   /** Placeholder description while `photos` is empty. */
   alt: string
-  photos: { src: string; alt: string }[]
+  photos: { src: string; alt: string; position?: string }[]
 }[] = [
-  { caption: 'Bienvenida WitCode', alt: 'Generación de WitCode', photos: [] },
-  { caption: 'Talleres con Ciudad de los Niños', alt: 'Taller de WitCode con alumnas de Ciudad de los Niños', photos: [] },
+  {
+    caption: 'Bienvenida WitCode',
+    alt: 'Generación de WitCode',
+    photos: [{ src: '/witcode/witcode-group.webp', alt: 'Grupo de WitCode con estudiantes y equipo de WIT en el campus' }],
+  },
+  {
+    caption: 'Talleres con Ciudad de los Niños',
+    alt: 'Taller de WitCode con alumnas de Ciudad de los Niños',
+    photos: [
+      {
+        src: '/witcode/witcode-class.webp',
+        alt: 'Clase de WitCode con la bienvenida en pantalla',
+        // Projector screen and instructors are on the left.
+        position: '25% 40%',
+      },
+    ],
+  },
 ]
 
-/** Home collage. Drop files in /public/photos and fill `src`. */
-export const COLLAGE_PHOTOS: { src: string | null; alt: string }[] = [
-  { src: null, alt: 'Integrantes de WIT en un evento' },
-  { src: null, alt: 'Taller de WitCode' },
-  { src: null, alt: 'Equipo WIT en Hack4Her' },
-]
+/**
+ * Home "Sobre nosotras" collage. The big slot is a muted loop (webm first, mp4
+ * fallback); its poster is the still shown while loading, under
+ * prefers-reduced-motion and with INICIO_VIDEO off. The second is a photo.
+ */
+export const ABOUT_VIDEO = {
+  webm: '/inicio/run4wit-loop.webm',
+  mp4: '/inicio/run4wit-loop.mp4',
+  poster: '/inicio/run4wit-poster.webp',
+  alt: 'Integrantes de WIT con medallas y un cartel de «Running on Connection»',
+}
+export const ABOUT_PHOTO = {
+  src: '/inicio/officers.webp',
+  alt: 'Equipo directivo de WIT haciendo la seña de WIT con las manos',
+}
 
 /** Hero background photos, kept at ~5% opacity. */
 export const MARQUEE_PHOTOS: (string | null)[] = [null, null, null, null, null, null]

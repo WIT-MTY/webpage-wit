@@ -23,8 +23,10 @@ export default function PhotoFade({
   staggerOffset = 0,
   className = '',
   sizes,
+  quality,
 }: {
-  photos: { src: string; alt: string }[]
+  /** `position`: optional CSS object-position for that photo. */
+  photos: { src: string; alt: string; position?: string }[]
   /** Placeholder description when `photos` is empty. */
   alt: string
   interval?: number
@@ -32,6 +34,8 @@ export default function PhotoFade({
   /** Size and shape of the slot, e.g. "aspect-[4/3] w-full". */
   className?: string
   sizes?: string
+  /** next/image quality, passed to every photo. */
+  quality?: number
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(0)
@@ -81,7 +85,16 @@ export default function PhotoFade({
   }, [count, interval, staggerOffset])
 
   if (count === 0) return <PhotoFrame src={null} alt={alt} className={className} />
-  if (count === 1) return <PhotoFrame src={photos[0].src} alt={photos[0].alt} className={className} sizes={sizes} />
+  if (count === 1) return (
+      <PhotoFrame
+        src={photos[0].src}
+        alt={photos[0].alt}
+        className={className}
+        sizes={sizes}
+        quality={quality}
+        objectPosition={photos[0].position}
+      />
+    )
 
   return (
     <div ref={ref} className={`relative ${className}`}>
@@ -92,7 +105,15 @@ export default function PhotoFade({
           className="absolute inset-0 transition-opacity duration-[1200ms] ease-in-out motion-reduce:transition-none"
           style={{ opacity: i === index ? 1 : 0 }}
         >
-          <PhotoFrame src={p.src} alt={p.alt} className="h-full w-full" sizes={sizes} loading={i === 0 ? 'eager' : 'lazy'} />
+          <PhotoFrame
+            src={p.src}
+            alt={p.alt}
+            className="h-full w-full"
+            sizes={sizes}
+            quality={quality}
+            objectPosition={p.position}
+            loading={i === 0 ? 'eager' : 'lazy'}
+          />
         </div>
       ))}
     </div>

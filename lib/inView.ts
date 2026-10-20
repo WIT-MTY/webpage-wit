@@ -56,3 +56,24 @@ export function onceInView(el: Element, cb: () => void, ratio = 0): () => void {
     }
   }
 }
+
+/*
+  Ongoing on/off-screen watching, for things that start and stop (a looping
+  video) instead of firing once. Separate observer: the one above unobserves
+  an element after its callback runs.
+*/
+let liveIo: IntersectionObserver | null = null
+const live = new Map<Element, (inView: boolean) => void>()
+
+/** Calls `cb(true|false)` whenever any part of `el` enters or leaves the screen. Returns a cleanup. */
+export function watchInView(el: Element, cb: (inView: boolean) => void): () => void {
+  liveIo ??= new IntersectionObserver((entries) => {
+    for (const entry of entries) live.get(entry.target)?.(entry.isIntersecting)
+  })
+  live.set(el, cb)
+  liveIo.observe(el)
+  return () => {
+    live.delete(el)
+    liveIo?.unobserve(el)
+  }
+}
