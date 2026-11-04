@@ -62,6 +62,6 @@ Tell me your plan before making multi-file changes. Small commits with English
 messages. Don't install packages without asking.
 
 ## Git
-Never run `git add`, `git commit`, `git push`, or change branches unless I
-explicitly ask for it in that same message. Leave all changes uncommitted for
-me to review.
+Never run `git add`, `git commit`, `git push`, `git merge`, or change branches
+unless I explicitly ask for it in that same message. Leave all changes
+uncommitted for me to review.

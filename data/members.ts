@@ -78,9 +78,10 @@ export const MEMBERS: Member[] = [
   { name: 'Ana Valeria Campos', generation: '2026-2027', role: 'coordinador', area: 'proyectos', title: 'Coordinadora de Proyectos' },
   { name: 'Marian Lombard', generation: '2026-2027', role: 'coordinador', area: 'proyectos', title: 'Coordinadora de Proyectos' },
   { name: 'Arely Sandoval', generation: '2026-2027', role: 'coordinador', area: 'proyectos', title: 'Coordinadora de Proyectos' },
+  { name: 'Ilse Romero', generation: '2026-2027', role: 'coordinador', area: 'proyectos', title: 'Coordinadora de Proyectos' },
+  { name: 'Blanca Catalina Gómez Osorio', generation: '2026-2027', role: 'coordinador', area: 'proyectos', title: 'Project Manager' },
 
   { name: 'Valeria Ruiz', generation: '2026-2027', role: 'coordinador', area: 'finanzas', title: 'Coordinadora de Finanzas' },
-  { name: 'Sofia Fernandez', generation: '2026-2027', role: 'coordinador', area: 'finanzas', title: 'Coordinadora de Finanzas' },
   { name: 'Suri Valeria Tristán', generation: '2026-2027', role: 'coordinador', area: 'finanzas', title: 'Coordinadora de Finanzas' },
   { name: 'Dana Janeth Dávila', generation: '2026-2027', role: 'coordinador', area: 'finanzas', title: 'Coordinadora de Finanzas' },
   { name: 'Fatima Abigail Ochoa', generation: '2026-2027', role: 'coordinador', area: 'finanzas', title: 'Coordinadora de Finanzas' },
@@ -106,6 +107,7 @@ export const MEMBERS: Member[] = [
   { name: 'Regina Ramírez', generation: '2026-2027', role: 'coordinador', area: 'vinculacion', title: 'Coordinadora de Vinculación' },
   { name: 'Sofia Danae Acevedo', generation: '2026-2027', role: 'coordinador', area: 'vinculacion', title: 'Coordinadora de Vinculación' },
   { name: 'Denisse Natzuky Quintanilla', generation: '2026-2027', role: 'coordinador', area: 'vinculacion', title: 'Coordinadora de Vinculación' },
+  { name: 'Paloma Solorio', generation: '2026-2027', role: 'coordinador', area: 'vinculacion', title: 'Coordinadora de Vinculación' },
 
   { name: 'Angela Monserrat Hernandez', generation: '2026-2027', role: 'coordinador', area: 'responsabilidad-social', title: 'Coordinadora de Responsabilidad Social' },
   { name: 'Sylvie Aylin Zabetoglu', generation: '2026-2027', role: 'coordinador', area: 'responsabilidad-social', title: 'Coordinadora de Responsabilidad Social' },
